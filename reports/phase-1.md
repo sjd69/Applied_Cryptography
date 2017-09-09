@@ -10,6 +10,12 @@ Stephen Dowhy (sjd69@pitt.edu, )
 * Only the system administrator or the user himself may delete a user profile.
     * What if a user wants to delete his or her own user profile? Should this be allowed? Or should he or she have to send in a        request first?
 * Users may create public and private groups.
+* **Property 1: Creation.**
+	* Creation states that a user *u* may create a group *g* and user *u* will be the only user who can read, modify, delete, or see files within group *g*. Without this requirement, any user could access files within the group upon creation, thereby undermining the notion of group-based file sharing.
+* **Property 2: Selected Privacy.**
+	* Selected Privacy states that files within group *g* can only be read, modified, deleted, or existance be known of by users who have been invited to group *g*. This requirement specifies the way in which groups are expanded and shared. Without it, any user would be able to access files within a group which is contrary to group-based file sharing.
+* **Property 3: Selected Permissiveness.**
+	* Permissive states that a user *u* may not read, modify, delete, or see a file *f* in group *g* if the user *u* is not given explicit permission to read, modify, delete, or see files within the group *g*. Without this requirement, a user who has been invited to a group would have complete access to any file within the group. This requirement allows more granularity for group-based file sharing.
 * Each public or private group has a group creator/manager who is the user who created said group.
 * The group creator/manager has full permissions to that group (upload/overwrite/delete, read/download).
 * Users may only access group content for groups which they are a member of.
