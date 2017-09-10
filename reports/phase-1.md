@@ -67,9 +67,9 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 
 
 ### Threat Models (WIP. To Build Upon)
-* **Company Wide Intranet (Not sure this fits well with the properties but seems like a logical threat model)
+* **Company Wide Intranet (Not sure this fits well with the properties but seems like a logical threat model)**
 	* The system will be deployed within an organization. All servers will only be accessible by connecting directly to the organizations network or through the organizations VPN. Each employee will have a single user account and will be part of a group that represents their team within the organization. Files that are pertinant to a team's project will be shared within that team's respective group on the file sharing service.
 	* 
 	
-* **Public Facing
+* **Public Facing**
 	* The system will be deployed on publicly accessible web servers. Any individual regardless of location will be able to access the service and create a single user account. The individual may create public and/or private groups to begin sharing files with that group. The individual will be able to invite other users to their group.
