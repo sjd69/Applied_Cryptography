@@ -5,7 +5,7 @@ Ruth Zuckerman (ruz24@pitt.edu, NohrianScum)
 
 Stephen Dowhy (sjd69@pitt.edu, sjd69)
 
-### Security Requirements (Brainstorming) 
+### Security Properties (Brainstorming) 
 * **Property 1: Human Verification.**
 	* Human Verification states that any user *u* who wishes to register an account *a* to the server *s* shall be required to pass a verification test on registration. This requirement is designed to prevent automated abuse.
 * **Property 17: User Generality.**
@@ -64,3 +64,12 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 * The group creator/manager for private groups may send invitations for memebership to said group to users.
     * Can a user request to join a group without being invited first?
     	* Based on property 8: group classification, a user should not be able to know the existence of groups they are not a member of.
+
+
+### Threat Models (WIP. To Build Upon)
+* **Company Wide Intranet (Not sure this fits well with the properties but seems like a logical threat model)
+	* The system will be deployed within an organization. All servers will only be accessible by connecting directly to the organizations network or through the organizations VPN. Each employee will have a single user account and will be part of a group that represents their team within the organization. Files that are pertinant to a team's project will be shared within that team's respective group on the file sharing service.
+	* 
+	
+* **Public Facing
+	* The system will be deployed on publicly accessible web servers. Any individual regardless of location will be able to access the service and create a single user account. The individual may create public and/or private groups to begin sharing files with that group. The individual will be able to invite other users to their group.
