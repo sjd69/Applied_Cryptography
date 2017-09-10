@@ -50,9 +50,9 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 	* If a member of a group uploads a file and another member of the same group uploads a file with the same name, the second user's file should not overwrite the first user's file.
 * **Property 22: File Names, Part III.** 
 	* If a member of a group uploads a file and then later uploads another file with the same name, that user should be able to choose whether or not the original file is overwritten by the newly uploaded one.
-* **Property 23: File Removal in Private Group.*
+* **Property 23: File Removal in Private Group.**
 	* If a user in a private group wishes to have a file removed, and that file is not his or her own, then he or she must request such a removal from the group creator/manager. The creator/manager can choose to either accept or reject the request.
-* **Property 24: File Removal in Public Group.*
+* **Property 24: File Removal in Public Group.**
 	* If a user in a public group wishes to have a file removed, and that file is not his or her own, he or she can request such a removel from the System Administrator. 
 * **Property 13: Server Maintenance.**
 	* Server Maintenance states that a routine cleanup shall be performed on the server *s* once per month. At this time, any group *g* that has been inactive for 31 days shall be automatically deleted. This requirement is designed to avoid an overabundance of abandoned groups cluttering the server. 
