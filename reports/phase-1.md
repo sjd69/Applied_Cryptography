@@ -63,9 +63,10 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 * **Property 28: Increased Storage Size.**
 	* increased Storage Size states that a Group Creator *U* may request additional storage space from the System Administrator. This requirement allows the Group Creator increased flexibility, in case more space was required than expected. 
 * **Property 29: Server Size.**
-	* Server Size states that there may only exist up to 1000 active, logged-in users on the server *s* at a time. Should an individual user *u* wish to log in after that number has been met, that user will have to wait until another user logs out. This requirement is meant to avoid overloading the server with activity. 
+	* Server Size states that there may only exist up to 100,000 active, logged-in users on the server *s* at a time. Should an individual user *u* wish to log in after that number has been met, that user will have to wait until another user logs out. This requirement is meant to avoid overloading the server with activity. 
 		* Is this number too specific? Too big or too small? Is it worth it to have a limit?
 		* would this number be too small? especially for the educational threat model
+		* I was assuming that not that many people would be logged in at once... but I have no idea. I increased the number, but now I'm concerned it's too big now.
 * **Property 30: Server Maintenance.**
 	* Server Maintenance states that a routine cleanup shall be performed on the server *s* once per month. At this time, any group *g* that has been inactive for 31 days shall be automatically deleted. This requirement is designed to avoid an overabundance of abandoned groups cluttering the server. 
 
@@ -98,8 +99,13 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			groups will be used for purposes like group projects and assignments.
 			* Property 15: Group Uniqueness - Group Uniqueness will be vital for not getting groups confused!
 			* Property 16: User Memberships - Students may be in multiple classes at once and teachers may instruct several courses at once.
-			* Property 17: Membership Abandonment - A student may drop the course and wish to leave the group for it.
+			* Property 17: Membership Abandonment - A student may drop the course and wish to leave the group.
 		* Files:
+			* Property 18: File Names - Files will have to be named properly, according to school policy.
+			* Property 19: File Size Requirements - All student files will be able to naturally fit under the limit.
+			* Property 20: Server File Uniqueness - With many classes and projects, this is necessary. Both as a convenience to teachers and other graders, and to avoid potentially ovewriting student's files.
+			* Property 21: Group File Uniqueness - For all of the reasons listed for property 20.
+			* Property 22: Individual File Uniqueness - Should a student wish to upload an updated project before the due date.
 		* Other:
 	
 
