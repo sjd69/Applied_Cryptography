@@ -107,7 +107,10 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 21: Group File Uniqueness - For all of the reasons listed for property 20.
 			* Property 22: Individual File Uniqueness - Should a student wish to upload an updated project before the due date.
 		* Other:
-	
+			* Property 27: Initial Storage Size - Given both to each class group and to each class' individual project/assignment groups.
+			* Property 28: Increased Storage Size - In case a class/assignment requires more space.
+			* Property 29: Server size - There needs to be enough space to ensure that even during peak performance time (e.g., finals week) that students and teachers can access vital files.
+			* Property 30: Server Maintenance - For cleanup of excess groups which are no longer necessary.
 
 
 
