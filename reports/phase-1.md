@@ -145,11 +145,33 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 30: Server Maintenance - 
 
 * **Business (initial idea)**
-	* System Model: The system will be deployed within a business organization to facilitate file sharing among employees working on projects with varying degrees of confidentiality. Severs will operate on a subnet that can only be accessed through authorized wired connections inside organization buildings or through a VPN connection. Groups, which represent project teams within the organization, will be created by the project leader. Public and private groups with varying degrees of permissions for specific users within each group will be able to model the hierarchy of members of the project team in real 
+	* System Model: The system will be deployed within a business organization to facilitate file sharing among employees working on projects with varying degrees of confidentiality. Severs will operate on a network that can only be accessed through authorized wired connections inside organization buildings or through a VPN connection. Groups, which represent project teams within the organization, will be created by the project leader. Public and private groups with varying degrees of permissions for specific users within each group will be able to model the hierarchy of members of the project team in real 
 	life giving them access to only what is needed for their responsibilities within the group. When a project reaches completion, the group for it will be deleted. New groups will be created as new projects are started within the organization. Users with multiple responsibilities within the organization may access all pertinent groups through a single account. 
-	* Trust Assumptions: 
-		* All users within the organization who work on projects have an account.
-		* Individuals not within that organization will not be able to create an account or have access to they system.
+	* Trust Assumptions: Within this business oriented model, it is assumed that all users within the organization who work on projects have an account. 
+	It is also assumed that individuals not within that organization will not be able to create an account or have access to the system.
+	It is assumed that the System Administrator has full permissions to all users, groups, and files within groups. It is assumed that the groups formed within the system represent valid project groups within the organization.
+	It is assumed that users will only request or accept memberships to groups that they should rightfully be apart of and will forfeit membership to groups that they leave in real-life operations. 
 	* Related Properties:
+		* Users
+			* Property 1: Human Verification - Every user in the system should be a legitimate member of the organization, specifically one who works on projects.
+			* Property 2: Login Authentication - Each user should only have access to his or her individual account.
+			* Property 3: User Generality - Employees have a single account to access all responsibilities within the business organization.
+			* Property 4: Account Deletion - Employees should only delete their accounts when they leave the organization or no longer work on projects in any capacity.
+			
+		* Groups
+			* Property 5: Private Group Creation - Project leaders may create a private groups for secret projects within the organization.
+			* Property 6: Public Group Creation - Project leaders may create a public groups for projects not under any level of secrecy within the organization.
+			* Property 7: Group Management - Project managers should create groups for their project team and then moderate the activities of group members.
+			* Property 8: Group Deletion - Project managers should delete the group for a project once the project is completed or abandoned. 
+			* Property 9: Selected Privacy - This ensures that only employees working on a project are able to access files related to that project.
+			* Property 10: Selected Permissiveness - Selected Permissiveness allows files within the system to be accessed on a need-to-know basis. Employees working within a specific group may not be granted full access to project files.
+			* Property 11: Revoked Permissiveness - When a employee's role within a project group changes, permissions may be revoked to reflect that change.
+			* Property 12: Group Classification - Private groups will be used for secret projects within the organization - possibly ones whos existence is not even know to employees outside the project team.
+			Public groups will be used for project groups not under any level of secrecy within a company.
+			* Property 15: Group Uniqueness - Group names should reflect the project names that they represent and there should be only one group per project.
+			* Property 16: User Membersips - Employees will be able to access multiple groups for different projects that they are involved in. 
+			* Property 17: Membership Abandonment - Employees may leave groups if they stop working on that project in real-life.
+		* Files
+		* Other
 		
 			
