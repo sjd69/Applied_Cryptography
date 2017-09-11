@@ -92,7 +92,22 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 2: Login Authentication - Every user should only log in through school network.
 			* Property 3: User Generality - A TA does not require two separate accounts to upload/download
 		* Groups:
-		* File:
+			* Property 5: Private Group Creation - Teachers will be the Group Creator *U* in this case.
+			* Property 6: Public Group Creation - Public groups will include handouts and other class information.
+			* Property 7: Group Management - The Teacher will have full management rights over the group.
+			* Property 8: Group Delection - Should be performed after a semester has concluded.
+			* Property 9: Selected Privacy - Students should only be able to access information pertinent to their
+			class.
+			* Property 10: Selected Permissiveness - Students may only be able to upload files, and only from the 				teacher, unless otherwise granted permission as part of projects.
+			TAs may be given greater permissions than students.
+			* Property 11: Revoked Permissiveness - A student may be removed from the group if that student drops
+			and then forgets or otherwise does not leave the group.
+			* Property 12: Group Classification - Public groups will be general class information, with private 
+			groups being for projects and assignments.
+			* Property 15: Group Uniqueness - Vital for not getting groups confused!
+			* Property 16: User Memberships - Students may be in multiple classes at once.
+			* Property 17: Membership Abandonment - If a student drops the class.
+		* Files:
 		* Other:
 	
 * **Public Facing**
