@@ -156,7 +156,7 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 29: Server Size - The amount of users will not exceed the maximum server size, else availability may be affected.
 			* Property 30: Server Maintenance - Maintenance will be performed at regular intervals to clear up potentially free space.
 
-* **Business (initial idea)**
+* **Business**
 	* System Model: The system will be deployed within a business organization to facilitate file sharing among employees working on projects with varying degrees of confidentiality. Severs will operate on a network that can only be accessed through authorized wired connections inside organization buildings or through a VPN connection. Groups, which represent project teams within the organization, will be created by the project leader. Public and private groups with varying degrees of permissions for specific users within each group will be able to model the hierarchy of members of the project team in real 
 	life giving them access to only what is needed for their responsibilities within the group. When a project reaches completion, the group for it will be deleted. New groups will be created as new projects are started within the organization. Users with multiple responsibilities within the organization may access all pertinent groups through a single account. 
 	* Trust Assumptions: Within this business oriented model, it is assumed that all users within the organization who work on projects have an account. 
@@ -181,9 +181,16 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 12: Group Classification - Private groups will be used for secret projects within the organization - possibly ones whos existence is not even know to employees outside the project team.
 			Public groups will be used for project groups not under any level of secrecy within a company.
 			* Property 15: Group Uniqueness - Group names should reflect the project names that they represent and there should be only one group per project.
-			* Property 16: User Membersips - Employees will be able to access multiple groups for different projects that they are involved in. 
+			* Property 16: User Memberships - Employees will be able to access multiple groups for different projects that they are involved in. 
 			* Property 17: Membership Abandonment - Employees may leave groups if they stop working on that project in real-life.
 		* Files
+		 	* Property 20: Server File Uniqueness - Project groups may have files of the same name.
+			* Property 21: Group File Uniqueness - Files within project groups will be uniquely named.
+			* Property 22: Individual File Uniqueness - Files may be overwritten or renamed if an existing file with the same name already exists.
+			* Property 23: Private File Removal - A user may delete his own file, as well as any user may request that a file be reviewed for removal.
+			* Property 24: Public File Removal - A user may delete his own file, as well as any user may request that a file be reviewed for removal by a system administrator.
 		* Other
+			* Property 29: Server Size - The amount of users connected to the system will not exceed the maximum server size, else availability may be affected.
+			* Property 30: Server Maintenance - Maintenance will be performed at regular intervals to clear up potentially free space.
 		
 			
