@@ -116,7 +116,10 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 
 * **Public Facing**
 	* System Model: The system will be deployed on publicly accessible web servers. Any individual regardless of location will be able to access the service and create a single user account for general file sharing purposes. The individual may create public and/or private groups to begin sharing files with that group. The individual will be able to invite other users to their group. The group creator will be able to grant permissions to modify and/or delete files to other users in the group as he sees fit.
-	* Trust Assumptions (needs elaborated): Within this public facing model, it is assumed that the System Administrator (along with members of the technical staff) has full permissions to all users, groups, and files within groups. 
+	* Trust Assumptions (needs elaborated): Within this public facing model, it is assumed that the System Administrator (along with members of the technical staff) have read, modify, and delete permissions to all users, groups, and files within groups. 
+	It is assumed that private group creators have some sort of other medium to find people to invite to their group.
+	It is assumed that a user will not try to subvert the single account policy.
+	It is assumed that the server the system is deployed on has sufficient uptime.
 	* Related Properties:
 		* Users
 			* Property 1: Human Verification - Users of the system should be human.
@@ -126,32 +129,32 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 16: User Membersips - Users may belong to multiple groups.
 			* Property 17: Membership Abandonment - A user may leave a group at any time.
 		* Groups
-			* Property 5: Private Group Creation - 
-			* Property 6: Public Group Creation - 
-			* Property 7: Group Management - 
-			* Property 8: Group Deletion - 
-			* Property 9: Selected Privacy - 
-			* Property 10: Selected Permissiveness - 
-			* Property 11: Revoked Permissiveness - 
-			* Property 12: Group Classification - 
-			* Property 13: Public Group Membership - 
-			* Property 14: Invitation Selectivity - 
-			* Property 15: Group Uniqueness - 
-			* Property 25: False-Positive Reporting - 
-			* Property 26: Invalid File Sharing - 
+			* Property 5: Private Group Creation - Any user may create a private group.
+			* Property 6: Public Group Creation - Any user may create a public group.
+			* Property 7: Group Management - The user who created the group will have full rights within the group.
+			* Property 8: Group Deletion - The user who created the group or an administrator would be able to delete the group.
+			* Property 9: Selected Privacy - The user who created the group will be able to invite users to their group. If the group is public all users will be able to read/see the group and files within the group. Tied in with Property 10.
+			* Property 10: Selected Permissiveness - The user who created the group will be able to select permissions for other users who are in the group. If the group is public any user will be able to read files within the group.
+			* Property 11: Revoked Permissiveness - The user who created the group will be able to revoke permissions to any other user within the group.
+			* Property 12: Group Classification - The user who creates a group shall decide if the group is public or private upon creation.
+			* Property 13: Public Group Membership - Any user may join a public group.
+			* Property 14: Invitation Selectivity - The user who created a private group may select who he invites to the group
+			* Property 15: Group Uniqueness - There will not be groups with duplicate names. 
+			* Property 25: False-Positive Reporting - The user who created a group may punish a user who is abusing reports by removing him from a group. If abuse is reported multiple times a server administrator may take action and bar the user from the server.
+			* Property 26: Invalid File Sharing - The user who created a group may punish a user who is uploading malicious files by removing him from a group. If abuse is reported multiple times a server administrator may take action and bar the user from the server.
 		* Files
-			* Property 18: File Name Requirements - 
-			* Property 19: File Size Requirements - 
-			* Property 20: Server File Uniqueness - 
-			* Property 21: Group File Uniqueness - 
-			* Property 22: Individual File Uniqueness - 
-			* Property 23: Private File Removal - 
-			* Property 24: Public File Removal - 
+			* Property 18: File Name Requirements - File names will conform to the server's file name policy.
+			* Property 19: File Size Requirements - File size will not exceed the maximum file size.
+			* Property 20: Server File Uniqueness - Files that are not in the same group may share the same name.
+			* Property 21: Group File Uniqueness - Files within groups will be uniquely named.
+			* Property 22: Individual File Uniqueness - Files may be overwritten or renamed if an existing file with the same name already exists.
+			* Property 23: Private File Removal - A user may delete his own file, as well as any user may request that a file be reviewed for removal.
+			* Property 24: Public File Removal - A user may delete his own file, as well as any user may request that a file be reviewed for removal by a system administrator.
 		* Other
-			* Property 27: Initial Storage Size - 
-			* Property 28: Increased Storage Size - 
-			* Property 29: Server Size - 
-			* Property 30: Server Maintenance - 
+			* Property 27: Initial Storage Size - The user who creates a group may select the storage size for his group.
+			* Property 28: Increased Storage Size - The user who creates a group may request more storage size for a group.
+			* Property 29: Server Size - The amount of users will not exceed the maximum server size, else availability may be affected.
+			* Property 30: Server Maintenance - Maintenance will be performed at regular intervals to clear up potentially free space.
 
 * **Business (initial idea)**
 	* System Model: The system will be deployed within a business organization to facilitate file sharing among employees working on projects with varying degrees of confidentiality. Severs will operate on a network that can only be accessed through authorized wired connections inside organization buildings or through a VPN connection. Groups, which represent project teams within the organization, will be created by the project leader. Public and private groups with varying degrees of permissions for specific users within each group will be able to model the hierarchy of members of the project team in real 
