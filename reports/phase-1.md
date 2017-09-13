@@ -63,15 +63,21 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 * **Property 28: Increased Storage Size.**
 	* Increased Storage Size states that a Group Creator *U* may request additional storage space from the System Administrator. This requirement allows the Group Creator increased flexibility, in case more space was required than expected. 
 * **Property 29: Server Size.**
-	* Server Size states that there may only exist up to 100,000 active, logged-in users on the server *s* at a time. Should an individual user *u* wish to log in after that number has been met, that user will have to wait until another user logs out. This requirement is meant to avoid overloading the server with activity. 
+	* Server Size states that there may only exist up to 100,000 active, logged-in users on the server *s* at a time. Should an individual user *u* wish to log in after that number has been met, that user will have to wait until another user logs out. This requirement is meant to be a failsafe to avoid overloading the server with activity. However, it is not expected that this will happen often in regular use, if at all. 
 * **Property 30: Server Maintenance.**
 	* Server Maintenance states that a routine cleanup shall be performed on the server *s* once per month. At this time, any group *g* that has been inactive for 31 days shall be automatically deleted. This requirement is designed to avoid an overabundance of abandoned groups cluttering the server. 
 
 ### Section 2: Threat Models
 * **Educational**
 	* System Model: This system will be deployed within an educational institution, such as a college or university, to facilitate file sharing among students and teachers. All servers will only be accessible by connecting directly to the school's network through wired connection inside institution buildings. Files, typically projects and homeworks assignments, will be shared privately in individual class groups. Students will be able to upload any file from the teacher (Group Creator) but will be unable to see each other's files, to mitigate cheating. 
-	* Trust Assumptions: Within this educational system model, it is assumed that each student and instructor within the institution has a valid account. It is also assumed that accounts will expire once a user has left the institution. It is assumed that users will be instructed in some capacity outside the system to request membership to public groups or to send invitations to private groups. It is assumed that users will only request or accept memberships to groups that they should rightfully be apart of and will forfeit membership to groups that they are no longer valid to their purposes. 
-	It is assumed that groups within the system represent valid groups within the institution. It is assumed that the System Administrator (along with members of the technical staff) has full permissions to all users, groups, and files within groups. It is assumed that servers in this model can not communicate with the Internet.
+	* Trust Assumptions: Within this educational system model, it is assumed that each student and instructor within the institution has a valid account. 
+	It is also assumed that accounts will expire once a user has left the institution. 
+	It is assumed that users will be instructed in some capacity outside the system to request membership to public groups or to send invitations to private groups. 
+	It is assumed that users will only request or accept memberships to groups that they should rightfully be a part of and will forfeit membership to groups that they are no longer valid to their purposes. 
+	It is assumed that groups within the system represent valid groups within the institution. 
+	It is assumed that the System Administrator (along with members of the technical staff) has full permissions to all users, groups, and files within groups. 
+	It is assumed that students will only have basic permissions, unless otherwise granted increased increased responsibility in some facility by a teacher. 
+	It is assumed that servers in this model can not communicate with the Internet.
 	* Related Properties:
 		* Login: 
 			* Property 1: Human Verification - Every user in the server should be a legitimate member of the school.
