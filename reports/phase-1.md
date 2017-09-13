@@ -45,10 +45,9 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 * **Property 19: File Size Requirements.**
 	* File Size Requirements state that an uploaded file *f* must be of size 10gb or less. This requirement discourages the sending of overly large files. 
 * **Property 20: Server File Uniqueness.**
-	* File Uniqueness states that if a user *u1* of group *g1* uploads a file *f1*, and a user *u2* of group *g2* uploads a file *f2* with the same name, that *f2* should not overwrite *f1*. Likewise, if a user *u1* of group *g* uploads a file *f1*, and a user *u2* of the same group uploads a file *f2* with the same name, *f2* should not overwrite *f1*. This requirement ensures that users cannot write over each other's files by accident.
+	* File Uniqueness states that if a user *u1* of group *g1* uploads a file *f1*, and a user *u2* of group *g2* uploads a file *f2* with the same name, that *f2* should not overwrite *f1*. This requirement ensures that users cannot write over each other's files by accident.
 * **Property 21: Group File Uniqueness**
 	* Group File Uniqueness states that if user *u1* of group *g* uploads a file *f1* and user *u2* of the same group uploads a file *f2* with the same name, *f2* should not overwrite *f1*. This requirement is similar to Property 12, but pertaining to two files within the same group.
-	* This is included in property 20, should we take this portion out of 20 or remove this requirement?
 * **Property 22: Individual File Uniqueness.** 
 	* Individual File Uniqueness states that if a member of a group uploads a file and then later uploads another file with the same name, that user should be able to choose whether or not the original file is overwritten by the newly uploaded one. This requirement allows a user to decide whether he would like to overwrite his own file.
 * **Property 23: Private File Removal.**
@@ -69,11 +68,8 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 	* Server Maintenance states that a routine cleanup shall be performed on the server *s* once per month. At this time, any group *g* that has been inactive for 31 days shall be automatically deleted. This requirement is designed to avoid an overabundance of abandoned groups cluttering the server. 
 
 ### Section 2: Threat Models
-* ~~**Company Wide Intranet (Not sure this fits well with the properties but seems like a logical threat model)**~~
-	~~* The system will be deployed within an organization. All servers will only be accessible by connecting directly to the organizations network or through the organizations VPN. Each employee will have a single user account and will be part of a group that represents their team within the organization. Files that are pertinant to a team's project will be shared within that team's respective group on the file sharing service.~~
-	
 * **Educational**
-	* System Model: Somewhat similar to the Company Wide Intranet, this system will be deployed within an educational institution, such as a college or university, to facilitate file sharing among students and teachers. All servers will only be accessible by connecting directly to the school's network through wired connection inside institution buildings. Files, typically projects and homeworks assignments, will be shared privately in individual class groups. Students will be able to upload any file from the teacher (Group Creator) but will be unable to see each other's files, to mitigate cheating. 
+	* System Model: This system will be deployed within an educational institution, such as a college or university, to facilitate file sharing among students and teachers. All servers will only be accessible by connecting directly to the school's network through wired connection inside institution buildings. Files, typically projects and homeworks assignments, will be shared privately in individual class groups. Students will be able to upload any file from the teacher (Group Creator) but will be unable to see each other's files, to mitigate cheating. 
 		* Are we keeping the company wide intranet model?
 	* Trust Assumptions: Within this educational system model, it is assumed that each student and instructor within the institution has a valid account. It is also assumed that accounts will expire once a user has left the institution. It is assumed that users will be instructed in some capacity outside the system to request membership to public groups or to send invitations to private groups. It is assumed that users will only request or accept memberships to groups that they should rightfully be apart of and will forfeit membership to groups that they are no longer valid to their purposes. 
 	It is assumed that groups within the system represent valid groups within the institution. It is assumed that the System Administrator (along with members of the technical staff) has full permissions to all users, groups, and files within groups. It is assumed that servers in this model can not communicate with the Internet.
@@ -110,7 +106,41 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 29: Server size - There needs to be enough space to ensure that, even during peak performance time (e.g., finals week), that students and teachers can access vital files.
 			* Property 30: Server Maintenance - This allows for cleanup of excess groups which are no longer necessary.
 
-
+* **Business**
+	* System Model: The system will be deployed within a business organization to facilitate file sharing among employees working on projects with varying degrees of confidentiality. Severs will operate on a network that can only be accessed through authorized wired connections inside organization buildings or through a VPN connection. Groups, which represent project teams within the organization, will be created by the project leader. Public and private groups with varying degrees of permissions for specific users within each group will be able to model the hierarchy of members of the project team in real 
+	life by giving them access to only what is needed for their responsibilities within the group. When a project reaches completion, the group for it will be deleted. New groups will be created as new projects are started within the organization. Users with multiple responsibilities within the organization may access all pertinent groups through a single account. 
+	* Trust Assumptions: Within this business oriented model, it is assumed that all users within the organization who work on projects have an account. 
+	It is also assumed that individuals not within that organization will not be able to create an account or have access to the system.
+	It is assumed that the System Administrator, along with members of the technical staff, will have full permissions to all users, groups, and files within groups. It is also assumed that the groups formed within the system represent valid project groups within the organization.
+	Finally, it is assumed that users will only request or accept memberships to groups that they should rightfully be apart of and will forfeit membership to groups that they leave in real-life operations. 
+	* Related Properties:
+		* Users
+			* Property 1: Human Verification - Every user in the system should be a legitimate member of the organization, specifically one who works on projects.
+			* Property 2: Login Authentication - Each user should only have access to his or her individual account.
+			* Property 3: User Generality - Employees have a single account to access all responsibilities within the business organization.
+			* Property 4: Account Deletion - Employees should only delete their accounts when they leave the organization or no longer work on projects in any capacity.
+			
+		* Groups
+			* Property 5: Private Group Creation - Project leaders may create a private groups for secret projects within the organization.
+			* Property 6: Public Group Creation - Project leaders may create a public groups for projects not under any level of secrecy within the organization.
+			* Property 7: Group Management - Project managers should create groups for their project team and then moderate the activities of group members.
+			* Property 8: Group Deletion - Project managers should delete the group for a project once the project is completed or abandoned. 
+			* Property 9: Selected Privacy - This ensures that only employees working on a project are able to access files related to that project.
+			* Property 10: Selected Permissiveness - Selected Permissiveness allows files within the system to be accessed on a need-to-know basis. Employees working within a specific group may not be granted full access to project files.
+			* Property 11: Revoked Permissiveness - When an employee's role within a project group changes, permissions may be revoked to reflect that change.
+			* Property 12: Group Classification - Private groups will be used for secret projects within the organization; possibly ones whos existence is not know to employees outside the project team.
+			Public groups will be used for project groups not under any level of secrecy within the organization.
+			* Property 15: Group Uniqueness - Group names should reflect the project names that they represent and there should be only one group per project.
+			* Property 16: User Memberships - Employees will be able to access multiple groups for different projects that they are involved in. 
+			* Property 17: Membership Abandonment - Employees may leave groups if they stop working on that project in real-life.
+		* Files
+			* Property 21: Group File Uniqueness - Files within project groups will be uniquely named.
+			* Property 22: Individual File Uniqueness - Files may be overwritten or renamed if an existing file with the same name already exists.
+			* Property 23: Private File Removal - A user may delete his own file, or request that another user's file be reviewed for removal.
+			* Property 24: Public File Removal - A user may delete his own file, or request that another user's file be reviewed for removal by the System Administrator.
+		* Other
+			* Property 29: Server Size - The amount of users connected to the system will not exceed the maximum server size.
+			* Property 30: Server Maintenance - Maintenance will be performed at regular intervals to potentially free up space.
 
 * **Public Facing**
 	* System Model: The system will be deployed on publicly accessible web servers. Any individual regardless of location will be able to access the service and create a single user account for general file sharing purposes. The individual may create public and/or private groups to begin sharing files with that group. The individual will be able to invite other users to their group. The group creator will be able to grant permissions to modify and/or delete files to other users in the group as he sees fit.
@@ -153,40 +183,3 @@ Stephen Dowhy (sjd69@pitt.edu, sjd69)
 			* Property 28: Increased Storage Size - The user who creates a group may request more storage size for a group.
 			* Property 29: Server Size - The amount of users will not exceed the maximum server size, else availability may be affected.
 			* Property 30: Server Maintenance - Maintenance will be performed at regular intervals to clear up potentially free space.
-
-* **Business**
-	* System Model: The system will be deployed within a business organization to facilitate file sharing among employees working on projects with varying degrees of confidentiality. Severs will operate on a network that can only be accessed through authorized wired connections inside organization buildings or through a VPN connection. Groups, which represent project teams within the organization, will be created by the project leader. Public and private groups with varying degrees of permissions for specific users within each group will be able to model the hierarchy of members of the project team in real 
-	life by giving them access to only what is needed for their responsibilities within the group. When a project reaches completion, the group for it will be deleted. New groups will be created as new projects are started within the organization. Users with multiple responsibilities within the organization may access all pertinent groups through a single account. 
-	* Trust Assumptions: Within this business oriented model, it is assumed that all users within the organization who work on projects have an account. 
-	It is also assumed that individuals not within that organization will not be able to create an account or have access to the system.
-	It is assumed that the System Administrator, along with members of the technical staff, will have full permissions to all users, groups, and files within groups. It is also assumed that the groups formed within the system represent valid project groups within the organization.
-	Finally, it is assumed that users will only request or accept memberships to groups that they should rightfully be apart of and will forfeit membership to groups that they leave in real-life operations. 
-	* Related Properties:
-		* Users
-			* Property 1: Human Verification - Every user in the system should be a legitimate member of the organization, specifically one who works on projects.
-			* Property 2: Login Authentication - Each user should only have access to his or her individual account.
-			* Property 3: User Generality - Employees have a single account to access all responsibilities within the business organization.
-			* Property 4: Account Deletion - Employees should only delete their accounts when they leave the organization or no longer work on projects in any capacity.
-			
-		* Groups
-			* Property 5: Private Group Creation - Project leaders may create a private groups for secret projects within the organization.
-			* Property 6: Public Group Creation - Project leaders may create a public groups for projects not under any level of secrecy within the organization.
-			* Property 7: Group Management - Project managers should create groups for their project team and then moderate the activities of group members.
-			* Property 8: Group Deletion - Project managers should delete the group for a project once the project is completed or abandoned. 
-			* Property 9: Selected Privacy - This ensures that only employees working on a project are able to access files related to that project.
-			* Property 10: Selected Permissiveness - Selected Permissiveness allows files within the system to be accessed on a need-to-know basis. Employees working within a specific group may not be granted full access to project files.
-			* Property 11: Revoked Permissiveness - When an employee's role within a project group changes, permissions may be revoked to reflect that change.
-			* Property 12: Group Classification - Private groups will be used for secret projects within the organization; possibly ones whos existence is not know to employees outside the project team.
-			Public groups will be used for project groups not under any level of secrecy within the organization.
-			* Property 15: Group Uniqueness - Group names should reflect the project names that they represent and there should be only one group per project.
-			* Property 16: User Memberships - Employees will be able to access multiple groups for different projects that they are involved in. 
-			* Property 17: Membership Abandonment - Employees may leave groups if they stop working on that project in real-life.
-		* Files
-			* Property 21: Group File Uniqueness - Files within project groups will be uniquely named.
-			* Property 22: Individual File Uniqueness - Files may be overwritten or renamed if an existing file with the same name already exists.
-			* Property 23: Private File Removal - A user may delete his own file, or request that another user's file be reviewed for removal.
-			* Property 24: Public File Removal - A user may delete his own file, or request that another user's file be reviewed for removal by the System Administrator.
-		* Other
-			* Property 29: Server Size - The amount of users connected to the system will not exceed the maximum server size.
-			* Property 30: Server Maintenance - Maintenance will be performed at regular intervals to potentially free up space.
-			
