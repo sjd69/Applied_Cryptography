@@ -24,14 +24,14 @@ public abstract class Client {
 			// Set up I/O streams with the server
 			final ObjectOutputStream output = new ObjectOutputStream(sock.getOutputStream());
 	    	final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
+	    	return true;
 		}
 		catch(Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
 			e.printStackTrace(System.err);
+			return false;
 		}
-		
-
 	}
 
 	public boolean isConnected() {
