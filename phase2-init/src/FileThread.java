@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.*;
 
 public class FileThread extends Thread
 {
@@ -27,6 +28,7 @@ public class FileThread extends Thread
 			final ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 			final ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 			Envelope response;
+			
 
 			do
 			{
@@ -36,7 +38,36 @@ public class FileThread extends Thread
 				// Handler to list files that this user is allowed to see
 				if(e.getMessage().equals("LFILES"))
 				{
-				    /* TODO: Write this handler */
+				    /* TODO: Write this handler 
+				    	First shot at trying to implement this
+				    */
+				    UserToken token = (UserToken)e.getObjContents().get(2);
+				    ArrayList<ShareFile> files = FileServer.fileList.getFiles();
+					if (files == null) {
+						System.out.printf("No Files Exist For User");
+					}
+					else
+					{
+						e = new Envelope("OK");
+						//output.writeObject(e);
+						ArrayList<ShareFile> userFiles = new ArrayList<ShareFile>();
+						for (ShareFile x:files)
+						{
+							List<String> userGroups = token.getGroups();
+							String groupname = x.getGroup();
+							// something to check users groups and if theres a match
+							for (String y:userGroups)
+							{
+								if (y.equals(groupname)){
+									// add it to userFiles if there is a match
+									userFiles.add(x);
+								}
+							}
+						}
+						//return the list of user files to the client
+						e.addObject(userFiles);
+						output.writeObject(e);
+					}
 				}
 				if(e.getMessage().equals("UPLOADF"))
 				{
