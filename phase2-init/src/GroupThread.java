@@ -110,7 +110,6 @@ public class GroupThread extends Thread
 				}
 				else if(message.getMessage().equals("CGROUP")) //Client wants to create a group
 				{
-				    /* TODO:  Write this handler */
 				    if (message.getObjContents().size()  < 2) {
 				    	response = new Envelope("FAIL");
 					} else {
@@ -133,7 +132,6 @@ public class GroupThread extends Thread
 				}
 				else if(message.getMessage().equals("DGROUP")) //Client wants to delete a group
 				{
-				    /* TODO:  Write this handler */
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
 					} else {
@@ -156,7 +154,6 @@ public class GroupThread extends Thread
 				}
 				else if(message.getMessage().equals("LMEMBERS")) //Client wants a list of members in a group
 				{
-				    /* TODO:  Write this handler */
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
 					} else {
@@ -182,7 +179,6 @@ public class GroupThread extends Thread
 				}
 				else if(message.getMessage().equals("AUSERTOGROUP")) //Client wants to add user to a group
 				{
-				    /* TODO:  Write this handler */
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
 					} else {
@@ -208,7 +204,6 @@ public class GroupThread extends Thread
 				}
 				else if(message.getMessage().equals("RUSERFROMGROUP")) //Client wants to remove user from a group
 				{
-				    /* TODO:  Write this handler */
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
 					} else {
@@ -251,34 +246,124 @@ public class GroupThread extends Thread
 		}
 	}
 
-	/* TODO:  Write method */
 	// Returns a list containing the members of the specified group. Returns null if error.
 	private List<String> listMembers(String groupName, UserToken yourToken) {
-		return null;
+		// Right now, this just lists all the users... and is not in List<String> format.
+		// I'm not sure what to do here. I can't find anything else in other files that also use the 
+		// List<String> format. 
+		if(my_gs.userList != null) {
+			return my_gs.userList;
+		}
+		else {
+			return null;
+		}
 	}
 
-	/* TODO:  Write method */
 	// Returns true if the user was successfully removed from the group, else false.
 	private boolean removeUserFromGroup(String username, String groupName, UserToken yourToken) {
-		return false;
+		String requester = yourToken.getSubject();
+		
+		// Does requester exist?
+		if(my_gs.userList.checkUser(requester)) {
+			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
+			// Requester needs to be an administrator
+			if(temp.contains("ADMIN")) {
+				// Does user exist?
+				if(my_gs.userList.checkUser(username)) {
+					// User is deleted from the group 
+					my_gs.userList.deleteUser(username);
+					return true;
+				}
+				else {
+				// User does not exist
+				return false; 
+				}
+			}
+			else {
+			// Requester is not an administrator
+			return false;
+			}
+		}
+		else {
+			// Requester does not exist
+			return false;
+		}
 	}
-
-	/* TODO:  Write method */
+	
 	// Returns true if the user was successfully added to the group, else false.
 	private boolean addUserToGroup(String username, String groupName, UserToken yourToken) {
-		return false;
+		String requester = yourToken.getSubject();
+		
+		// Check if requester exists
+		if(my_gs.userList.checkUser(requester)) {
+			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
+			// Requester needs to be an administrator
+			if(temp.contains("ADMIN")) {
+				// Does user already exist?
+				if(my_gs.userList.checkUser(username)) {
+					// User already exists
+					return false;
+				}
+				else {
+					my_gs.userList.addUser(username);
+					return true;
+				}
+			}
+			else {
+				// Requester not an administrator
+				return false;
+			}	
+		}
+		else {
+			// Requester does not exist
+			return false;
+		}
 	}
 
-	/* TODO:  Write method */
 	// Returns true if the group was successfully deleted, else false.
 	private boolean deleteGroup(String groupName, UserToken yourToken) {
-		return false;
+		String requester = yourToken.getSubject();
+		
+		// Does requester exist?
+		if(my_gs.userList.checkUser(requester)) {
+			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
+			// Requester needs to be an administrator
+			if(temp.contains("ADMIN")) {
+				my_gs.userList.removeGroup(requester, groupName);
+				return true;
+			}
+			else {
+				// Requester is not an administrator
+				return false;
+			}
+		}
+		else {
+			// Requester does not exist
+			return false;
+		}
 	}
 
-	/* TODO:  Write method */
 	// Returns true if the group was successfully created, else false.
 	private boolean createGroup(String groupName, UserToken yourToken) {
-		return false;
+		String requester = yourToken.getSubject();
+		
+		// Check if user exists
+		if(my_gs.userList.checkUser(requester)) {
+			ArrayList<String> temp = my_gs.userList.gerUserGroups(requester);
+			// Requester needs to be an administrator
+			if(temp.contains("ADMIN")) {
+				my_gs.userList.addGroup(requester, groupName);
+				return true;
+			}
+			else {
+				// Requester is not an administrator
+				return false;
+			}
+		}
+		else {
+			// Requester does not exist
+			return false;
+		}
 	}
 
 	//Method to create tokens
