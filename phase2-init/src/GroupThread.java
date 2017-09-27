@@ -111,22 +111,126 @@ public class GroupThread extends Thread
 				else if(message.getMessage().equals("CGROUP")) //Client wants to create a group
 				{
 				    /* TODO:  Write this handler */
+				    if (message.getObjContents().size()  < 2) {
+				    	response = new Envelope("FAIL");
+					} else {
+				    	response = new Envelope("FAIL");
+
+				    	if (message.getObjContents().get(0) != null) {
+				    		if (message.getObjContents().get(1) != null) {
+				    			String groupName = (String)message.getObjContents().get(0); //Extract the group name
+								UserToken yourToken = (UserToken)message.getObjContents().get(1); //Extract the token
+
+								if (createGroup(groupName, yourToken)) {
+									response = new Envelope("OK");
+								}
+
+							}
+						}
+					}
+
+					output.writeObject(response);
 				}
 				else if(message.getMessage().equals("DGROUP")) //Client wants to delete a group
 				{
 				    /* TODO:  Write this handler */
+					if (message.getObjContents().size()  < 2) {
+						response = new Envelope("FAIL");
+					} else {
+						response = new Envelope("FAIL");
+
+						if (message.getObjContents().get(0) != null) {
+							if (message.getObjContents().get(1) != null) {
+								String groupName = (String)message.getObjContents().get(0); //Extract the group name
+								UserToken yourToken = (UserToken)message.getObjContents().get(1); //Extract the token
+
+								if (deleteGroup(groupName, yourToken)) {
+									response = new Envelope("OK");
+								}
+
+							}
+						}
+					}
+
+					output.writeObject(response);
 				}
 				else if(message.getMessage().equals("LMEMBERS")) //Client wants a list of members in a group
 				{
 				    /* TODO:  Write this handler */
+					if (message.getObjContents().size()  < 2) {
+						response = new Envelope("FAIL");
+					} else {
+						response = new Envelope("FAIL");
+
+						if (message.getObjContents().get(0) != null) {
+							if (message.getObjContents().get(1) != null) {
+								String groupName = (String)message.getObjContents().get(0); //Extract the group name
+								UserToken yourToken = (UserToken)message.getObjContents().get(1); //Extract the token
+
+								List<String> memberList = listMembers(groupName, yourToken);
+
+								if (memberList != null) {
+									response = new Envelope("OK");
+									response.addObject(memberList);
+								}
+
+							}
+						}
+					}
+
+					output.writeObject(response);
 				}
 				else if(message.getMessage().equals("AUSERTOGROUP")) //Client wants to add user to a group
 				{
 				    /* TODO:  Write this handler */
+					if (message.getObjContents().size()  < 2) {
+						response = new Envelope("FAIL");
+					} else {
+						response = new Envelope("FAIL");
+
+						if (message.getObjContents().get(0) != null) {
+							if (message.getObjContents().get(1) != null) {
+								if (message.getObjContents().get(2) != null) {
+									String username = (String)message.getObjContents().get(0); //Extract the group name
+									String groupName = (String)message.getObjContents().get(1); //Extract the group name
+									UserToken yourToken = (UserToken)message.getObjContents().get(2); //Extract the token
+
+									if (addUserToGroup(username, groupName, yourToken)) {
+										response = new Envelope("OK");
+									}
+
+								}
+							}
+						}
+					}
+
+					output.writeObject(response);
 				}
 				else if(message.getMessage().equals("RUSERFROMGROUP")) //Client wants to remove user from a group
 				{
 				    /* TODO:  Write this handler */
+					if (message.getObjContents().size()  < 2) {
+						response = new Envelope("FAIL");
+					} else {
+						response = new Envelope("FAIL");
+
+						if (message.getObjContents().get(0) != null) {
+							if (message.getObjContents().get(1) != null) {
+								if (message.getObjContents().get(2) != null) {
+									String username = (String)message.getObjContents().get(0); //Extract the group name
+									String groupName = (String)message.getObjContents().get(1); //Extract the group name
+									UserToken yourToken = (UserToken)message.getObjContents().get(2); //Extract the token
+
+									if (removeUserFromGroup(username, groupName, yourToken)) {
+										response = new Envelope("OK");
+									}
+
+								}
+							}
+						}
+					}
+
+					output.writeObject(response);
 				}
 				else if(message.getMessage().equals("DISCONNECT")) //Client wants to disconnect
 				{
@@ -146,7 +250,32 @@ public class GroupThread extends Thread
 			e.printStackTrace(System.err);
 		}
 	}
-	
+
+	/* TODO:  Write method */
+	private List<String> listMembers(String groupName, UserToken yourToken) {
+		return null;
+	}
+
+	/* TODO:  Write method */
+	private boolean removeUserFromGroup(String username, String groupName, UserToken yourToken) {
+		return false;
+	}
+
+	/* TODO:  Write method */
+	private boolean addUserToGroup(String username, String groupName, UserToken yourToken) {
+		return false;
+	}
+
+	/* TODO:  Write method */
+	private boolean deleteGroup(String groupName, UserToken yourToken) {
+		return false;
+	}
+
+	/* TODO:  Write method */
+	private boolean createGroup(String groupName, UserToken yourToken) {
+		return false;
+	}
+
 	//Method to create tokens
 	private UserToken createToken(String username) 
 	{
