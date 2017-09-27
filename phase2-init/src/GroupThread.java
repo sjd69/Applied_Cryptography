@@ -252,26 +252,31 @@ public class GroupThread extends Thread
 	}
 
 	/* TODO:  Write method */
+	// Returns a list containing the members of the specified group. Returns null if error.
 	private List<String> listMembers(String groupName, UserToken yourToken) {
 		return null;
 	}
 
 	/* TODO:  Write method */
+	// Returns true if the user was successfully removed from the group, else false.
 	private boolean removeUserFromGroup(String username, String groupName, UserToken yourToken) {
 		return false;
 	}
 
 	/* TODO:  Write method */
+	// Returns true if the user was successfully added to the group, else false.
 	private boolean addUserToGroup(String username, String groupName, UserToken yourToken) {
 		return false;
 	}
 
 	/* TODO:  Write method */
+	// Returns true if the group was successfully deleted, else false.
 	private boolean deleteGroup(String groupName, UserToken yourToken) {
 		return false;
 	}
 
 	/* TODO:  Write method */
+	// Returns true if the group was successfully created, else false.
 	private boolean createGroup(String groupName, UserToken yourToken) {
 		return false;
 	}
