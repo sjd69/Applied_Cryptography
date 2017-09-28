@@ -248,12 +248,14 @@ public class GroupThread extends Thread
 
 	// Returns a list containing the members of the specified group. Returns null if error.
 	private List<String> listMembers(String groupName, UserToken yourToken) {
-		// Right now, this just lists all the users... and is not in List<String> format.
-		// I'm not sure what to do here. I can't find anything else in other files that also use the 
-		// List<String> format. 
-		if(my_gs.userList != null) {
-			return my_gs.userList;
+		String requester = yourToken.getSubject();
+		// Make sure the requester has a group
+		if(my_gs.groupList.checkGroup()) {
+			ArrayList<String> groupMembers = new ArrayList<String>();
+			groupMembers = my_gs.groupList.getUsers(groupName);
+			return groupMembers;
 		}
+		// Requester does not have a group to list
 		else {
 			return null;
 		}
