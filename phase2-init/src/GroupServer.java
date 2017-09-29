@@ -45,12 +45,19 @@ public class GroupServer extends Server {
 		//Open user file to get user list
 		try
 		{
-			FileInputStream fis = new FileInputStream(userFile);
-			userStream = new ObjectInputStream(fis);
+			//Going to close the userstream before we open the groupstream just in case.
+			FileInputStream ufis = new FileInputStream(userFile);
+			userStream = new ObjectInputStream(ufis);
 			userList = (UserList)userStream.readObject();
+			userStream.close();
+
+			FileInputStream gfis = new FileInputStream(groupFile);
+			groupStream = new ObjectInputStream(gfis);
+			groupList = (GroupList)groupStream.readObject();
 		}
 		catch(FileNotFoundException e)
 		{
+			//Assume that if one file doesn't exist the other doesn't either.
 			System.out.println("UserList File Does Not Exist. Creating UserList...");
 			System.out.println("No users currently exist. Your account will be the administrator.");
 			System.out.print("Enter your username: ");
@@ -61,6 +68,13 @@ public class GroupServer extends Server {
 			userList.addUser(username);
 			userList.addGroup(username, "ADMIN");
 			userList.addOwnership(username, "ADMIN");
+
+			//Create new group list. Defaults to ADMIN group.
+			groupList = new GroupList();
+			groupList.addGroup("ADMIN");
+			groupList.addOwnership(username, "ADMIN");
+			groupList.addUser(username, "ADMIN");
+
 		}
 		catch(IOException e)
 		{
@@ -72,7 +86,6 @@ public class GroupServer extends Server {
 			System.out.println("Error reading from UserList file");
 			System.exit(-1);
 		}
-
 		
 		//Autosave Daemon. Saves lists every 5 minutes
 		AutoSave aSave = new AutoSave(this);

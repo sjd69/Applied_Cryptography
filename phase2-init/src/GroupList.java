@@ -25,8 +25,16 @@ public class GroupList implements java.io.Serializable {
         return (this.list.get(groupName).getUsers());
     }
 
+    public synchronized boolean addUser(String user, String groupName) {
+        return (this.list.get(groupName).addUser(user));
+    }
+
     public synchronized ArrayList<String> getOwnership(String groupName) {
         return (this.list.get(groupName).getOwnership());
+    }
+
+    public synchronized boolean addOwnership(String user, String groupName) {
+        return (this.list.get(groupName).addOwnership(user));
     }
 
     class Group implements java.io.Serializable {
