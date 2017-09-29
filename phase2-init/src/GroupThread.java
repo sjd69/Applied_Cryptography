@@ -267,22 +267,23 @@ public class GroupThread extends Thread
 		
 		// Does requester exist?
 		if(my_gs.userList.checkUser(requester)) {
-			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
-			// Requester needs to be an administrator
-			if(temp.contains("ADMIN")) {
-				// Does user exist?
-				if(my_gs.userList.checkUser(username)) {
-					// User is deleted from the group 
-					my_gs.userList.deleteUser(username);
+			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
+			// Requester needs to be an administrator of the group
+			if(owner.contains(requester)) {
+				// Does user exist in the group?
+				ArrayList<String> groupList = my_gs.groupList.getUsers(groupName);
+				if(groupList.contains(user)) {
+					// User is deleted from the group
+					my_gs.groupList.removeUser(username);
 					return true;
 				}
 				else {
-				// User does not exist
+				// User does not exist in the group
 				return false; 
 				}
 			}
 			else {
-			// Requester is not an administrator
+			// Requester is not an administrator of the group
 			return false;
 			}
 		}
@@ -298,21 +299,22 @@ public class GroupThread extends Thread
 		
 		// Check if requester exists
 		if(my_gs.userList.checkUser(requester)) {
-			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
-			// Requester needs to be an administrator
-			if(temp.contains("ADMIN")) {
-				// Does user already exist?
-				if(my_gs.userList.checkUser(username)) {
-					// User already exists
+			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
+			// Requester needs to be an administrator of the group
+			if(owner.contains(requester)) {
+				// Does user exist in the group?
+				ArrayList<String> groupList = my_gs.groupList.getUsers(groupName);
+				if(groupList.contains(user)) {
+					// User already exists in the group
 					return false;
 				}
 				else {
-					my_gs.userList.addUser(username);
+					my_gs.groupList.addUser(username);
 					return true;
 				}
 			}
 			else {
-				// Requester not an administrator
+				// Requester not an administrator of the group
 				return false;
 			}	
 		}
@@ -328,14 +330,14 @@ public class GroupThread extends Thread
 		
 		// Does requester exist?
 		if(my_gs.userList.checkUser(requester)) {
-			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
-			// Requester needs to be an administrator
-			if(temp.contains("ADMIN")) {
-				my_gs.userList.removeGroup(requester, groupName);
+			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
+			// Requester needs to be an administrator of the group
+			if(owner.contains(requester)) {
+				my_gs.groupList.deleteGroup(groupName);
 				return true;
 			}
 			else {
-				// Requester is not an administrator
+				// Requester is not an administrator of the group
 				return false;
 			}
 		}
@@ -349,17 +351,24 @@ public class GroupThread extends Thread
 	private boolean createGroup(String groupName, UserToken yourToken) {
 		String requester = yourToken.getSubject();
 		
-		// Check if user exists
+		// Check if requester exists
 		if(my_gs.userList.checkUser(requester)) {
-			ArrayList<String> temp = my_gs.userList.gerUserGroups(requester);
-			// Requester needs to be an administrator
-			if(temp.contains("ADMIN")) {
-				my_gs.userList.addGroup(requester, groupName);
-				return true;
+			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
+			// Group needs to not already exist
+			if(temp.contains(groupName)) {
+				// Group already exists
+				return false;
 			}
 			else {
-				// Requester is not an administrator
-				return false;
+				// Requester needs to be an administrator
+				if(temp.contains("ADMIN")) {
+					my_gs.groupList.addGroup(groupName);
+					return true;
+				}
+				else {
+					// Requester is not an amdministrator
+					return false;
+				}
 			}
 		}
 		else {
