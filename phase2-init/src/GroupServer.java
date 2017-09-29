@@ -78,12 +78,12 @@ public class GroupServer extends Server {
 		}
 		catch(IOException e)
 		{
-			System.out.println("Error reading from UserList file");
+			System.out.println("Error reading from files");
 			System.exit(-1);
 		}
 		catch(ClassNotFoundException e)
 		{
-			System.out.println("Error reading from UserList file");
+			System.out.println("Error reading from files");
 			System.exit(-1);
 		}
 		
@@ -135,6 +135,10 @@ class ShutDownListener extends Thread
 		{
 			outStream = new ObjectOutputStream(new FileOutputStream("UserList.bin"));
 			outStream.writeObject(my_gs.userList);
+			outStream.close();
+
+			outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
+			outStream.writeObject(my_gs.groupList);
 		}
 		catch(Exception e)
 		{
@@ -165,6 +169,10 @@ class AutoSave extends Thread
 				{
 					outStream = new ObjectOutputStream(new FileOutputStream("UserList.bin"));
 					outStream.writeObject(my_gs.userList);
+					outStream.close();
+
+					outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
+					outStream.writeObject(my_gs.groupList);
 				}
 				catch(Exception e)
 				{
