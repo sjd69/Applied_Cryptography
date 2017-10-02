@@ -30,7 +30,7 @@ public class MyClient {
 
                     //Connect to group client to auth
                     //Not entirely sure what to use for port
-                    groupClient.connect("localhost", 5309 );
+                    groupClient.connect("localhost", 8765 );
 
                     if (groupClient.isConnected()) {
                         userToken = groupClient.getToken(username);
@@ -63,11 +63,11 @@ public class MyClient {
 
                 switch(nav) {
                     case 1:
-                        myFileClient.startMyFileClient("localhost", 5309, (Token)userToken);
+                        myFileClient.startMyFileClient("localhost", 8765, (Token)userToken);
                         break;
 
                     case 2:
-                        myGroupClient.startMyGroupClient("localhost", 5309, (Token)userToken);
+                        myGroupClient.startMyGroupClient("localhost", 8765, (Token)userToken);
                         break;
 
                     case 3:
