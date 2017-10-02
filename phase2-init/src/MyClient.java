@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class MyClient {
     public static void main(String[] args) {
-        FileClient fileClient = new FileClient();
+        //FileClient fileClient = new FileClient();
         GroupClient groupClient = new GroupClient();
         UserToken userToken = null;
         String username = null;
