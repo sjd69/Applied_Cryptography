@@ -8,18 +8,18 @@ public class MyGroupClient
 {
 	GroupClient groupclient = new GroupClient();
 	UserToken utoken;
-	
+
 	public boolean startMyGroupClient(String server, int port)
 	{
 		boolean flag = true;
 		boolean connected = groupclient.connect(server, port);
 		System.out.println("Using MyGroupClient - Connected to Group Server");
-		
+
 		// Get user token
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter username:");
-		String user = sc.nextLine();
-		utoken = groupclient.getToken(user);
+		String username = sc.nextLine();
+		utoken = groupclient.getToken(username);
 		if (utoken != null)
 		{
 			System.out.println("Token - " + utoken.getSubject());
@@ -33,21 +33,21 @@ public class MyGroupClient
 			try {
 				Token userToken = null;
 				Envelope message = null, response = null;
-				
+
 				// Tell the server to return a token
 				message = new Envelope("GET");
 				message.addObject(username); // add username String
 				output.writeObject(message);
-				
+
 				// Get the response from the server
 				response = (Envelope)input.readObject();
-				
+
 				// Successful response
 				if(response.getMessage().equals("OK")) {
 					// If there is a token in the envelope, return it
 					ArrayList<Object> temp = null;
 					temp = response.getObjContents();
-					
+
 					if (temp.size() == 1) {
 						userToken = (Token)temp.get(0);
 						return userToken;
@@ -60,7 +60,7 @@ public class MyGroupClient
 				e.printStackTrace(System.err);
 				return null;
 			}
-			
+
 			// create user
 			// delete user
 			// create group
@@ -74,7 +74,7 @@ public class MyGroupClient
 			System.out.println("Error getting token");
 			return false;
 		}
-		
+
 		while (flag){
 			if (connected)
 			{
@@ -88,14 +88,14 @@ public class MyGroupClient
 				System.out.println("(7) - Delete user from group");
 				System.out.println("(8) - List members of group");
 				System.out.println("(9) - Disconnect from Group Server");
-		
+
 				int commandNum = sc.nextInt();
-			
-				switch (commandNum) 
+
+				switch (commandNum)
 				{
 					// get token
 					// UserToken getToken(String username)
-					case 1: 
+					case 1:
 						System.out.println("Enter username:");
 						String usern = sc.nextLine();
 						utoken = groupclient.getToken(usern);
@@ -112,15 +112,15 @@ public class MyGroupClient
 						else
 						{
 							System.out.println("Error getting token");
-						}	
-					
+						}
+
 					// create user
 					// boolean createUser(String username, UserToken token)
 					case 2:
 						System.out.println("(2) - Create user");
 						System.out.println("Enter username to be created:");
-						String username = sc.nextLine();
-					
+						username = sc.nextLine();
+
 						utoken = groupclient.getToken(username);
 						if(groupclient.createUser(username, utoken)){
 							System.out.println("User " + username + " created");
@@ -128,14 +128,14 @@ public class MyGroupClient
 						else{
 							System.out.println("Error creating user");
 						}
-						
+
 					// delete user
 					// boolean deleteUser(String username, UserToken token)
 					case 3:
 						System.out.println("(3) - Delete user");
 						System.out.println("Enter username to be deleted:");
 						String uname = sc.nextLine();
-					
+
 						utoken = groupclient.getToken(uname);
 						if(groupclient.deleteUser(uname, utoken)){
 							System.out.println("User " + uname + " deleted");
@@ -143,14 +143,14 @@ public class MyGroupClient
 						else{
 							System.out.println("Error deleting user");
 						}
-					
+
 					// create group
 					// boolean createGroup(String groupname, UserToken token)
 					case 4:
 						System.out.println("(4) - Create group");
 						System.out.println("Enter group to be created:");
 						String g = sc.nextLine();
-					
+
 						if(groupclient.createGroup(g, utoken)){
 							System.out.println("Group " + g + " created");
 						}
@@ -162,7 +162,7 @@ public class MyGroupClient
 						System.out.println("(5) - Delete group");
 						System.out.println("Enter group to be deleted:");
 						String groupName = sc.nextLine();
-				
+
 						if(groupclient.deleteGroup(groupName, utoken)){
 							System.out.println("Group " + groupName + " deleted");
 						}
@@ -185,7 +185,7 @@ public class MyGroupClient
 							System.out.println("Error adding user to group");
 						}
 					// delete user from group
-					// boolean deleteUserFromGroup(String username, String groupname, UserToken token) 
+					// boolean deleteUserFromGroup(String username, String groupname, UserToken token)
 					case 7:
 						System.out.println("(7) - Delete user from group");
 						System.out.println("Enter username to be deleted:");
@@ -209,7 +209,7 @@ public class MyGroupClient
 						for (String f:members){
 							System.out.println(f);
 						}
-					// disconnect from server 
+					// disconnect from server
 					case 9:
 						System.out.println("(8) - Disconnect from Group Server");
 						groupclient.disconnect();
@@ -227,8 +227,8 @@ public class MyGroupClient
 			}
 		}
 		return true;
-	}	
+	}
 }
 	}
-	
+
 }
