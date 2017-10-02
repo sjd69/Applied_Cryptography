@@ -38,8 +38,7 @@ public class FileThread extends Thread
 				// Handler to list files that this user is allowed to see
 				if(e.getMessage().equals("LFILES"))
 				{
-				    /* TODO: Write this handler 
-				    	First shot at trying to implement this
+				    /* First shot at trying to implement this 
 				    */
 				    UserToken token = (UserToken)e.getObjContents().get(2);
 				    ArrayList<ShareFile> files = FileServer.fileList.getFiles();
