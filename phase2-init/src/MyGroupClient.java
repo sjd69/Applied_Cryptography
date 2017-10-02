@@ -13,71 +13,11 @@ public class MyGroupClient
 	{
 		boolean flag = true;
 		boolean connected = groupclient.connect(server, port);
-		System.out.println("Using MyGroupClient - Connected to Group Server");
-
-		// Get user token
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter username:");
-		String username = sc.nextLine();
-		utoken = groupclient.getToken(username);
-		if (utoken != null)
-		{
-			System.out.println("Token - " + utoken.getSubject());
-			System.out.println("Issued by" + utoken.getIssuer());
-			System.out.println("Groups: ");
-			List<String> groupnames = utoken.getGroups();
-			for (String f:groupnames){
-				System.out.println(f);
-			}
-			// get token
-			try {
-				Token userToken = null;
-				Envelope message = null, response = null;
-
-				// Tell the server to return a token
-				message = new Envelope("GET");
-				message.addObject(username); // add username String
-				output.writeObject(message);
-
-				// Get the response from the server
-				response = (Envelope)input.readObject();
-
-				// Successful response
-				if(response.getMessage().equals("OK")) {
-					// If there is a token in the envelope, return it
-					ArrayList<Object> temp = null;
-					temp = response.getObjContents();
-
-					if (temp.size() == 1) {
-						userToken = (Token)temp.get(0);
-						return userToken;
-					}
-				}
-				return null;
-			}
-			catch(Exception e) {
-				System.err.println("Error: " + e.getMessage());
-				e.printStackTrace(System.err);
-				return null;
-			}
-
-			// create user
-			// delete user
-			// create group
-			// delete group
-			// add user to group
-			// delete user from group
-			// list members of group
-		}
-		else
-		{
-			System.out.println("Error getting token");
-			return false;
-		}
 
 		while (flag){
 			if (connected)
 			{
+				System.out.println("Using MyGroupClient - Connected to Group Server");
 				System.out.println("Enter command number:");
 				System.out.println("(1) - Get token");
 				System.out.println("(2) - Create user");
@@ -89,6 +29,7 @@ public class MyGroupClient
 				System.out.println("(8) - List members of group");
 				System.out.println("(9) - Disconnect from Group Server");
 
+				Scanner sc = new Scanner (System.in);
 				int commandNum = sc.nextInt();
 
 				switch (commandNum)
@@ -217,18 +158,15 @@ public class MyGroupClient
 						break;
 					default: System.out.println("Invalid Command Number");
 						break;
-			}
-			}
+				} 
+			} 
 			else
 			{
 				System.out.println("Error connecting to GroupClient");
 				flag = false;
 				return false;
 			}
-		}
+		} 
 		return true;
-	}
-}
-	}
-
-}
+	} 
+} 
