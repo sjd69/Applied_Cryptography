@@ -14,7 +14,6 @@ public abstract class Client {
 	public boolean connect(final String server, final int port) {
 		System.out.println("attempting to connect");
 		
-		/* TODO: Write this method */
 		try
 		{
 			// Connect to server
