@@ -18,10 +18,20 @@ public class MyClient {
 
         do {
             while (!auth) {
-                System.out.println("MENU\n " +
-                        "1: LOGIN\n " +
-                        "2: EXIT");
-                nav = scanIn.nextInt();
+                do {
+                    System.out.println("MENU\n " +
+                            "1: LOGIN\n " +
+                            "2: EXIT");
+
+                    while (!scanIn.hasNextInt()) {
+                        System.out.println("MENU\n " +
+                                "1: LOGIN\n " +
+                                "2: EXIT");
+                        scanIn.next();
+                    }
+                    nav = scanIn.nextInt();
+                } while ((nav != 1 && nav != 2));
+
                 if (nav == 1) {
                     exit = false;
 
@@ -30,7 +40,8 @@ public class MyClient {
 
                     //Connect to group client to auth
                     //Not entirely sure what to use for port
-                    groupClient.connect("localhost", 5309 );
+                    //Going to use the one from the sample client
+                    groupClient.connect("localhost", 8765 );
 
                     if (groupClient.isConnected()) {
                         userToken = groupClient.getToken(username);
@@ -55,23 +66,51 @@ public class MyClient {
             }
 
             while (auth) {
-                System.out.println("MENU:\n" +
-                        "1: Connect to File Server\n" +
-                        "2: Connect to Group Server\n" +
-                        "3: Exit\n");
+                do {
+                    System.out.println("MENU:\n" +
+                            "1: Connect to File Server\n" +
+                            "2: Connect to Group Server\n" +
+                            "3: Logout\n" +
+                            "4: Exit\n");
 
+                    while (!scanIn.hasNextInt()) {
+                        System.out.println("MENU:\n" +
+                                "1: Connect to File Server\n" +
+                                "2: Connect to Group Server\n" +
+                                "3: Logout\n" +
+                                "4: Exit\n");
+                        scanIn.next();
+                    }
+                    nav = scanIn.nextInt();
+                } while (!(nav > 0 && nav < 5));
 
                 switch(nav) {
                     case 1:
-                        myFileClient.startMyFileClient("localhost", 5309, (Token)userToken);
+                        System.out.println("Enter IP Address of File Server.");
+                        String fs_ip = scanIn.nextLine();
+
+                        System.out.println("Enter the port number for the File Server");
+                        int fs_port = scanIn.nextInt();
+                        myFileClient.startMyFileClient(fs_ip, fs_port, (Token)userToken);
                         break;
 
                     case 2:
-                        myGroupClient.startMyGroupClient("localhost", 5309, (Token)userToken);
+                        System.out.println("Enter IP Address of File Server.");
+                        String gc_ip = scanIn.nextLine();
+
+                        System.out.println("Enter the port number for the File Server");
+                        int gc_port = scanIn.nextInt();
+                        myGroupClient.startMyGroupClient(gc_ip, gc_port);
                         break;
 
                     case 3:
-                        System.out.println("Exiting...");
+                        System.out.println("Logging out");
+                        auth = false;
+                        break;
+
+                    case 4:
+                        System.out.println("Exiting");
+                        auth = false;
                         exit = true;
                         break;
 
