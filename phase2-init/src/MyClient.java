@@ -4,6 +4,7 @@ public class MyClient {
     public static void main(String[] args) {
         //FileClient fileClient = new FileClient();
         GroupClient groupClient = new GroupClient();
+        GroupServer groupServer = new GroupServer();
         UserToken userToken = null;
         String username = null;
 
@@ -39,9 +40,9 @@ public class MyClient {
                     username = scanIn.nextLine();
 
                     //Connect to group client to auth
-                    //Not entirely sure what to use for port
-                    //Going to use the one from the sample client
-                    groupClient.connect("localhost", 8765 );
+                    // Used this for the port. I think this should work. 
+                    // It's 8765 just in case this is not right.
+                    groupClient.connect("localhost", groupServer.SERVER_PORT ); 
 
                     if (groupClient.isConnected()) {
                         userToken = groupClient.getToken(username);
