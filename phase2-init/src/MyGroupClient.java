@@ -78,16 +78,20 @@ public class MyGroupClient
 					// create user
 					// boolean createUser(String username, UserToken token)
 					case 2:
-						System.out.println("-- Create user --");
-						System.out.println("Enter username to be created:");
-						String username = sc.nextLine();
-					
-						utoken = groupclient.getToken(username);
-						if(groupclient.createUser(username, utoken)){
-							System.out.println("User " + username + " created");
-						}
-						else{
-							System.out.println("Error creating user");
+
+						if (token.getGroups().contains("ADMIN")) {
+							System.out.println("-- Create user --");
+							System.out.println("Enter username to be created:");
+							String username = sc.nextLine();
+
+							if(groupclient.createUser(username, token)){
+								System.out.println("User " + username + " created");
+							}
+							else{
+								System.out.println("Error creating user");
+							}
+						} else {
+							System.out.println("Insufficient privileges.");
 						}
 						break;
 						

@@ -88,6 +88,7 @@ public class MyClient {
                 switch(nav) {
                     case 1:
                         System.out.println("Enter IP Address of File Server.");
+                        scanIn.nextLine();
                         String fs_ip = scanIn.nextLine();
 
                         System.out.println("Enter the port number for the File Server");
@@ -97,6 +98,7 @@ public class MyClient {
 
                     case 2:
                         System.out.println("Enter IP Address of Group Server.");
+                        scanIn.nextLine();
                         String gc_ip = scanIn.nextLine();
 
                         System.out.println("Enter the port number for the Group Server");
