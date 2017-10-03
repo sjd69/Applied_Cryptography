@@ -187,9 +187,14 @@ public class MyGroupClient
 						System.out.println("Enter group:");
 						String gname = sc.nextLine();
 						List<String> members = groupclient.listMembers(gname, utoken);
-						for (String f:members){
-							System.out.println(f);
+						if (members != null) {
+							for (String f:members){
+								System.out.println(f);
+							}
+						} else {
+							System.out.println("Group does not exist.");
 						}
+
 						break;
 						
 					// disconnect from server 

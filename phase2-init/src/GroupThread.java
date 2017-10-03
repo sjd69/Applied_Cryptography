@@ -280,6 +280,9 @@ public class GroupThread extends Thread
 		if(my_gs.userList.checkUser(requester)) {
 			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
 			// Requester needs to be an administrator of the group
+			if (owner == null) {
+				return false;
+			}
 			if(owner.contains(requester)) {
 				// Does user exist in the group?
 				ArrayList<String> groupList = my_gs.groupList.getUsers(groupName);

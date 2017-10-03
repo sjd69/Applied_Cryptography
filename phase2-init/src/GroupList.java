@@ -33,19 +33,27 @@ public class GroupList implements java.io.Serializable {
     }
 
     public synchronized boolean addUser(String user, String groupName) {
-        return (this.list.get(groupName).addUser(user));
+        return this.list.containsKey(groupName) && (this.list.get(groupName).addUser(user));
+
     }
 
     public synchronized boolean removeUser(String user, String groupName) {
-        return (this.list.get(groupName).removeUser(user));
+        return this.list.containsKey(groupName) && (this.list.get(groupName).removeUser(user));
+
     }
 
     public synchronized ArrayList<String> getOwnership(String groupName) {
-        return (this.list.get(groupName).getOwnership());
+        if (this.list.containsKey(groupName)) {
+            return (this.list.get(groupName).getOwnership());
+        } else {
+            return null;
+        }
+
     }
 
     public synchronized boolean addOwnership(String user, String groupName) {
-        return (this.list.get(groupName).addOwnership(user));
+        return this.list.containsKey(groupName) && (this.list.get(groupName).addOwnership(user));
+
     }
 
     class Group implements java.io.Serializable {
