@@ -96,12 +96,12 @@ public class MyClient {
                         break;
 
                     case 2:
-                        System.out.println("Enter IP Address of File Server.");
+                        System.out.println("Enter IP Address of Group Server.");
                         String gc_ip = scanIn.nextLine();
 
-                        System.out.println("Enter the port number for the File Server");
+                        System.out.println("Enter the port number for the Group Server");
                         int gc_port = scanIn.nextInt();
-                        myGroupClient.startMyGroupClient(gc_ip, gc_port);
+                        myGroupClient.startMyGroupClient(gc_ip, gc_port, userToken);
                         break;
 
                     case 3:
