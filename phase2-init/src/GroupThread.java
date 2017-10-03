@@ -331,13 +331,13 @@ public class GroupThread extends Thread
 		// Does requester exist?
 		if(my_gs.userList.checkUser(requester)) {
 			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
-			// Requester needs to be an administrator of the group
-			if(owner.contains(requester) || yourToken.getGroups().contains("ADMIN")) {
+			// Requester needs to be an owner of the group
+			if(owner.contains(requester)) {
 				my_gs.groupList.deleteGroup(groupName);
 				return true;
 			}
 			else {
-				// Requester is not an administrator of the group
+				// Requester is not an owner of the group
 				return false;
 			}
 		}
@@ -350,32 +350,18 @@ public class GroupThread extends Thread
 	// Returns true if the group was successfully created, else false.
 	private boolean createGroup(String groupName, UserToken yourToken) {
 		String requester = yourToken.getSubject();
-
-		// Check if requester exists
-		if(my_gs.userList.checkUser(requester)) {
-			ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
+		ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
 			// Group needs to not already exist
 			if(temp.contains(groupName)) {
 				// Group already exists
+				System.out.println("Group Already Exists");
 				return false;
 			}
 			else {
-				// Requester needs to be an administrator
-				if(temp.contains("ADMIN")) {
-					my_gs.groupList.addGroup(groupName);
-					my_gs.groupList.addOwnership(requester, groupName);
-					return true;
-				}
-				else {
-					// Requester is not an amdministrator
-					return false;
-				}
+				my_gs.groupList.addGroup(groupName);
+				my_gs.groupList.addOwnership(requester, groupName);
+				return true;
 			}
-		}
-		else {
-			// Requester does not exist
-			return false;
-		}
 	}
 
 	//Method to create tokens
