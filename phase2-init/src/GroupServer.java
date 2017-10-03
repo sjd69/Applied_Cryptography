@@ -75,6 +75,21 @@ public class GroupServer extends Server {
 			groupList.addOwnership(username, "ADMIN");
 			groupList.addUser(username, "ADMIN");
 
+			ObjectOutputStream outStream;
+			try
+			{
+				outStream = new ObjectOutputStream(new FileOutputStream("UserList.bin"));
+				outStream.writeObject(userList);
+				outStream.close();
+
+				outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
+				outStream.writeObject(groupList);
+			}
+			catch(Exception ex)
+			{
+				System.err.println("Error: " + e.getMessage());
+				e.printStackTrace(System.err);
+			}
 		}
 		catch(IOException e)
 		{
