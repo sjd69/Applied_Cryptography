@@ -6,7 +6,7 @@ public class MyClient {
         GroupClient groupClient = new GroupClient();
         GroupServer groupServer = new GroupServer();
         UserToken userToken = null;
-        String username = null;
+        String username;
 
         MyFileClient myFileClient = new MyFileClient();
         MyGroupClient myGroupClient = new MyGroupClient();

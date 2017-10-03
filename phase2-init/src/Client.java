@@ -21,8 +21,8 @@ public abstract class Client {
 			System.out.println("Connected to " + server + " on port " + port);
 			
 			// Set up I/O streams with the server
-			final ObjectOutputStream output = new ObjectOutputStream(sock.getOutputStream());
-	    	final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
+			output = new ObjectOutputStream(sock.getOutputStream());
+	    	input = new ObjectInputStream(sock.getInputStream());
 	    	return true;
 		}
 		catch(Exception e)
