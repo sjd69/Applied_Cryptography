@@ -247,16 +247,27 @@ public class GroupThread extends Thread
 	}
 
 	// Returns a list containing the members of the specified group. Returns null if error.
+	// only shows list if 
 	private List<String> listMembers(String groupName, UserToken yourToken) {
 		String requester = yourToken.getSubject();
-		// Make sure the requester has a group
+		// Make sure group exists
 		if(my_gs.groupList.checkGroup(groupName)) {
-			ArrayList<String> groupMembers = new ArrayList<String>();
-			groupMembers = my_gs.groupList.getUsers(groupName);
-			return groupMembers;
+			// if requester is owner of group
+			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
+			if (owner.contains(requester)){
+				ArrayList<String> groupMembers = new ArrayList<String>();
+				groupMembers = my_gs.groupList.getUsers(groupName);
+				return groupMembers;
+			}
+			else
+			{
+				System.out.println("User not owner of group");
+				return null;
+			}
 		}
 		// Requester does not have a group to list
 		else {
+			System.out.println("Group Doesn't Exist");
 			return null;
 		}
 	}
@@ -283,7 +294,7 @@ public class GroupThread extends Thread
 				}
 			}
 			else {
-			// Requester is not an administrator of the group
+			// Requester is not an owner of the group
 			return false;
 			}
 		}
@@ -360,6 +371,8 @@ public class GroupThread extends Thread
 			else {
 				my_gs.groupList.addGroup(groupName);
 				my_gs.groupList.addOwnership(requester, groupName);
+				// also add to user list of that group
+				my_gs.groupList.addUser(requester, groupName);
 				return true;
 			}
 	}
