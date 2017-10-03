@@ -51,17 +51,18 @@ public class MyGroupClient
 				System.out.println("(9) - Disconnect from Group Server");
 		
 				int commandNum = sc.nextInt();
-			
+				sc.nextLine();
+				
 				switch (commandNum) 
 				{
 					// get token
 					// UserToken getToken(String username)
 					case 1: 
-						System.out.println("(1) - Get token");
+						System.out.println("-- Get token --");
 						if (utoken != null)
 						{
 							System.out.println("Token - " + utoken.getSubject());
-							System.out.println("Issued by" + utoken.getIssuer());
+							System.out.println("Issued by - " + utoken.getIssuer());
 							System.out.println("Groups: ");
 							List<String> groups = utoken.getGroups();
 							for (String f:groups){
@@ -77,10 +78,9 @@ public class MyGroupClient
 					// create user
 					// boolean createUser(String username, UserToken token)
 					case 2:
-						Scanner scan = new Scanner(System.in);
-						System.out.println("(2) - Create user");
+						System.out.println("-- Create user --");
 						System.out.println("Enter username to be created:");
-						String username = scan.nextLine();
+						String username = sc.nextLine();
 					
 						utoken = groupclient.getToken(username);
 						if(groupclient.createUser(username, utoken)){
@@ -94,10 +94,9 @@ public class MyGroupClient
 					// delete user
 					// boolean deleteUser(String username, UserToken token)
 					case 3:
-						Scanner scan3 = new Scanner(System.in);
 						System.out.println("(3) - Delete user");
 						System.out.println("Enter username to be deleted:");
-						String uname = scan3.nextLine();
+						String uname = sc.nextLine();
 					
 						utoken = groupclient.getToken(uname);
 						if(groupclient.deleteUser(uname, utoken)){
@@ -111,10 +110,9 @@ public class MyGroupClient
 					// create group
 					// boolean createGroup(String groupname, UserToken token)
 					case 4:
-						Scanner scan4 = new Scanner(System.in);
-						System.out.println("(4) - Create group");
+						System.out.println("-- Create group --");
 						System.out.println("Enter group to be created:");
-						String g = scan4.nextLine();
+						String g = sc.nextLine();
 					
 						if(groupclient.createGroup(g, utoken)){
 							System.out.println("Group " + g + " created");
@@ -126,10 +124,9 @@ public class MyGroupClient
 
 					// delete group
 					case 5:
-						Scanner scan5 = new Scanner(System.in);
-						System.out.println("(5) - Delete group");
+						System.out.println("-- Delete group --");
 						System.out.println("Enter group to be deleted:");
-						String groupName = scan5.nextLine();
+						String groupName = sc.nextLine();
 				
 						if(groupclient.deleteGroup(groupName, utoken)){
 							System.out.println("Group " + groupName + " deleted");
@@ -142,12 +139,11 @@ public class MyGroupClient
 					// add user to group
 					// boolean addUserToGroup(String username, String groupname, UserToken token)
 					case 6:
-						Scanner scan6 = new Scanner(System.in);
-						System.out.println("(6) - Add user to group");
+						System.out.println("-- Add user to group --");
 						System.out.println("Enter username to be added:");
 						String name = sc.nextLine();
 						System.out.println("Enter group:");
-						String grpname = scan6.nextLine();
+						String grpname = sc.nextLine();
 						if (groupclient.addUserToGroup(name, grpname, utoken)){
 							System.out.println("User " + name + " added to " + grpname);
 						}
@@ -160,12 +156,11 @@ public class MyGroupClient
 					// delete user from group
 					// boolean deleteUserFromGroup(String username, String groupname, UserToken token) 
 					case 7:
-						Scanner scan7 = new Scanner(System.in);
-						System.out.println("(7) - Delete user from group");
+						System.out.println("-- Delete user from group --");
 						System.out.println("Enter username to be deleted:");
 						String usename = sc.nextLine();
 						System.out.println("Enter group:");
-						String grp = scan7.nextLine();
+						String grp = sc.nextLine();
 						if (groupclient.addUserToGroup(usename, grp, utoken)){
 							System.out.println("User " + usename + " deleted from " + grp);
 						}
@@ -178,10 +173,9 @@ public class MyGroupClient
 					// list members of group
 					// List<String> listMembers(String group, UserToken token)
 					case 8:
-						Scanner scan8 = new Scanner(System.in);
-						System.out.println("(8) - List members of group");
+						System.out.println("--  List members of group --");
 						System.out.println("Enter group:");
-						String gname = scan8.nextLine();
+						String gname = sc.nextLine();
 						List<String> members = groupclient.listMembers(gname, utoken);
 						for (String f:members){
 							System.out.println(f);
@@ -190,13 +184,14 @@ public class MyGroupClient
 						
 					// disconnect from server 
 					case 9:
-						System.out.println("(8) - Disconnect from Group Server");
+						System.out.println("--  Disconnect from Group Server --");
 						groupclient.disconnect();
 						flag = false;
 						break;
 					default: System.out.println("Invalid Command Number");
 						break;
 			}
+			System.out.println();
 			}
 			else
 			{

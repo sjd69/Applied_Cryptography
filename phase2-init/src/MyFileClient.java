@@ -8,12 +8,12 @@ public class MyFileClient
 	{
 		boolean flag = true;
 		boolean connected = fileclient.connect(server, port);
-		while (flag){
-			if (connected)
-			{
-				Scanner sc = new Scanner(System.in);
+		if (connected)
+		{
+			System.out.println("Using MyFileClient - " + token.getSubject() + " Connected to File Server");
+			while (flag){
 			
-				System.out.println("Using MyFileClient - " + token.getSubject() + " Connected to File Server");
+				Scanner sc = new Scanner(System.in);
 				System.out.println("Enter command number:");
 				System.out.println("(1) - List files for " + token.getSubject());
 				System.out.println("(2) - Upload file");
@@ -23,24 +23,25 @@ public class MyFileClient
 			
 				int commandNum = sc.nextInt();
 				sc.nextLine();
+				System.out.println();
 				
 				// list files
 				if (commandNum == 1) {
 					List<String> filelist;
 					filelist = fileclient.listFiles(token);
-					System.out.println("(1) File List");
+					System.out.println(" -- File List -- ");
 					if (filelist != null){
 						for (String f:filelist){
 							System.out.println(f);
 						}
 					}
 					else {
-						System.out.println("No files");
+						System.out.println("No files for " + token.getSubject());
 					}
 				}
 				// upload file
 				else if (commandNum == 2) {
-					System.out.println("(2) Upload File");
+					System.out.println("-- Upload File --");
 					System.out.println("Enter source file: ");
 					String sourcefile = sc.nextLine();
 				
@@ -52,8 +53,8 @@ public class MyFileClient
 					fileclient.upload(sourcefile, destfile, grp, token);
 				}
 				// download file
-				if (commandNum == 3) {
-					System.out.println("(3) Download File");
+				else if (commandNum == 3) {
+					System.out.println("-- Download File --");
 					System.out.println("Enter source file: ");
 					String sFile = sc.nextLine();
 				
@@ -63,15 +64,15 @@ public class MyFileClient
 					fileclient.download(sFile, dFile, token);
 				}
 				// delete file
-				if (commandNum == 4) {
-					System.out.println("(4) Delete File");
+				else if (commandNum == 4) {
+					System.out.println("-- Delete File --");
 					System.out.println("Enter name of file to be deleted: ");
 					String filename = sc.nextLine();
 					fileclient.delete(filename, token);
 				}
 				// disconnect from server
-				if (commandNum == 5) {
-					System.out.println("(5) Disconnecting From File Server");
+				else if (commandNum == 5) {
+					System.out.println("-- Disconnecting From File Server --");
 					fileclient.disconnect();
 					connected = false;
 					flag = false;
@@ -79,14 +80,15 @@ public class MyFileClient
 				else {
 					System.out.println("Invalid Command Number");
 				}
+				System.out.println();
 			
 			}
-			else
-			{
-				System.out.println("Error connecting to FileClient");
-				return false;
-			}
 		}
-	return true;
+		else
+		{
+			System.out.println("Error connecting to FileClient");
+			return false;
+		}
+		return true;
 	}	
 }
