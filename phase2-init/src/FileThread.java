@@ -40,7 +40,7 @@ public class FileThread extends Thread
 				{
 				    /* First shot at trying to implement this 
 				    */
-				    UserToken token = (UserToken)e.getObjContents().get(2);
+				    UserToken token = (UserToken)e.getObjContents().get(0);
 				    ArrayList<ShareFile> files = FileServer.fileList.getFiles();
 					if (files == null) {
 						System.out.printf("No Files Exist For User");
@@ -49,7 +49,8 @@ public class FileThread extends Thread
 					{
 						e = new Envelope("OK");
 						//output.writeObject(e);
-						ArrayList<ShareFile> userFiles = new ArrayList<ShareFile>();
+						//ArrayList<ShareFile> userFiles = new ArrayList<ShareFile>();
+						ArrayList<String> uFiles = new ArrayList<String>();
 						for (ShareFile x:files)
 						{
 							List<String> userGroups = token.getGroups();
@@ -59,12 +60,13 @@ public class FileThread extends Thread
 							{
 								if (y.equals(groupname)){
 									// add it to userFiles if there is a match
-									userFiles.add(x);
+									System.out.println(x.getPath());
+									uFiles.add(x.getPath());
 								}
 							}
 						}
 						//return the list of user files to the client
-						e.addObject(userFiles);
+						e.addObject(uFiles);
 						output.writeObject(e);
 					}
 				}

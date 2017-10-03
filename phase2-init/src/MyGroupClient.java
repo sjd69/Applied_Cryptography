@@ -135,7 +135,6 @@ public class MyGroupClient
 						System.out.println("-- Delete group --");
 						System.out.println("Enter group to be deleted:");
 						String groupName = sc.nextLine();
-				
 						if(groupclient.deleteGroup(groupName, utoken)){
 							System.out.println("Group " + groupName + " deleted");
 						}
@@ -152,6 +151,7 @@ public class MyGroupClient
 						String name = sc.nextLine();
 						System.out.println("Enter group:");
 						String grpname = sc.nextLine();
+						
 						if (groupclient.addUserToGroup(name, grpname, utoken)){
 							System.out.println("User " + name + " added to " + grpname);
 						}
@@ -167,9 +167,11 @@ public class MyGroupClient
 						System.out.println("-- Delete user from group --");
 						System.out.println("Enter username to be deleted:");
 						String usename = sc.nextLine();
+						
 						System.out.println("Enter group:");
 						String grp = sc.nextLine();
-						if (groupclient.addUserToGroup(usename, grp, utoken)){
+						
+						if (groupclient.deleteUserFromGroup(usename, grp, utoken)){
 							System.out.println("User " + usename + " deleted from " + grp);
 						}
 						else

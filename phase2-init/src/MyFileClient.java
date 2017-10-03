@@ -3,17 +3,19 @@ import java.util.*;
 public class MyFileClient
 {
 	FileClient fileclient = new FileClient();
+	UserToken utoken;
 	
 	public boolean startMyFileClient(String server, int port, Token token)
 	{
 		boolean flag = true;
 		boolean connected = fileclient.connect(server, port);
-		if (connected)
-		{
-			System.out.println("Using MyFileClient - " + token.getSubject() + " Connected to File Server");
-			while (flag){
-			
-				Scanner sc = new Scanner(System.in);
+		utoken = token;
+		System.out.println("Using MyFileClient - " + token.getSubject() + " Connected to File Server");
+		Scanner sc = new Scanner(System.in);
+		
+		while (flag){
+			if (connected)
+			{
 				System.out.println("Enter command number:");
 				System.out.println("(1) - List files for " + token.getSubject());
 				System.out.println("(2) - Upload file");
@@ -23,24 +25,32 @@ public class MyFileClient
 			
 				int commandNum = sc.nextInt();
 				sc.nextLine();
-				System.out.println();
+				//System.out.println();
 				
 				// list files
-				if (commandNum == 1) {
+				switch (commandNum) 
+				{
+				case 1:
 					List<String> filelist;
-					filelist = fileclient.listFiles(token);
+					filelist = fileclient.listFiles(utoken);
 					System.out.println(" -- File List -- ");
-					if (filelist != null){
-						for (String f:filelist){
+					if (filelist != null)
+					{
+						/*for (String f:filelist)
+						{
 							System.out.println(f);
-						}
+						}*/
+						System.out.println("User has files");
 					}
-					else {
+					else 
+					{
 						System.out.println("No files for " + token.getSubject());
 					}
-				}
+					break;
+				
 				// upload file
-				else if (commandNum == 2) {
+				// boolean upload(String sourceFile, String destFile, String group, UserToken token)
+				case 2:
 					System.out.println("-- Upload File --");
 					System.out.println("Enter source file: ");
 					String sourcefile = sc.nextLine();
@@ -50,10 +60,11 @@ public class MyFileClient
 				
 					System.out.println("Enter group that file will belong to: ");
 					String grp = sc.nextLine();
-					fileclient.upload(sourcefile, destfile, grp, token);
-				}
+					fileclient.upload(sourcefile, destfile, grp, utoken);
+					break;
+					
 				// download file
-				else if (commandNum == 3) {
+				case 3:
 					System.out.println("-- Download File --");
 					System.out.println("Enter source file: ");
 					String sFile = sc.nextLine();
@@ -61,33 +72,36 @@ public class MyFileClient
 					System.out.println("Enter destination file: ");
 					String dFile = sc.nextLine();
 
-					fileclient.download(sFile, dFile, token);
-				}
+					fileclient.download(sFile, dFile, utoken);
+					break;
+				
 				// delete file
-				else if (commandNum == 4) {
+				case 4:
 					System.out.println("-- Delete File --");
 					System.out.println("Enter name of file to be deleted: ");
 					String filename = sc.nextLine();
-					fileclient.delete(filename, token);
-				}
+					fileclient.delete(filename, utoken);
+					break;
+
 				// disconnect from server
-				else if (commandNum == 5) {
+				case 5:
 					System.out.println("-- Disconnecting From File Server --");
 					fileclient.disconnect();
 					connected = false;
 					flag = false;
-				}
-				else {
-					System.out.println("Invalid Command Number");
+					break;
+					
+				default: System.out.println("Invalid Command Number");
+						break;
 				}
 				System.out.println();
 			
 			}
-		}
-		else
-		{
-			System.out.println("Error connecting to FileClient");
-			return false;
+			else
+			{
+				System.out.println("Error connecting to FileClient");
+				return false;
+			}
 		}
 		return true;
 	}	
