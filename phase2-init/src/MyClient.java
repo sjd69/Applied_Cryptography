@@ -42,7 +42,7 @@ public class MyClient {
                     //Connect to group client to auth
                     // Used this for the port. I think this should work. 
                     // It's 8765 just in case this is not right.
-                    groupClient.connect("localhost", groupServer.SERVER_PORT ); 
+                    groupClient.connect("localhost", GroupServer.SERVER_PORT);
 
                     if (groupClient.isConnected()) {
                         userToken = groupClient.getToken(username);
@@ -60,7 +60,7 @@ public class MyClient {
                         exit = true;
                         break;
                     }
-                } else if (nav == 2) {
+                } else {
                     exit = true;
                     break;
                 }
