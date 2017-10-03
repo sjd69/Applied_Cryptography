@@ -321,6 +321,7 @@ public class GroupThread extends Thread
 				}
 				else {
 					my_gs.groupList.addUser(username, groupName);
+					my_gs.userList.addGroup(username, groupName);
 					return true;
 				}
 			}
@@ -373,6 +374,7 @@ public class GroupThread extends Thread
 				my_gs.groupList.addOwnership(requester, groupName);
 				// also add to user list of that group
 				my_gs.groupList.addUser(requester, groupName);
+				my_gs.userList.addGroup(requester, groupName);
 				return true;
 			}
 	}
