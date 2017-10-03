@@ -48,18 +48,19 @@ public class FileThread extends Thread
 					else
 					{
 						e = new Envelope("OK");
-						//output.writeObject(e);
-						//ArrayList<ShareFile> userFiles = new ArrayList<ShareFile>();
+						
+						// uFiles to hold list of user file names
 						ArrayList<String> uFiles = new ArrayList<String>();
+						// list of user groups
+						List<String> userGroups = token.getGroups();
 						for (ShareFile x:files)
 						{
-							List<String> userGroups = token.getGroups();
 							String groupname = x.getGroup();
-							// something to check users groups and if theres a match
+							// check users groups and if theres a match
 							for (String y:userGroups)
 							{
 								if (y.equals(groupname)){
-									// add it to userFiles if there is a match
+									// add it to uFiles if there is a match
 									System.out.println(x.getPath());
 									uFiles.add(x.getPath());
 								}

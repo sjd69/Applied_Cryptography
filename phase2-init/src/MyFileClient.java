@@ -36,10 +36,10 @@ public class MyFileClient
 					System.out.println(" -- File List -- ");
 					if (filelist != null)
 					{
-						/*for (String f:filelist)
+						for (String f:filelist)
 						{
 							System.out.println(f);
-						}*/
+						}
 						System.out.println("User has files");
 					}
 					else 
