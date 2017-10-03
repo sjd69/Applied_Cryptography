@@ -10,11 +10,18 @@ public class GroupList implements java.io.Serializable {
 
     public synchronized boolean addGroup(String groupName) {
         Group newGroup = new Group();
-        return (this.list.put(groupName, newGroup) != null);
+        this.list.put(groupName, newGroup);
+        return this.list.get(groupName) != null;
     }
 
     public synchronized boolean deleteGroup(String groupName) {
-        return (this.list.remove(groupName) != null);
+
+        if (this.list.containsKey(groupName)) {
+            this.list.remove(groupName);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public synchronized boolean checkGroup(String username) {
