@@ -98,16 +98,20 @@ public class MyGroupClient
 					// delete user
 					// boolean deleteUser(String username, UserToken token)
 					case 3:
-						System.out.println("(3) - Delete user");
-						System.out.println("Enter username to be deleted:");
-						String uname = sc.nextLine();
+						if (token.getGroups().contains("ADMIN")) {
+							System.out.println("(3) - Delete user");
+							System.out.println("Enter username to be deleted:");
+							String uname = sc.nextLine();
 					
-						utoken = groupclient.getToken(uname);
-						if(groupclient.deleteUser(uname, utoken)){
-							System.out.println("User " + uname + " deleted");
+							if(groupclient.deleteUser(uname, utoken)){
+								System.out.println("User " + uname + " deleted");
+							}
+							else{
+								System.out.println("Error deleting user");
+							}
 						}
 						else{
-							System.out.println("Error deleting user");
+							System.out.println("Insufficient privileges.");
 						}
 						break;
 					
