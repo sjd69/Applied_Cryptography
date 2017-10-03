@@ -29,6 +29,10 @@ public class GroupList implements java.io.Serializable {
         return (this.list.get(groupName).addUser(user));
     }
 
+    public synchronized boolean removeUser(String user, String groupName) {
+        return (this.list.get(groupName).removeUser(user));
+    }
+
     public synchronized ArrayList<String> getOwnership(String groupName) {
         return (this.list.get(groupName).getOwnership());
     }

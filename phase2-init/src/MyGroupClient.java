@@ -2,7 +2,6 @@ import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.ObjectInputStream;
->>>>>>> 42ad126ec29f7b7f9a194de96785311cd72248cb
 
 public class MyGroupClient
 {
@@ -60,7 +59,7 @@ public class MyGroupClient
 					case 2:
 						System.out.println("(2) - Create user");
 						System.out.println("Enter username to be created:");
-						username = sc.nextLine();
+						String username = sc.nextLine();
 
 						utoken = groupclient.getToken(username);
 						if(groupclient.createUser(username, utoken)){
