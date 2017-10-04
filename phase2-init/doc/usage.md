@@ -3,7 +3,7 @@
 ## Running the Group Server
 
 To start the Group Server:
- - Enter the directory containing `RunGroupServer.class`
+ - Enter the src directory containing `RunGroupServer.class`
  - Type `java RunGroupServer`
 
 When the group server is first started, there are no users or groups. Since there must be an ADMIN of the system, the user is prompted via the console to enter a username. This name becomes the first user and is a member of the *ADMIN* group.  No groups other than *ADMIN* will exist.
@@ -11,13 +11,15 @@ When the group server is first started, there are no users or groups. Since ther
 ## Running the File Server
 
 To start the File Server:
- - Enter the directory containing `RunFileServer.class`
+ - Enter the src directory containing `RunFileServer.class`
  - Type `java RunFileServer`
 
 The file server will create a shared_files inside the working directory if one does not exist. The file server is now online.
 
 ## Running MyClient
 First, run both the GroupServer and the FileServer in seperate terminals as stated above.
+ - Enter the src directory containing `MyClient.class`
+ - Type `java MyClient`
  - Login when prompted for your username
  - Use the menu prompts to interact with either the GroupServer or the FileServer
 
