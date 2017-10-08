@@ -38,6 +38,7 @@ public interface GroupClientInterface
      *         If this user does not exist, a null value will be returned.
      *
      */
+    // TODO: Implement changes to interface in order to properly address Threat T1.
     public UserToken getToken(final String username);
 
 
