@@ -18,8 +18,10 @@ Using passwords gives the user a secret that only he knows to log in. Since only
 
 ## T2: Token Modification/Forgery
 
+Digital Signature Maybe?
+
 ## T3: Unauthorized File Servers
 
 ## T4: Information Leakage via Passive Monitoring
 
-SSH? Not sure of an alternative
+Combination of RSA/AES? Diffie Hellman exchange? 
