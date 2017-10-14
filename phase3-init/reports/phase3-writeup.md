@@ -18,10 +18,20 @@ Using passwords gives the user a secret that only he knows to log in. Since only
 
 ## T2: Token Modification/Forgery
 
+### Mechanism
 Digital Signature Maybe?
+
+### Justification
 
 ## T3: Unauthorized File Servers
 
+### Mechanism
+
+### Justification
+
 ## T4: Information Leakage via Passive Monitoring
 
-Combination of RSA/AES? Diffie Hellman exchange? 
+### Mechanism
+Combination of RSA/AES? Diffie Hellman exchange?
+
+### Justification
