@@ -17,11 +17,17 @@ Using passwords gives the user a secret that only he knows to log in. Since only
 
 
 ## T2: Token Modification/Forgery
+If users can increase their own access rights at will, they can tamper with any file they wish. They could delete all the files on the server, or download files that aren't mean for them. Additionally, users who can counterfeit tokens could distribute them to whomever they wish, which takes away rights from the administrator. 
+
+Once forged tokens come into existence, stopping distribution and use becomes more difficult. If there is no way to dinstiguish between a legitimate token and a forged one, innocent users may end up getting targeted as well.
 
 ### Mechanism
-Digital Signature Maybe?
+We will extend the UserToken interface to utilize RSA to both authenticate and exchange keys. We will generate a key pair, consisting of a public key and a private key, and then copy the public key to the server. Then we will generate a signature using the private key. The server can then verify that signature to validate the user's token. 
 
 ### Justification
+With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. 
+
+RSA in particular was chosen because it can be also be utilized for Threat Models 3 and 4 as well. 
 
 ## T3: Unauthorized File Servers
 
