@@ -1,5 +1,5 @@
 # Cryptographic Mechanisms
-INTRO PARAGRAPH  
+After considering the types of threat models our file-sharing program will be faced with, we've decided to implement new security enhancements which are primarily based on two concepts: ease of use and coverage. Our mechanisms are designed to ensure that legitimate users may interact with the servers without any additional frustration due to increased security. Our user-facing password system will be simple and easily-accessible for a user while still being robust enough to protect against unauthorized token issuance, due to salting and hashing. We decided to utilize RSA encryption for many of our protection mechanisms. This is both to keep the codebase consistent and also because RSA provides coverage for three of our four threat models. 
 
 
 ## T1: Unauthorized Token Issuance
@@ -36,8 +36,12 @@ RSA in particular was chosen because it can be also be utilized for Threat Model
 ### Justification
 
 ## T4: Information Leakage via Passive Monitoring
+Since we must assume that all activity on the servers is being monitored by a passive observer, it is imperative to ensure that the observer cannot glean any useful information from any communication. Although the observer himself cannot act on the knowledge, there is nothing stopping him from brokering it. The act of snooping in and of itself is also a threat of disclosure which violates any users' confidentiality. It is additionally important that this threat model is properly dealt with, as other mechanisms will rely on this threat being neutralized to be effective.
 
 ### Mechanism
-Combination of RSA/AES? Diffie Hellman exchange?
+We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. 
+[This needs to be fleshed out a little, but I don't know what else to say...]
 
 ### Justification
+An observer cannot gain any useful information from monitoring key exchanges, since he will only be privy to the public key. 
+[Again, not sure what else to add here.]
