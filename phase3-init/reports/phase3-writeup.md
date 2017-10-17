@@ -48,4 +48,4 @@ Using RSA to authenticate and exchange the symmetric session key allows us bette
 
 ## Final Thoughts
 
-![alt text](Example_exchange.pdf)
+![alt text](Example_exchange.png)
