@@ -41,5 +41,11 @@ Since we must assume that all activity on the servers is being monitored by a pa
 ### Mechanism
 We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. The client will initiate the connection to the server by sending a message indicating who they are, as well as a random number encrypted with the server's public key and the session key encrypted with the server's public key which is then signed by the user. The server decrypts the messages, and sends the first random number along with a second random number encrypted with the user's public key. The user then responds with the second random number. Now all messages can be exchanged using the secret session key. 
 
+<object data="T4.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="T4.pdf">
+        This browser does not support PDFs. Please download the PDF to view it: <a href="http://yoursite.com/the.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
+
 ### Justification
 Using RSA to authenticate and exchange the symmetric session key allows us better performance than using just RSA. The session key will be a 128bit AES key since that is the biggest allowed by JavaCrypto. So long as we generate a sufficiently large "probably" number, our key exchange will be secure.
