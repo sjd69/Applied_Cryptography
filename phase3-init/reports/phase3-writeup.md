@@ -30,8 +30,12 @@ With public-key authentication, signatures created by the user's private key can
 RSA in particular was chosen because it can be also be utilized for Threat Models 3 and 4 as well. 
 
 ## T3: Unauthorized File Servers
+Since we may only assume that file servers are entirely trustworthy after they have been properly authenticated, we must ensure that if a user wishes to contact a server, that they actually connect to that server and not some other server that is potentially malicious. Since any user may run a file server, the group server may not be required to know about all file servers and thus may not be used in user authentification of a file server. 
+
+Connecting to a malicious server while the user is under the impression that they are connected to the intended server brings about a number of problematic situations. For example, if Bob connects to a malicious server posing as the server Bob intended to access, the malicious server now has direct access to any file that Bob uploads which is a breach of confidentiality. The malicious server can also breach data integrity, if Bob requests a file the server can return any information that it so chooses to pose as that file. Finally, this situation threatens data avaliablitity if Bob requests an avaliable file and the malicious server doesn't return a file.
 
 ### Mechanism
+
 
 ### Justification
 
