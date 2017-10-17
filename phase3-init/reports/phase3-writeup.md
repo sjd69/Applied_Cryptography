@@ -45,3 +45,7 @@ We will utilize public key cryptography, RSA in particular, to establish and exc
 
 ### Justification
 Using RSA to authenticate and exchange the symmetric session key allows us better performance than using just RSA. The session key will be a 128bit AES key since that is the biggest allowed by JavaCrypto. So long as we generate a sufficiently large "probably" number, our key exchange will be secure.
+
+## Final Thoughts
+
+![alt text](Example exchange.pdf)
