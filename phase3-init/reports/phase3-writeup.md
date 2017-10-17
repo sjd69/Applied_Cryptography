@@ -22,7 +22,7 @@ If users can increase their own access rights at will, they can tamper with any 
 Once forged tokens come into existence, stopping distribution and use becomes more difficult. If there is no way to dinstiguish between a legitimate token and a forged one, innocent users may end up getting targeted as well.
 
 ### Mechanism
-We will extend the UserToken interface to utilize RSA to both authenticate and exchange keys. We will generate a key pair, consisting of a public key and a private key, and then copy the public key to the server. Then we will generate a signature using the private key. The server can then verify that signature to validate the user's token. 
+We will extend the UserToken interface to utilize RSA to both authenticate and exchange keys. The server will generate a key pair, consisting of a public key and a private key, and will generate a signature using the private key. We can then verify that signature to validate the token. 
 
 ### Justification
 With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. 
