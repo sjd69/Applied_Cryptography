@@ -38,6 +38,9 @@ When a file server is created, the server will generate a public and private RSA
 
 ### Justification
 By encrypting a random challenge with a server's public key, only the owner of that private key will be able to decrypt. Since we are assuming the list of file server public keys is trustworthy due to the assumption that adversaries are only passive, only the intended server will have the matching private key. This authenticates that file server the user interacts with is the intended file server. This uses less client CPU time than the Diffie-Hellman algorithm specified as part of the core SSH protocol (RFC 4432). Since one of the core concepts of our system is ease of use, we allow the user to authenticate servers quickly. RSA is also convenient as it is utilized in other ways by the system.
+
+RFC 4432 - http://www.ietf.org/rfc/rfc4432.txt
+
 ![alt text](T3diagram.png)
 
 ## T4: Information Leakage via Passive Monitoring
@@ -56,4 +59,4 @@ To account for ease of use and coverage, our security enhancements rely mainly o
 
 ![alt text](Example_exchange.png)
 
-RFC 4432 - http://www.ietf.org/rfc/rfc4432.txt
+
