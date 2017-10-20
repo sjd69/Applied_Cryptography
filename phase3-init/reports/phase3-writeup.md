@@ -17,7 +17,7 @@ Using passwords gives the user a secret that only he knows to log in. Since only
 
 
 ## T2: Token Modification/Forgery
-If users can increase their own access rights at will, they can tamper with any file they wish. They could delete all the files on the server, or download files that aren't mean for them. Additionally, users who can counterfeit tokens could distribute them to whomever they wish, which takes away rights from the administrator. 
+If users can increase their own access rights at will, they can tamper with any file they wish. They could delete all the files on the server, or download files that aren't meant for them. Additionally, users who can counterfeit tokens could distribute them to whomever they wish, which takes away rights from the administrator. 
 
 Once forged tokens come into existence, stopping distribution and use becomes more difficult. If there is no way to dinstiguish between a legitimate token and a forged one, innocent users may end up getting targeted as well.
 
@@ -25,9 +25,8 @@ Once forged tokens come into existence, stopping distribution and use becomes mo
 We will extend the UserToken interface to utilize RSA to both authenticate and exchange keys. The server will generate a key pair, consisting of a public key and a private key, and will generate a signature using the private key. We can then verify that signature to validate the token. 
 
 ### Justification
-With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. 
+With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. This ensures that forged tokens will not be accepted, as a third party would be able to verify if the signature is valid or not. RSA in particular was chosen because it can be also be utilized for multiple other mechanisms, providing coverage and economy of mechanism.
 
-RSA in particular was chosen because it can be also be utilized for Threat Models 3 and 4 as well. 
 
 ## T3: Unauthorized File Servers
 Since we may only assume that file servers are entirely trustworthy after they have been properly authenticated, we must ensure that if a user wishes to contact a server, that they actually connect to that server and not some other server that is potentially malicious. Since any user may run a file server, the group server may not be required to know about all file servers and thus may not be used in user authentification of a file server. 
