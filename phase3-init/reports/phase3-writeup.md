@@ -38,7 +38,7 @@ Connecting to a malicious server while the user is under the impression that the
 When a file server is created, the server will generate a public and private RSA key pair. The public key will be added to a list of file server public keys kept in a bin file. Since it is assumed that the system is monitored by a only passive adversary, we assume that the list of public keys can be seen as plain text but not modified. When a user attempts to authenticate a file server, the user will generate and encrypt a random challenge with the server's public key. The file server will be able to decrypt the challenge with its private key. The server then sends back that random challenge to the user.
 
 ### Justification
-By encrypting a random challenge with a server's public key, only the owner of that private key will be able to decrypt. Since we are assuming the list of file server public keys is trustworthy, only the intended server will have the matching private key. This authenticates that file server the user interacts with is the intended file server.
+By encrypting a random challenge with a server's public key, only the owner of that private key will be able to decrypt. Since we are assuming the list of file server public keys is trustworthy due to the assumption that adversaries are only passive, only the intended server will have the matching private key. This authenticates that file server the user interacts with is the intended file server. This uses less client CPU time than the Diffie-Hellman algorithm specified as part of the core SSH protocol (RFC 4432). Since one of the core concepts of our system is ease of use, we allow the user to authenticate servers quickly. RSA is also convenient as it is utilized in other ways by the system.
 ![alt text](T3diagram.png)
 
 ## T4: Information Leakage via Passive Monitoring
@@ -56,3 +56,5 @@ Using RSA to authenticate and exchange the symmetric session key allows us bette
 To account for ease of use and coverage, our security enhancements rely mainly on a user-facing password system and RSA encryption. The interplay of our mechanisms in response to the specific threats work well together, as they all have an underlying dependence on RSA public key encryption. The security mechanisms specifically address user legitimacy for interaction with servers without an excess of user burder for system interactions. Our mechanisms also ensure that untrusted users may not elevate access rights or attempt to create false tokens. File servers are authenticated by the user before interaction and communications between client and server are protected from passive adversaries.
 
 ![alt text](Example_exchange.png)
+
+RFC 4432 - http://www.ietf.org/rfc/rfc4432.txt
