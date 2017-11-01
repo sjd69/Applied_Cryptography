@@ -48,9 +48,11 @@ Since we must assume that all activity on the servers is being monitored by a pa
 
 ### Mechanism
 We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. The client will initiate the connection to the group server by sending a message indicating who they are, as well as a random number encrypted with the server's public key and the session key encrypted with the server's public key which is then signed by the user. The server decrypts the messages, and sends the first random number along with a second random number encrypted with the user's public key. The user then responds with the second random number. Now all messages can be exchanged using the secret session key. 
-The client will initaite the connection to the file server. After authentification of the file server, the user will send a shared session key K. All further messages will be encrypted with the session key before being exhanged.
+
+The client will initaite the connection to the file server. After authentification of the file server as described in T3, the user will send a shared session key, K, encrypted with the file server's public key. The file server will decrypt K using the server's private key. The user and server now share a secret session key. All further messages will be encrypted with the session key before being exhanged.
 
 ![alt text](T4.png)
+![alt text](T4diagram.png)
 
 ### Justification
 Using RSA to authenticate and exchange the symmetric session key allows us better performance than using just RSA. The session key will be a 128bit AES key since that is the biggest allowed by JavaCrypto, and AES is essentially the de facto standard for symmetric key cryptography. So long as we generate a sufficiently large "probably" number, our key exchange will be secure. A diffie-hellman exchange would also allow us to exchange a session key, but RSA seems easier to implement overall since it can be used in a variety of use cases in our system. 
