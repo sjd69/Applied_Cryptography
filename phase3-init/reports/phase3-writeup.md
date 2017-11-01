@@ -58,7 +58,6 @@ We will utilize public key cryptography, RSA in particular, to establish and exc
 
 The client will initaite the connection to the file server. After authentification of the file server as described in T3, the user will send a shared session key, K, encrypted with the file server's public key. The file server will decrypt K using the server's private key. The user and server now share a secret session key. All further messages will be encrypted with the session key before being exhanged.
 
-![alt text](T4.png)
 ![alt text](T4diagram.png)
 
 ### Justification
@@ -66,7 +65,3 @@ Using RSA to authenticate and exchange the symmetric session key allows us bette
 
 ## Final Thoughts
 To account for ease of use and coverage, our security enhancements rely mainly on a user-facing password system and RSA encryption. The interplay of our mechanisms in response to the specific threats work well together, as they all have an underlying dependence on RSA public key encryption. The security mechanisms specifically address user legitimacy for interaction with servers without an excess of user burder for system interactions. Our mechanisms also ensure that untrusted users may not elevate access rights or attempt to create false tokens. File servers are authenticated by the user before interaction and communications between client and server are protected from passive adversaries.
-
-![alt text](Example_exchange.png)
-
-
