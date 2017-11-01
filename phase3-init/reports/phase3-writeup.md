@@ -6,6 +6,7 @@ Our implementation utilizes the following mechanisms:
 * RSA: Our implementation uses 1024 bit RSA keys for public key encryption. 2048 bit keys sufficient for our purposes. 
 * Salting: Following the rule of thumb that a salt is the same size as the output of the hash function, our salt size will be 256 bits. This prevents against the possibility of an attacker creating a lookup table for every possible salt.
 * Random Number Challenge: The size of all random challenges utilized are 256 bits. This size is sufficently large to protect against brute force random guessing of the challenge by an adversary.
+* AES: For symmetric key encryption within our system (for session keys), we will utilize AES with a 128 bit key size. 
 
 
 ## T1: Unauthorized Token Issuance
