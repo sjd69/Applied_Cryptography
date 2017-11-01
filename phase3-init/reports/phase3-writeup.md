@@ -35,6 +35,7 @@ We will utilize RSA to both authenticate and exchange keys. The server will gene
 With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. This ensures that forged tokens will not be accepted, as a third party would be able to verify if the signature is valid or not. RSA in particular was chosen because it can be also be utilized for multiple other mechanisms, providing coverage and economy of mechanism.
 
 Rather than sign and transfer the token as it is, we've decided to instead send a signed hash of the token's data. This is due to both the size of the token and also the fact that it's the token's relevant data, and not the Java object itself, that we want to transfer. We picked SHA256 for our hash algorithm for further economy of mechanism, as we also use it to hash our passwords in T1.
+
 ![alt text](TokenDiag.png)
 
 ## T3: Unauthorized File Servers
