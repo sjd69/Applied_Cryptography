@@ -1,5 +1,6 @@
 /* This list represents the users on the server */
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -12,8 +13,8 @@ public class UserList implements java.io.Serializable {
     private static final long serialVersionUID = 7600343803563417992L;
     private Hashtable<String, User> list = new Hashtable<String, User>();
 
-    public synchronized void addUser(String username) {
-        User newUser = new User();
+    public synchronized void addUser(String username, PublicKey publicKey) {
+        User newUser = new User(publicKey);
         list.put(username, newUser);
     }
 
@@ -27,6 +28,10 @@ public class UserList implements java.io.Serializable {
         } else {
             return false;
         }
+    }
+
+    public synchronized PublicKey getPublicKey(String username) {
+        return list.get(username).getPublicKey();
     }
 
     public synchronized ArrayList<String> getUserGroups(String username) {
@@ -62,10 +67,20 @@ public class UserList implements java.io.Serializable {
         private static final long serialVersionUID = -6699986336399821598L;
         private ArrayList<String> groups;
         private ArrayList<String> ownership;
+        private PublicKey publicKey;
 
-        public User() {
+        public User(PublicKey publicKey) {
+            this.publicKey = publicKey;
             groups = new ArrayList<String>();
             ownership = new ArrayList<String>();
+        }
+
+        public PublicKey getPublicKey() {
+            return publicKey;
+        }
+
+        public void setPublicKey(PublicKey newPublicKey) {
+            this.publicKey = newPublicKey;
         }
 
         public ArrayList<String> getGroups() {
