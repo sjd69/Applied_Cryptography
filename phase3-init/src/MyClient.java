@@ -139,13 +139,13 @@ public class MyClient {
                         break;
 
                     case 2:
-                    	// generate session key for group server
-						Security.addProvider(new BouncyCastleProvider());
-						System.out.println("AES session key generation file server");
+                    	                    	// generate session key for group server
+                    	SecretKey sessionKey = null;
+						System.out.println("AES session key generation group server");
 						try {
 							KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
 							keyGenAES.init(128);
-							SecretKey sessionKey = keyGenAES.generateKey();
+							sessionKey = keyGenAES.generateKey();
 							//System.out.println(sessionKey);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -157,8 +157,62 @@ public class MyClient {
 
                         System.out.println("Enter the port number for the Group Server");
                         int gc_port = scanIn.nextInt();
-                        myGroupClient.startMyGroupClient(gc_ip, gc_port, userToken);
-                        break;
+                        
+                        System.out.println("Enter the Group Server's public key:");
+                        String stringKey = scanIn.nextLine();
+						byte[] byteKey = Base64.getDecoder().decode(stringKey);
+						PublicKey gspublicKey = null;
+						try {
+							gspublicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(byteKey));
+						} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+							e.printStackTrace();
+						}
+						
+						System.out.println("Enter your private key:");
+                        String stringPKey = scanIn.nextLine();
+						byte[] bytePKey = Base64.getDecoder().decode(stringPKey);
+						PrivateKey privateKey = null;
+						try {
+							privateKey = KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(byteKey));
+						} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+							e.printStackTrace();
+						}
+						
+						// Random Challenge
+						SecureRandom sr = new SecureRandom();
+						byte[] randbytes = new byte[20];
+						sr.nextBytes(randbytes);
+						
+						byte[] byteEncSK = null;
+						try {
+							// Random Challenge Encrypted with Server's Public Key
+							Cipher rsaCipherSig = Cipher.getInstance("RSA", "BC");
+							rsaCipherSig.init(Cipher.ENCRYPT_MODE, gspublicKey);
+							byte[] byteSignedRC = rsaCipherSig.doFinal(randbytes);
+							
+							// Session Key Encrypted with Server's Public Key 
+							byte[] bsessionKey = sessionKey.getEncoded();
+							byteEncSK = rsaCipherSig.doFinal(bsessionKey);
+						} 
+						catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException | NoSuchPaddingException | NoSuchProviderException| NoSuchAlgorithmException e) {
+							e.printStackTrace();
+						}
+						
+						try {
+						// Encrypted Session Key Signed with User Private Key
+							Cipher Signature = Cipher.getInstance("RSA", "BC");
+							Signature.init(Cipher.ENCRYPT_MODE, privateKey);
+							byte[] byteSignedSK = Signature.doFinal(byteEncSK);
+						} 
+						catch (BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchProviderException | InvalidKeyException | NoSuchAlgorithmException e) {
+							e.printStackTrace();
+						}
+						
+						
+						
+						// ------ handshake/auth here ---------------------------
+						
+                        myGroupClient.startMyGroupClient(gc_ip, gc_port, userToken); 
 
                     case 3:
                         System.out.println("Logging out");
