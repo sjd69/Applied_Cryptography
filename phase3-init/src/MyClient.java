@@ -5,6 +5,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Scanner;
+import java.security.Security;
+import java.security.*;
+import javax.crypto.*;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class MyClient {
     public static void main(String[] args) {
@@ -23,6 +27,18 @@ public class MyClient {
         boolean exit = true;
         boolean auth = false;
         int nav = -1;
+        
+        // generate session key
+        Security.addProvider(new BouncyCastleProvider());
+        System.out.println("AES session key generation");
+        try {
+			KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
+			keyGenAES.init(128);
+			SecretKey sessionKey = keyGenAES.generateKey();
+			//System.out.println(sessionKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         do {
             while (!auth) {
