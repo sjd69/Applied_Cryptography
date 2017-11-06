@@ -27,18 +27,6 @@ public class MyClient {
         boolean exit = true;
         boolean auth = false;
         int nav = -1;
-        
-        // generate session key
-        Security.addProvider(new BouncyCastleProvider());
-        System.out.println("AES session key generation");
-        try {
-			KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
-			keyGenAES.init(128);
-			SecretKey sessionKey = keyGenAES.generateKey();
-			//System.out.println(sessionKey);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         do {
             while (!auth) {
@@ -129,6 +117,18 @@ public class MyClient {
 
                 switch(nav) {
                     case 1:
+                    	// generate session key for file server
+						Security.addProvider(new BouncyCastleProvider());
+						System.out.println("AES session key generation file server");
+						try {
+							KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
+							keyGenAES.init(128);
+							SecretKey sessionKey = keyGenAES.generateKey();
+							//System.out.println(sessionKey);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
                         System.out.println("Enter IP Address of File Server.");
                         scanIn.nextLine();
                         String fs_ip = scanIn.nextLine();
@@ -139,6 +139,18 @@ public class MyClient {
                         break;
 
                     case 2:
+                    	// generate session key for group server
+						Security.addProvider(new BouncyCastleProvider());
+						System.out.println("AES session key generation file server");
+						try {
+							KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
+							keyGenAES.init(128);
+							SecretKey sessionKey = keyGenAES.generateKey();
+							//System.out.println(sessionKey);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
                         System.out.println("Enter IP Address of Group Server.");
                         scanIn.nextLine();
                         String gc_ip = scanIn.nextLine();
