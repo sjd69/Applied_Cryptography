@@ -38,38 +38,72 @@ public class FileThread extends Thread
 				// Handler to list files that this user is allowed to see
 				if(e.getMessage().equals("LFILES"))
 				{
-				    /* First shot at trying to implement this 
-				    */
-				    UserToken token = (UserToken)e.getObjContents().get(0);
-				    ArrayList<ShareFile> files = FileServer.fileList.getFiles();
-					if (files == null) {
-						System.out.printf("No Files Exist For User");
+
+					if(e.getObjContents().size() < 1)
+					{
+						response = new Envelope("FAIL-BADCONTENTS");
 					}
 					else
 					{
-						e = new Envelope("OK");
-						
-						// uFiles to hold list of user file names
-						ArrayList<String> uFiles = new ArrayList<String>();
-						// list of user groups
-						List<String> userGroups = token.getGroups();
-						for (ShareFile x:files)
+						if(e.getObjContents().get(0) == null) {
+							response = new Envelope("FAIL-BADTOKEN");
+						}
+						else
 						{
-							String groupname = x.getGroup();
-							// check users groups and if theres a match
-							for (String y:userGroups)
+							UserToken yourToken = (UserToken)e.getObjContents().get(0); //Extract token
+							String username = yourToken.getSubject();
+							String outputStr;
+							List<ShareFile> fullFileList = FileServer.fileList.getFiles();
+							List<String> userFileList = new ArrayList<String>();
+							if (fullFileList != null)
 							{
-								if (y.equals(groupname)){
-									// add it to uFiles if there is a match
-									System.out.println(x.getPath());
-									uFiles.add(x.getPath());
+								for (ShareFile sf: fullFileList)
+								{
+									if (yourToken.getGroups().contains(sf.getGroup()))
+									{
+										userFileList.add(sf.getPath() + "\t(" + sf.getOwner() + "/" + sf.getGroup() + ")");
+									}
 								}
 							}
+
+							response = new Envelope("OK"); //Success
+							response.addObject(userFileList);
 						}
-						//return the list of user files to the client
-						e.addObject(uFiles);
-						output.writeObject(e);
 					}
+					output.writeObject(response);
+
+//				    /* First shot at trying to implement this
+//				    */
+//				    UserToken token = (UserToken)e.getObjContents().get(0);
+//				    ArrayList<ShareFile> files = FileServer.fileList.getFiles();
+//					if (files == null) {
+//						System.out.printf("No Files Exist For User");
+//					}
+//					else
+//					{
+//						e = new Envelope("OK");
+//
+//						// uFiles to hold list of user file names
+//						ArrayList<String> uFiles = new ArrayList<String>();
+//						// list of user groups
+//						List<String> userGroups = token.getGroups();
+//						for (ShareFile x:files)
+//						{
+//							String groupname = x.getGroup();
+//							// check users groups and if theres a match
+//							for (String y:userGroups)
+//							{
+//								if (y.equals(groupname)){
+//									// add it to uFiles if there is a match
+//									System.out.println(x.getPath());
+//									uFiles.add(x.getPath());
+//								}
+//							}
+//						}
+//						//return the list of user files to the client
+//						e.addObject(uFiles);
+//						output.writeObject(e);
+//					}
 				}
 				if(e.getMessage().equals("UPLOADF"))
 				{

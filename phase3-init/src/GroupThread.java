@@ -4,6 +4,7 @@
 import java.lang.Thread;
 import java.net.Socket;
 import java.io.*;
+import java.security.PublicKey;
 import java.util.*;
 
 public class GroupThread extends Thread
@@ -69,8 +70,8 @@ public class GroupThread extends Thread
 							{
 								String username = (String)message.getObjContents().get(0); //Extract the username
 								UserToken yourToken = (UserToken)message.getObjContents().get(1); //Extract the token
-
-								if(createUser(username, yourToken))
+								PublicKey userPublicKey = (PublicKey)message.getObjContents().get(2);
+								if(createUser(username, yourToken, userPublicKey))
 								{
 									response = new Envelope("OK"); //Success
 								}
@@ -255,7 +256,7 @@ public class GroupThread extends Thread
 			// if requester is owner of group
 			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
 			if (owner.contains(requester)){
-				ArrayList<String> groupMembers = new ArrayList<String>();
+				ArrayList<String> groupMembers;
 				groupMembers = my_gs.groupList.getUsers(groupName);
 				return groupMembers;
 			}
@@ -399,7 +400,7 @@ public class GroupThread extends Thread
 
 
 	//Method to create a user
-	private boolean createUser(String username, UserToken yourToken)
+	private boolean createUser(String username, UserToken yourToken, PublicKey userPublicKey)
 	{
 		String requester = yourToken.getSubject();
 
@@ -418,7 +419,7 @@ public class GroupThread extends Thread
 				}
 				else
 				{
-					my_gs.userList.addUser(username);
+					my_gs.userList.addUser(username, userPublicKey);
 					return true;
 				}
 			}

@@ -12,7 +12,11 @@
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.*;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 
 public class GroupServer extends Server {
@@ -29,9 +33,10 @@ public class GroupServer extends Server {
 		super(_port, "ALPHA");
 	}
 	
-	public void start() {
+	public void start() throws InvalidKeyException {
 		// Overwrote server.start() because if no user file exists, initial admin account needs to be created
-		
+		Security.addProvider(new BouncyCastleProvider());
+
 		String userFile = "UserList.bin";
 		String groupFile = "GroupList.bin";
 		Scanner console = new Scanner(System.in);
@@ -61,11 +66,25 @@ public class GroupServer extends Server {
 			System.out.println("UserList File Does Not Exist. Creating UserList...");
 			System.out.println("No users currently exist. Your account will be the administrator.");
 			System.out.print("Enter your username: ");
-			String username = console.next();
-			
+			String username = console.nextLine();
+
+			PublicKey adminKey = null;
+
+			try {
+				System.out.print("What is your public key?: ");
+				String stringKey = console.nextLine();
+				byte[] byteKey = Base64.getDecoder().decode(stringKey);
+				adminKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(byteKey));
+			} catch (InvalidKeySpecException | NoSuchAlgorithmException e1) {
+				e1.printStackTrace();
+			}
+
+			if (adminKey == null) {
+				throw new InvalidKeyException();
+			}
 			//Create a new list, add current user to the ADMIN group. They now own the ADMIN group.
 			userList = new UserList();
-			userList.addUser(username);
+			userList.addUser(username, adminKey);
 			userList.addGroup(username, "ADMIN");
 			userList.addOwnership(username, "ADMIN");
 

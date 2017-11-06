@@ -1,3 +1,4 @@
+import java.security.PublicKey;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public interface GroupClientInterface
      *
      */
     // TODO: Implement changes to interface in order to properly address Threat T1.
-    public UserToken getToken(final String username);
+    public UserToken getToken(final String username, final PublicKey publicKey);
 
 
     /**
@@ -52,7 +53,7 @@ public interface GroupClientInterface
      * @return true if the new user was created, false otherwise
      *
      */
-    public boolean createUser(final String username, final UserToken token);
+    public boolean createUser(final String username, final UserToken token, final PublicKey userPublicKey);
 
 
     /**

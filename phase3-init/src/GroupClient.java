@@ -1,12 +1,13 @@
 /* Implements the GroupClient Interface */
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.ObjectInputStream;
 
 public class GroupClient extends Client implements GroupClientInterface {
  
-	 public UserToken getToken(String username)
+	 public UserToken getToken(String username, PublicKey publicKey)
 	 {
 		try
 		{
@@ -45,8 +46,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 		}
 		
 	 }
-	 
-	 public boolean createUser(String username, UserToken token)
+
+	 public boolean createUser(String username, UserToken token, PublicKey userPublicKey)
 	 {
 		 try
 			{
@@ -55,17 +56,14 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message = new Envelope("CUSER");
 				message.addObject(username); //Add user name string
 				message.addObject(token); //Add the requester's token
+				message.addObject(userPublicKey);
 				output.writeObject(message);
 			
 				response = (Envelope)input.readObject();
 				
 				//If server indicates success, return true
-				if(response.getMessage().equals("OK"))
-				{
-					return true;
-				}
-				
-				return false;
+				return response.getMessage().equals("OK");
+
 			}
 			catch(Exception e)
 			{

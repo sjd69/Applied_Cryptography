@@ -1,10 +1,11 @@
 import java.net.Socket;
+import java.security.InvalidKeyException;
 
 public abstract class Server {
 	
 	protected int port;
 	public String name;
-	abstract void start();
+	abstract void start() throws InvalidKeyException;
 	
 	public Server(int _SERVER_PORT, String _serverName) {
 		port = _SERVER_PORT;

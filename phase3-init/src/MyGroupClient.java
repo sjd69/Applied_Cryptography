@@ -1,3 +1,8 @@
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +88,17 @@ public class MyGroupClient
 							System.out.println("Enter username to be created:");
 							String username = sc.nextLine();
 
-							if(groupclient.createUser(username, token)){
+							System.out.println("Enter the user's public key");
+							String stringKey = sc.nextLine();
+							byte[] byteKey = Base64.getDecoder().decode(stringKey);
+							PublicKey publicKey = null;
+							try {
+								publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(byteKey));
+							} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+								e.printStackTrace();
+							}
+
+							if(groupclient.createUser(username, token, publicKey)){
 								System.out.println("User " + username + " created");
 							}
 							else{
