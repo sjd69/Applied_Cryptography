@@ -4,7 +4,6 @@ After considering the types of threat models our file-sharing program will be fa
 Our implementation utilizes the following mechanisms:
 * SHA256: We utilize SHA256 for hashing within our system. We chose to use SHA256 instead of SHA1 due to SHA1 being considered broken. Since this is just a file sharing service, SHA256 seems more than adequate rather than going with a more heavy-handed SHA512.
 * RSA: Our implementation uses 2048 bit RSA keys for public key encryption. 2048 bit keys provides us with performance and storage benefits over 4096 bit keys, while still supplying us with sufficient security. In addition, 4096 bit RSA keys has potential compatibility concerns with older hardware, we would like to reach the widest audience possible while still providing adequate security.
-* Salting: Following the rule of thumb that a salt is the same size as the output of the hash function, our salt size will be 256 bits. This prevents against the possibility of an attacker creating a lookup table for every possible salt.
 * Random Number Challenge: The size of all random challenges utilized are 256 bits. This size is sufficently large to protect against brute force random guessing of the challenge by an adversary. Random challenges will not be reused.
 * AES: For symmetric key encryption within our system (for session keys), we will utilize AES with a 128 bit key size. 
 
@@ -36,7 +35,7 @@ If users can increase their own access rights at will, they can tamper with any 
 Once forged tokens come into existence, stopping distribution and use becomes more difficult. If there is no way to dinstiguish between a legitimate token and a forged one, innocent users may end up getting targeted as well.
 
 ### Mechanism
-We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key for the itself. Key generation for user accounts will occur at the time of account creation by the Admin. The user will retrieve this public key outside the system in the same way that the user retrieves their temporary password from the Admin.
+We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key for the itself. Key generation for user accounts will occur at the time of account creation by use of a seperate. The user will retrieve this public key outside the system in the same way that the user retrieves their temporary password from the Admin.
 
 When the server creates a token, it will first stream the individual (delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server. The server will then send the signed hash of token information to the user, along with a challenge which is encrypted with the user's public key. We can then verify that signature of the hash of the token data to validate the user's token. Under the assumption that T4 is correctly implemented, this message will be encrypted. 
 
