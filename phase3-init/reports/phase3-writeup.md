@@ -20,7 +20,6 @@ ASSUMPTION: **T3** is properly implemented and public keys are exchanged prior t
 
 We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. The client will initiate the connection to the group server by sending a message indicating who they are, as well as a nonce encrypted with the server's public key. The server decrypts the message and sends the first nonce along with a second nonce encrypted with the user's public key. The user then responds with the second nonce as well as a session key that is signed by the user. Both the server and the user are now mutually authenticated and can communicate over a shared session key. The token may now be encrypted using the shared session key and sent to the user.
 
-![alt text](T4diagram.png)
 ![alt text](T4diagram2.png)
 
 ### Justification
@@ -70,6 +69,7 @@ SSH Host Key Checking - https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0
 ## T4: Information Leakage via Passive Monitoring
 Since we must assume that all activity on the servers is being monitored by a passive observer, it is imperative to ensure that the observer cannot glean any useful information from any communication. Although the observer himself cannot act on the knowledge, there is nothing stopping him from brokering it. The act of snooping in and of itself is also a threat of disclosure which violates any users' confidentiality. It is additionally important that this threat model is properly dealt with, as other mechanisms will rely on this threat being neutralized to be effective.
 
+![alt text](T4diagram.png)
 ### Mechanism
 Mutual authentication and setup is identical to that in **T1**. All communication after the setup described in **T1** will take place utilizing an AES session key.
 
