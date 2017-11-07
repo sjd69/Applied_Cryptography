@@ -25,19 +25,22 @@ We will utilize public key cryptography, RSA in particular, to establish and exc
 
 
 ### Justification
-NOTE: Justification for the session key and using RSA over diffie hellman are expound upon in **T4**
+NOTE: Justification for the session key and using RSA over diffie hellman are expound upon in **T4.** A second simple application is built just to generate key pairs. User can generate the key pair then give the public key to the administrator to create the account outside the system.
 
 Using RSA to authenticate provides us better, more robust security over using a standard password based system. In addition, this system was already being implemented for T4 to establish and exchange a session key. Since this system provides mutual authentication it makes sense to simplify things and not use a redundant system like passwords.
 
 ## T2: Token Modification/Forgery
+Assumption: **T4** is correctly implemented, this message will be encrypted.
+
+
 If users can increase their own access rights at will, they can tamper with any file they wish. They could delete all the files on the server, or download files that aren't meant for them. Additionally, users who can counterfeit tokens could distribute them to whomever they wish, which takes away rights from the administrator. 
 
 Once forged tokens come into existence, stopping distribution and use becomes more difficult. If there is no way to dinstiguish between a legitimate token and a forged one, innocent users may end up getting targeted as well.
 
 ### Mechanism
-We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key for the itself. Key generation for user accounts will occur at the time of account creation by use of a seperate. The user will retrieve this public key outside the system in the same way that the user retrieves their temporary password from the Admin.
+We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key for the itself. Key generation for user accounts will occur at the time of account creation by use of a seperate KeyGeneration program. This Keypair generation occurs prior to the Admin creating an account. The user "hands" the admin the public key to create the account, again outside the system.
 
-When the server creates a token, it will first stream the individual (delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server. The server will then send the signed hash of token information to the user, along with a challenge which is encrypted with the user's public key. We can then verify that signature of the hash of the token data to validate the user's token. Under the assumption that T4 is correctly implemented, this message will be encrypted. 
+When the server creates a token, it will first stream the individual (delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server. The server will then send the signed hash of token information to the user, along with a challenge which is encrypted with the user's public key. We can then verify that signature of the hash of the token data to validate the user's token.  
 
 ### Justification
 With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. This ensures that forged tokens will not be accepted, as a third party would be able to verify if the signature is valid or not. RSA in particular was chosen because it can be also be utilized for multiple other mechanisms, providing coverage and economy of mechanism. 
@@ -58,9 +61,10 @@ Connecting to a malicious server while the user is under the impression that the
 When a file server is created, the server will generate a public and private RSA key pair. When a user attempts to connect to a server,  the server will send the user it's public key fingerprint. The fingerprint and IP will be checked against stored information on the client, and if there is a mismatch or the server's information does not yet exist on the client (first connection), the user will be prompted with the server's name, fingerprint, and IP, and asked if they would like to connect to this server at their own risk. If the user accepts, the server's information is stored (name, IP, public key) on the client. When a user attempts to authenticate a file server, the user will generate and encrypt a random challenge with the server's public key. The file server will be able to decrypt the challenge with its private key. The server then sends back that random challenge to the user.
 
 ### Justification
-By encrypting a random challenge with a server's public key, only the owner of that private key will be able to decrypt. Since we are assuming the list of file server public keys is trustworthy due to the assumption that adversaries are only passive, only the intended server will have the matching private key. This authenticates that file server the user interacts with is the intended file server. This uses less client CPU time than the Diffie-Hellman algorithm specified as part of the core SSH protocol (RFC 4432). Since one of the core concepts of our system is ease of use, we allow the user to authenticate servers quickly. RSA is also convenient as it is utilized in other ways by the system. Past random challenges will be recorded in a bin file to prevent against replay attacks to ensure that old challenges are not accepted or used.
+By encrypting a random challenge with a server's public key, only the owner of that private key will be able to decrypt. Since we are assuming the storage of server public keys is trustworthy due to the assumption that adversaries are only passive, only the intended server will have the matching private key. This authenticates that file server the user interacts with is the intended file server. This uses less client CPU time than the Diffie-Hellman algorithm specified as part of the core SSH protocol (RFC 4432). Since one of the core concepts of our system is ease of use, we allow the user to authenticate servers quickly. RSA is also convenient as it is utilized in other ways by the system. Past random challenges will be recorded in a bin file to prevent against replay attacks to ensure that old challenges are not accepted or used. Our mechanism was inspired by the SSH host verification scheme. 
 
 RFC 4432 - http://www.ietf.org/rfc/rfc4432.txt
+SSH Host Key Checking - https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.foto100/hostch.htm
 
 ![alt text](T3diagram.png)
 
