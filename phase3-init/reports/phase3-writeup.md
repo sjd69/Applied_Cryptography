@@ -24,9 +24,9 @@ We will utilize public key cryptography, RSA in particular, to establish and exc
 ![alt text](T4diagram2.png)
 
 ### Justification
-NOTE: Justification for the session key and using RSA over diffie hellman are expound upon in **T4.** A second simple application is built just to generate key pairs. User can generate the key pair then give the public key to the administrator to create the account outside the system.
+NOTE: Our system depends on the assumption that a second simple application is built solely to generate key pairs. This application allows users to generate the key pair and give the public key to the administrator for account creation outside the system. Justification for the session key and using RSA over diffie hellman are expound upon in **T4.** 
 
-Using RSA to authenticate provides us better, more robust security over using a standard password based system. In addition, this system was already being implemented for T4 to establish and exchange a session key. Since this system provides mutual authentication it makes sense to simplify things and not use a redundant system like passwords.
+Using RSA to authenticate provides us better, more robust security compared to the alternative standard password-based system. In addition, this protocol was already being utilized in T4 to establish and securely exchange a session key. Since this protocol provides mutual authentication, it makes sense to simplify user interaction and not require a redundant password login.
 
 ## T2: Token Modification/Forgery
 Assumption: **T4** is correctly implemented, this message will be encrypted.
