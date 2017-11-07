@@ -40,14 +40,14 @@ Once forged tokens come into existence, stopping distribution and use becomes mo
 ### Mechanism
 We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key for the itself. Key generation for user accounts will occur at the time of account creation by use of a seperate KeyGeneration program. This Keypair generation occurs prior to the Admin creating an account. The user "hands" the admin the public key to create the account, again outside the system.
 
-When the server creates a token, it will first stream the individual (delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server. The server will then send the signed hash of token information to the user, along with a challenge which is encrypted with the user's public key. We can then verify that signature of the hash of the token data to validate the user's token.  
+When the server creates a token, it will first stream the individual (delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server. The server will then send the signed hash of token information to the user, along with the token itself. We can then verify that signature of the hash of the token data to validate the user's token.  
 
 ### Justification
 With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. This ensures that forged tokens will not be accepted, as a third party would be able to verify if the signature is valid or not. RSA in particular was chosen because it can be also be utilized for multiple other mechanisms, providing coverage and economy of mechanism. 
 
 Rather than sign and transfer the token as it is, we've decided to instead send a signed hash of the token's data. This is due to both the size of the token and also the fact that it's the token's relevant data, and not the Java object itself, that we want to transfer. We picked SHA256 for our hash algorithm for further economy of mechanism, as we also use it to hash our passwords in T1.
 
-The token's issuer, subject, and group information will be delimited prior to hashing to provide collision resistance.
+The token's issuer, subject, and group information will be delimited prior to hashing to provide collision resistance, as it prevents you from encoding arbitrary data structures within a group.
 
 ![alt text](TokenDiag.png)
 ![alt text](T2diagram2.png)
