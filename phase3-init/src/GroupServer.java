@@ -103,12 +103,15 @@ public class GroupServer extends Server {
 
 				outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
 				outStream.writeObject(groupList);
+
+				System.out.println("Created lists.");
 			}
 			catch(Exception ex)
 			{
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace(System.err);
 			}
+			System.out.println("Server running.");
 		}
 		catch(IOException e)
 		{

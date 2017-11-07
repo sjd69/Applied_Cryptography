@@ -20,11 +20,11 @@ public class KeyGen {
 
             if (rsaPrivate != null && rsaPublic != null) {
                 System.out.println("RSA keys successfully generated.");
-                System.out.println("PRIVATE: "
+                System.out.println("\nPRIVATE: "
                         + new String(java.util.Base64.getEncoder().encode(rsaPrivate.getEncoded())));
-                System.out.println("PUBLIC: "
+                System.out.println("\nPUBLIC: "
                         + new String(java.util.Base64.getEncoder().encode(rsaPublic.getEncoded())));
-                System.out.println("DO NOT GIVE YOUR PRIVATE KEY TO ANYONE!");
+                System.out.println("\nDO NOT GIVE YOUR PRIVATE KEY TO ANYONE!");
             }
 
             Scanner scanner = new Scanner(System.in);

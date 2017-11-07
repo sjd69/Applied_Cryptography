@@ -63,15 +63,20 @@ public class Token implements UserToken, Serializable
     public byte[] getBytes()
     {
     	String[] tokenInfo = new String[3];
-	tokenInfo[0] = issuer + ",";
-	tokenInfo[1] = subject + ",";
-	String groupStr = "";
-	for (String x:groups){
-		groupStr = groupStr + "," + x;
-	}
-	tokenInfo[2] = groupStr;
-	new byte b[] = tokenInfo.getBytes()
-	return b[];
+		tokenInfo[0] = issuer + ",";
+		tokenInfo[1] = subject + ",";
+		String groupStr = "";
+		for (String x:groups){
+			groupStr = groupStr + "," + x;
+		}
+		tokenInfo[2] = groupStr;
+		byte[] tokenBytes = new byte[tokenInfo.length];
+		int i = 0;
+		for (String s: tokenInfo) {
+			tokenBytes[i] = Byte.parseByte(s);
+			i++;
+		}
+		return tokenBytes;
     }
 
 }
