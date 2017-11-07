@@ -16,13 +16,12 @@ The token stores all of a user's data and since clients are assumed to be untrus
 Example: Bob is an administrator on our file sharing service. Mallory requests Bob's token and subsequently wipes the service of users, groups, and files.  
 
 ### Mechanism
-NOTE: Then token itself is not sent, but the contents. This is expound upon in **T2**.
-
 ASSUMPTION: **T3** is properly implemented and public keys are exchanged prior to the start of this exchange.
 
 We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. The client will initiate the connection to the group server by sending a message indicating who they are, as well as a nonce encrypted with the server's public key. The server decrypts the message and sends the first nonce along with a second nonce encrypted with the user's public key. The user then responds with the second nonce as well as a session key that is signed by the user. Both the server and the user are now mutually authenticated and can communicate over a shared session key. The token may now be encrypted using the shared session key and sent to the user.
 
-
+![alt text](T4diagram.png)
+![alt text](T4diagram2.png)
 
 ### Justification
 NOTE: Justification for the session key and using RSA over diffie hellman are expound upon in **T4.** A second simple application is built just to generate key pairs. User can generate the key pair then give the public key to the administrator to create the account outside the system.
@@ -75,9 +74,6 @@ Since we must assume that all activity on the servers is being monitored by a pa
 Mutual authentication and setup is identical to that in **T1**. All communication after the setup described in **T1** will take place utilizing an AES session key.
 
 The client will initiate the connection to the file server. After authentication of the file server as described in T3, the user will send a shared session key, K, encrypted with the file server's public key. The file server will decrypt K using the server's private key. The user and server now share a secret session key. All further messages will be encrypted with the session key before being exhanged.
-
-![alt text](T4diagram.png)
-![alt text](T4diagram2.png)
 
 ### Justification
 Using RSA to authenticate and exchange the symmetric session key allows us better performance than using just RSA. The session key will be a 128bit AES key since that is the biggest allowed by JavaCrypto, and AES is essentially the de facto standard for symmetric key cryptography and provides us with sufficient security. So long as we generate a sufficiently large "probably" prime number, our key exchange will be secure. A diffie-hellman exchange would also allow us to exchange a session key, but RSA seems easier to implement overall since it can be used in a variety of use cases in our system. 
