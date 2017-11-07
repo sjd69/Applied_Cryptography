@@ -5,7 +5,8 @@ Our implementation utilizes the following mechanisms:
 * SHA256: We utilize SHA256 for hashing within our system. We chose to use SHA256 instead of SHA1 due to SHA1 being considered broken. Since this is just a file sharing service, SHA256 seems more than adequate rather than going with a more heavy-handed SHA512.
 * RSA: Our implementation uses 2048 bit RSA keys for public key encryption. 1024 RSA keys are considered dead. 2048 bit keys are still considered secure and provide us with performance and storage benefits over 4096 bit keys, while still supplying us with sufficient security. In addition, 4096 bit RSA keys has potential compatibility concerns with older hardware, we would like to reach the widest audience possible while still providing adequate security.
 * Random Number Challenge: The size of all random challenges utilized are 256 bits. This size is sufficently large to protect against brute force random guessing of the challenge by an adversary. Random challenges will not be reused.
-* AES: For symmetric key encryption within our system (for session keys), we will utilize AES with a 128 bit key size. We chose 128 bit keys over 256 keys as 128 bit keys are significantly faster but still sufficent security-wise.  
+* AES: For symmetric key encryption within our system (for session keys), we will utilize AES with a 128 bit key size. We chose 128 bit keys over 256 keys as 128 bit keys are significantly faster but still sufficent security-wise. We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. 
+* MD5: We utilize MD5 within our system for generating public key fingerprints. MD5 produces human readible fingerprints, which is necessary for our purposes. MD5 is also used for SSH for a similiar protocol which is why we chose it compared to SHA1.
 
 
 ## T1: Unauthorized Token Issuance
@@ -16,13 +17,11 @@ The token stores all of a user's data and since clients are assumed to be untrus
 Example: Bob is an administrator on our file sharing service. Mallory requests Bob's token and subsequently wipes the service of users, groups, and files.  
 
 ### Mechanism
-NOTE: Then token itself is not sent, but the contents. This is expound upon in **T2**.
-
 ASSUMPTION: **T3** is properly implemented and public keys are exchanged prior to the start of this exchange.
 
 We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. The client will initiate the connection to the group server by sending a message indicating who they are, as well as a nonce encrypted with the server's public key. The server decrypts the message and sends the first nonce along with a second nonce encrypted with the user's public key. The user then responds with the second nonce as well as a session key that is signed by the user. Both the server and the user are now mutually authenticated and can communicate over a shared session key. The token may now be encrypted using the shared session key and sent to the user.
 
-
+![alt text](T4diagram2.png)
 
 ### Justification
 NOTE: Justification for the session key and using RSA over diffie hellman are expound upon in **T4.** A second simple application is built just to generate key pairs. User can generate the key pair then give the public key to the administrator to create the account outside the system.
@@ -71,13 +70,11 @@ SSH Host Key Checking - https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0
 ## T4: Information Leakage via Passive Monitoring
 Since we must assume that all activity on the servers is being monitored by a passive observer, it is imperative to ensure that the observer cannot glean any useful information from any communication. Although the observer himself cannot act on the knowledge, there is nothing stopping him from brokering it. The act of snooping in and of itself is also a threat of disclosure which violates any users' confidentiality. It is additionally important that this threat model is properly dealt with, as other mechanisms will rely on this threat being neutralized to be effective.
 
+![alt text](T4diagram.png)
 ### Mechanism
 Mutual authentication and setup is identical to that in **T1**. All communication after the setup described in **T1** will take place utilizing an AES session key.
 
 The client will initiate the connection to the file server. After authentication of the file server as described in T3, the user will send a shared session key, K, encrypted with the file server's public key. The file server will decrypt K using the server's private key. The user and server now share a secret session key. All further messages will be encrypted with the session key before being exhanged.
-
-![alt text](T4diagram.png)
-![alt text](T4diagram2.png)
 
 ### Justification
 Using RSA to authenticate and exchange the symmetric session key allows us better performance than using just RSA. The session key will be a 128bit AES key since that is the biggest allowed by JavaCrypto, and AES is essentially the de facto standard for symmetric key cryptography and provides us with sufficient security. So long as we generate a sufficiently large "probably" prime number, our key exchange will be secure. A diffie-hellman exchange would also allow us to exchange a session key, but RSA seems easier to implement overall since it can be used in a variety of use cases in our system. 
