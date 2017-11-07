@@ -17,9 +17,9 @@ The token stores all of a user's data and since clients are assumed to be untrus
 Example: Bob is an administrator on our file sharing service. Mallory requests Bob's token and subsequently wipes the service of users, groups, and files.  
 
 ### Mechanism
-ASSUMPTION: **T3** is properly implemented and public keys are exchanged prior to the start of this exchange.
+ASSUMPTION: **T3** is properly implemented and public keys are exchanged prior to the start of this exchange. We also assume that the session key is implemented properly according to **T4**.
 
-We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. The client will initiate the connection to the group server by sending a message indicating who they are, as well as a nonce encrypted with the server's public key. The server decrypts the message and sends the first nonce along with a second nonce encrypted with the user's public key. The user then responds with the second nonce as well as a session key that is signed by the user. Both the server and the user are now mutually authenticated and can communicate over a shared session key. The token may now be encrypted using the shared session key and sent to the user.
+We will utilize public key cryptography, RSA in particular, to establish and exchange a session key. The client will initiate the connection to the group server by sending a message indicating who they are, as well as a nonce encrypted with the server's public key (and an encrypted session key, protocol in **T4**). The server decrypts the message and sends the first nonce along with a second nonce encrypted with the user's public key. The user then responds with the second nonce as well as a session key that is signed by the user. Both the server and the user are now mutually authenticated and can communicate with the shared session key. The token may now be encrypted using the shared session key and sent to the user.
 
 ![alt text](T4diagram2.png)
 
