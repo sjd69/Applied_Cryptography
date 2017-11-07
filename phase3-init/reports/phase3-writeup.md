@@ -66,7 +66,7 @@ By encrypting a random challenge with a server's public key, only the owner of t
 RFC 4432 - http://www.ietf.org/rfc/rfc4432.txt
 SSH Host Key Checking - https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.foto100/hostch.htm
 
-![alt text](T3diagram.png)
+![alt text](T2diagram (1).png)
 
 ## T4: Information Leakage via Passive Monitoring
 Since we must assume that all activity on the servers is being monitored by a passive observer, it is imperative to ensure that the observer cannot glean any useful information from any communication. Although the observer himself cannot act on the knowledge, there is nothing stopping him from brokering it. The act of snooping in and of itself is also a threat of disclosure which violates any users' confidentiality. It is additionally important that this threat model is properly dealt with, as other mechanisms will rely on this threat being neutralized to be effective.
