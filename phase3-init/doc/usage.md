@@ -21,7 +21,7 @@ To run KeyGen:
  - Enter the src directory containing `KeyGen.class`
  - Type `java KeyGen`
  
-The application will output a public and private key pair
+The application will output a public and private key pair. The public key will need copied to the group server (on first usgae) and private key will need copied to the client for login.
 
 ## Running MyClient
 First, run both the GroupServer and the FileServer in seperate terminals as stated above.
