@@ -24,7 +24,7 @@ We will utilize public key cryptography, RSA in particular, to establish and exc
 ![alt text](T4diagram2.png)
 
 ### Justification
-NOTE: Our system depends on the assumption that a second simple application is built solely to generate key pairs. This application allows users to generate the key pair and give the public key to the administrator for account creation outside the system. Justification for the session key and using RSA over diffie hellman are expound upon in **T4.** 
+NOTE: Our system depends on the assumption that a second simple KeyGeneration application is built solely to generate key pairs. This application allows users to generate the key pair and give the public key to the administrator for account creation outside the system. Justification for the session key and using RSA over diffie hellman are expound upon in **T4.** 
 
 Using RSA to authenticate provides us better, more robust security compared to the alternative standard password-based system. In addition, this protocol was already being utilized in T4 to establish and securely exchange a session key. Since this protocol provides mutual authentication, it makes sense to simplify user interaction and not require a redundant password login.
 
@@ -37,16 +37,16 @@ If users can increase their own access rights at will, they can tamper with any 
 Once forged tokens come into existence, stopping distribution and use becomes more difficult. If there is no way to dinstiguish between a legitimate token and a forged one, innocent users may end up getting targeted as well.
 
 ### Mechanism
-We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key for the itself. Key generation for user accounts will occur at the time of account creation by use of a seperate KeyGeneration program. This Keypair generation occurs prior to the Admin creating an account. The user "hands" the admin the public key to create the account, again outside the system.
+We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key, for the itself. Key generation for user accounts will occur at the time of account creation by use of a seperate KeyGeneration application. This key pair generation occurs prior to the creation an account by an Admin. The user "hands" the Admin their public key for account creation, again outside the system.
 
-When the server creates a token, it will first stream the individual (delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server. The server will then send the signed hash of token information to the user, along with the token itself. We can then verify that signature of the hash of the token data to validate the user's token.  
+When the server creates a token, it will first stream the (comma-delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server using its private key. The server will then send the signed hash of token information to the user, along with the token itself. The user may verify the signature and the hash of the token data to validate the user's token.   
 
 ### Justification
 With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. This ensures that forged tokens will not be accepted, as a third party would be able to verify if the signature is valid or not. RSA in particular was chosen because it can be also be utilized for multiple other mechanisms, providing coverage and economy of mechanism. 
 
 Rather than sign and transfer the token as it is, we've decided to instead send a signed hash of the token's data. This is due to both the size of the token and also the fact that it's the token's relevant data, and not the Java object itself, that we want to transfer. We picked SHA256 for our hash algorithm for further economy of mechanism, as we also use it to hash our passwords in T1.
 
-The token's issuer, subject, and group information will be delimited prior to hashing to provide collision resistance, as it prevents you from encoding arbitrary data structures within a group.
+The token's issuer, subject, and group information will be delimited prior to hashing to provide collision resistance, as it prevents you from encoding arbitrary data structures within a group. Signing the hash value ensures that the hash value of the token has not been modified since it was sent directly from the server. The unmodified hash value can be used to compare to the hash of the token itself. If the hash values do not match, we know that the token has been modified and should not be used. 
 
 ![alt text](TokenDiag.png)
 ![alt text](T2diagram2.png)
