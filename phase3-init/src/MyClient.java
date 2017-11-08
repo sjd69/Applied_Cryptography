@@ -19,6 +19,7 @@ public class MyClient {
     private static MessageDigest md;
 
     public static void main(String[] args) {
+	 Security.addProvider(new BouncyCastleProvider());
         //FileClient fileClient = new FileClient();
         GroupClient groupClient = new GroupClient();
         GroupServer groupServer = new GroupServer();
@@ -149,7 +150,6 @@ public class MyClient {
                 switch(nav) {
                     case 1:
                     	// generate session key for file server
-						Security.addProvider(new BouncyCastleProvider());
 						System.out.println("AES session key generation file server");
 						try {
 							KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
@@ -170,6 +170,7 @@ public class MyClient {
                         break;
 
                     case 2:
+                    	// generate session key for group server
                     	                    	// generate session key for group server
                     	SecretKey sessionKey = null;
 						System.out.println("AES session key generation group server");
@@ -238,13 +239,11 @@ public class MyClient {
 						catch (BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchProviderException | InvalidKeyException | NoSuchAlgorithmException e) {
 							e.printStackTrace();
 						}
-						
-						
-						
+					
 						// ------ handshake/auth here ---------------------------
 						
                         myGroupClient.startMyGroupClient(gc_ip, gc_port, userToken); 
-
+                        break;
                     case 3:
                         System.out.println("Logging out");
                         auth = false;
