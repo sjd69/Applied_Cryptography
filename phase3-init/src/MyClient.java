@@ -31,6 +31,7 @@ public class MyClient {
         String username;
         PrivateKey privateKey = null;
         PublicKey serverPublicKey = null;
+        SecretKey sessionKey;
 
         MyFileClient myFileClient = new MyFileClient();
         MyGroupClient myGroupClient = new MyGroupClient();
@@ -110,7 +111,7 @@ public class MyClient {
                         if (validated) {
 
 
-                            SecretKey sessionKey = handshake(username, serverPublicKey, privateKey);
+                            sessionKey = handshake(username, serverPublicKey, privateKey);
 
                             if (sessionKey != null) {
                                 userToken = groupClient.getToken(username);
@@ -167,7 +168,7 @@ public class MyClient {
                         try {
                             KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
                             keyGenAES.init(128);
-                            SecretKey sessionKey = keyGenAES.generateKey();
+                            sessionKey = keyGenAES.generateKey();
                             //System.out.println(sessionKey);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -185,7 +186,7 @@ public class MyClient {
                     case 2:
                     	// generate session key for group server
                     	                    	// generate session key for group server
-                    	SecretKey sessionKey = null;
+                    	sessionKey = null;
 						System.out.println("AES session key generation group server");
 						try {
 							KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
@@ -342,7 +343,8 @@ public class MyClient {
             byte[] secondNonce = (byte[])serverResponse.getObjContents().get(1);
 
             if (respNonce.equals(nonce1)) {
-                BigInteger decryptedNonce = new BigInteger(decrypt(privateKey, secondNonce, "RSA", "BC"));
+                byte[] decrypted = decrypt(sessionKey, secondNonce, "AES", "BC");
+                BigInteger decryptedNonce = new BigInteger(decrypted);
 
                 if (groupClient.secondHandshake(decryptedNonce)) {
                     return sessionKey;
@@ -394,14 +396,14 @@ public class MyClient {
         return null;
     }
 
-    private static String decrypt(Key key, byte[] encryptedText, String type, String provider) {
+    private static byte[] decrypt(Key key, byte[] encryptedText, String type, String provider) {
         try {
             //Create an cipher using bouncycastle. Set to decrypt using key
             Cipher cipher = Cipher.getInstance(type, provider);
             cipher.init(Cipher.DECRYPT_MODE, key);
 
             //Return string representation of the decrypted byte array.
-            return new String(cipher.doFinal(encryptedText));
+            return cipher.doFinal(encryptedText);
 
         } catch (Exception e) {
             e.printStackTrace();

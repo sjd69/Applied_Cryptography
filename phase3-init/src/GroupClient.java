@@ -37,9 +37,10 @@ public class GroupClient extends Client implements GroupClientInterface {
 		try
 		{
 			Envelope message = null, response = null;
+			message = new Envelope("HANDSHAKE");
 			message.addObject(nonce);
 
-			message = new Envelope("HANDSHAKE");
+
 			output.writeObject(message);
 
 			response = (Envelope)input.readObject();
