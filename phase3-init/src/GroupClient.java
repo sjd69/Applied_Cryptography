@@ -1,13 +1,60 @@
 /* Implements the GroupClient Interface */
 
+import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.ObjectInputStream;
 
 public class GroupClient extends Client implements GroupClientInterface {
- 
-	 public UserToken getToken(String username, PublicKey publicKey)
+
+	public Envelope firstHandshake(String username, byte[] nonce, byte[] key) {
+		try
+		{
+			Envelope message = null, response = null;
+			message.addObject(username);
+			message.addObject(nonce);
+			message.addObject(key);
+
+			message = new Envelope("HANDSHAKE");
+			output.writeObject(message);
+
+			response = (Envelope)input.readObject();
+
+			//If server indicates success, return true
+			return response;
+
+		}
+		catch(Exception e)
+		{
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace(System.err);
+			return null;
+		}
+	}
+
+	public boolean secondHandshake(BigInteger nonce) {
+		try
+		{
+			Envelope message = null, response = null;
+			message.addObject(nonce);
+
+			message = new Envelope("HANDSHAKE");
+			output.writeObject(message);
+
+			response = (Envelope)input.readObject();
+
+			//If server indicates success, return true
+			return response.getMessage().equals("OK");
+
+		}
+		catch(Exception e)
+		{
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace(System.err);
+			return false;
+		}
+	}
+	public UserToken getToken(String username)
 	 {
 		try
 		{

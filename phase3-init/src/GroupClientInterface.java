@@ -40,7 +40,7 @@ public interface GroupClientInterface
      *
      */
     // TODO: Implement changes to interface in order to properly address Threat T1.
-    public UserToken getToken(final String username, final PublicKey publicKey);
+    public UserToken getToken(final String username);
 
 
     /**

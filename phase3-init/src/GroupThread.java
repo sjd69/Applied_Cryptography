@@ -1,9 +1,14 @@
 /* This thread does all the work. It communicates with the client through Envelopes.
  *
  */
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.lang.Thread;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.io.*;
+import java.security.Key;
 import java.security.PublicKey;
 import java.util.*;
 
@@ -11,6 +16,8 @@ public class GroupThread extends Thread
 {
 	private final Socket socket;
 	private GroupServer my_gs;
+	private SecretKey sessionKey;
+	private BigInteger secondNonce;
 
 	public GroupThread(Socket _socket, GroupServer _gs)
 	{
@@ -35,7 +42,46 @@ public class GroupThread extends Thread
 				System.out.println("Request received: " + message.getMessage());
 				Envelope response;
 
-				if (message.getMessage().equals("GET"))//Client wants a token
+				if (message.getMessage().equals("HANDSHAKE"))//Client wants a token
+				{
+					if (message.getObjContents().size() == 3){	//First part of handshake
+						String username = (String)message.getObjContents().get(0); //Get the username
+						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
+						byte[] signedKey = (byte[])message.getObjContents().get(2); //Get the signed key
+						BigInteger decryptedNonce;
+
+						if(username == null)
+						{
+							response = new Envelope("FAIL");
+							response.addObject(null);
+							output.writeObject(response);
+						} else {
+							response = new Envelope("OK");
+							decryptedNonce = new BigInteger(decrypt(my_gs.privateKey,
+									nonce, "RSA", "BC"));
+
+							byte[] encryptedKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
+							byte[] byteKey = decrypt(my_gs.privateKey, encryptedKey, "RSA", "BC");
+							assert byteKey != null;
+							sessionKey = new SecretKeySpec(byteKey, 0, byteKey.length, "AES");
+							secondNonce = new BigInteger(256, new Random());
+							response.addObject(decryptedNonce);
+							response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
+							output.writeObject(response);
+						}
+					} else {	//Second part of handshake
+						BigInteger nonce = (BigInteger)message.getObjContents().get(0);
+
+						if (nonce.equals(secondNonce)) {
+							response = new Envelope("OK");
+							output.writeObject(response);
+						} else {
+							response = new Envelope("FAIL");
+							output.writeObject(response);
+						}
+					}
+
+				} else if (message.getMessage().equals("GET"))//Client wants a token
 				{
 					String username = (String)message.getObjContents().get(0); //Get the username
 					if(username == null)
@@ -251,6 +297,10 @@ public class GroupThread extends Thread
 			System.err.println("Error: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
+	}
+
+	private PublicKey getUserKey(String username) {
+		return my_gs.userList.getPublicKey(username);
 	}
 
 	// Returns a list containing the members of the specified group. Returns null if error.
@@ -494,6 +544,37 @@ public class GroupThread extends Thread
 		{
 			return false; //requester does not exist
 		}
+	}
+
+	private static byte[] encrypt(Key key, byte[] bytes, String type, String provider) {
+		try {
+
+			//Create an cipher using bouncycastle. Set to encrypt using key
+			Cipher cipher = Cipher.getInstance(type, provider);
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+
+			return cipher.doFinal(bytes);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	private static byte[] decrypt(Key key, byte[] encryptedText, String type, String provider) {
+		try {
+			//Create an cipher using bouncycastle. Set to decrypt using key
+			Cipher cipher = Cipher.getInstance(type, provider);
+			cipher.init(Cipher.DECRYPT_MODE, key);
+
+			//Return string representation of the decrypted byte array.
+			return cipher.doFinal(encryptedText);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

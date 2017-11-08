@@ -1,12 +1,15 @@
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Random;
 import java.util.Scanner;
 import java.security.Security;
 import java.security.*;
@@ -17,11 +20,12 @@ public class MyClient {
     private static String serverFile = "ServerList.bin";
     private static ServerList serverList = null;
     private static MessageDigest md;
+    private static GroupClient groupClient = new GroupClient();
 
     public static void main(String[] args) {
 	 Security.addProvider(new BouncyCastleProvider());
         //FileClient fileClient = new FileClient();
-        GroupClient groupClient = new GroupClient();
+
         GroupServer groupServer = new GroupServer();
         UserToken userToken = null;
         String username;
@@ -75,7 +79,7 @@ public class MyClient {
                     String stringKey = scanIn.nextLine();
                     byte[] byteKey = Base64.getDecoder().decode(stringKey);
                     try {
-                        privateKey = KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(byteKey));
+                        privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(byteKey));
                     } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
                         e.printStackTrace();
                     }
@@ -93,30 +97,38 @@ public class MyClient {
                             System.out.println("\n\n********WARNING********");
                             System.out.println("Server " + gs_ip + "Could not be validated");
                             System.out.println("\n\nThe server's fingerprint is "
-                                    + Arrays.toString(md.digest(serverPublicKey.getEncoded())));
+                                    + serverPublicKey);
                             System.out.println("Would you like to connect and store this server's information?");
                             System.out.print("(Yes/No): ");
                             userResp = scanIn.nextLine();
 
                             if (userResp.equalsIgnoreCase("yes")) {
                                 serverList.addServer(gs_ip, serverPublicKey);
+                                validated=true;
                             }
                         }
                         if (validated) {
-                            userToken = groupClient.getToken(username, privateKey);
 
-                            if (userToken == null) {
-                                System.out.println("Authentication error.");
-                            } else {
-                                auth = true;
-                                System.out.println("Authentication successful.");
+
+                            SecretKey sessionKey = handshake(gs_ip, serverPublicKey, privateKey);
+
+                            if (sessionKey != null) {
+                                userToken = groupClient.getToken(username);
+                                if (userToken == null) {
+                                    System.out.println("Authentication error.");
+                                } else {
+                                    auth = true;
+                                    System.out.println("Authentication successful.");
+                                }
                             }
+
                         } else {
                             System.out.println("Disconnecting...");
                         }
 
                         groupClient.disconnect();
                     } catch (Exception e) {
+                        e.printStackTrace(System.err);
                         System.out.println("Connection error.");
                         exit = true;
                         break;
@@ -149,17 +161,18 @@ public class MyClient {
 
                 switch(nav) {
                     case 1:
-                    	// generate session key for file server
-						System.out.println("AES session key generation file server");
-						try {
-							KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
-							keyGenAES.init(128);
-							SecretKey sessionKey = keyGenAES.generateKey();
-							//System.out.println(sessionKey);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+
+                        // generate session key for file server
+                        System.out.println("AES session key generation file server");
+                        try {
+                            KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
+                            keyGenAES.init(128);
+                            SecretKey sessionKey = keyGenAES.generateKey();
+                            //System.out.println(sessionKey);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                         System.out.println("Enter IP Address of File Server.");
                         scanIn.nextLine();
                         String fs_ip = scanIn.nextLine();
@@ -283,9 +296,115 @@ public class MyClient {
                 return true;
             }
         } catch(Exception ex) {
+            if (serverList == null) {
+                serverList = new ServerList();
+            }
             return false;
         }
 
         return false;
     }
+
+    private static SecretKey generate_AES() {
+        // generate session key for file server
+        System.out.println("AES session key generation");
+        try {
+            KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
+            keyGenAES.init(128);
+            //System.out.println(sessionKey);
+            return keyGenAES.generateKey();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static SecretKey handshake(String username, PublicKey serverPublicKey, PrivateKey privateKey) {
+        try {
+            SecretKey sessionKey = generate_AES();
+
+            byte[] encryptedKey = encrypt(serverPublicKey, sessionKey.getEncoded(), "RSA", "BC");
+            Signature rsaSignature = Signature.getInstance("RSA", "BC");
+            rsaSignature.initSign(privateKey);
+            assert encryptedKey != null;
+            rsaSignature.update(encryptedKey);
+
+            byte[] signedKey = rsaSignature.sign();
+
+            BigInteger nonce1 = new BigInteger(256, new Random());
+            byte[] encryptedNonce1 = encrypt(serverPublicKey, nonce1.toByteArray(), "RSA", "BC");
+
+            Envelope serverResponse = groupClient.firstHandshake(username, encryptedNonce1, signedKey);
+
+            BigInteger respNonce = (BigInteger)serverResponse.getObjContents().get(0);
+            byte[] secondNonce = (byte[])serverResponse.getObjContents().get(1);
+
+            if (respNonce.equals(nonce1)) {
+                BigInteger decryptedNonce = new BigInteger(decrypt(privateKey, secondNonce, "RSA", "BC"));
+
+                if (groupClient.secondHandshake(decryptedNonce)) {
+                    return sessionKey;
+                }
+
+
+            } else {
+                return null;
+            }
+
+            return null;
+        } catch (Exception ex) {
+            System.out.println("Authentication error.");
+            return null;
+        }
+
+    }
+
+    private static byte[] encrypt(Key key, String text, String type, String provider) {
+        try {
+
+            //Create an cipher using bouncycastle. Set to encrypt using key
+            Cipher cipher = Cipher.getInstance(type, provider);
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            return cipher.doFinal(text.getBytes());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private static byte[] encrypt(Key key, byte[] bytes, String type, String provider) {
+        try {
+
+            //Create an cipher using bouncycastle. Set to encrypt using key
+            Cipher cipher = Cipher.getInstance(type, provider);
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            return cipher.doFinal(bytes);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private static String decrypt(Key key, byte[] encryptedText, String type, String provider) {
+        try {
+            //Create an cipher using bouncycastle. Set to decrypt using key
+            Cipher cipher = Cipher.getInstance(type, provider);
+            cipher.init(Cipher.DECRYPT_MODE, key);
+
+            //Return string representation of the decrypted byte array.
+            return new String(cipher.doFinal(encryptedText));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 }
