@@ -47,6 +47,40 @@ public class GroupClient extends Client implements GroupClientInterface {
 		
 	 }
 
+	 public PublicKey getPublicKey() {
+		 try
+		 {
+			 Envelope message = null, response = null;
+			 //Tell the server to create a user
+			 message = new Envelope("PUBKEY");
+			 output.writeObject(message);
+
+			 response = (Envelope)input.readObject();
+
+			 //Successful response
+			 if(response.getMessage().equals("OK"))
+			 {
+				 //If there is a token in the Envelope, return it
+				 ArrayList<Object> temp = null;
+				 temp = response.getObjContents();
+
+				 if(temp.size() == 1)
+				 {
+				 	return (PublicKey)temp.get(0);
+				 }
+			 }
+
+			 return null;
+
+		 }
+		 catch(Exception e)
+		 {
+			 System.err.println("Error: " + e.getMessage());
+			 e.printStackTrace(System.err);
+			 return null;
+		 }
+	 }
+
 	 public boolean createUser(String username, UserToken token, PublicKey userPublicKey)
 	 {
 		 try

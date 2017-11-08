@@ -54,6 +54,12 @@ public class GroupThread extends Thread
 						output.writeObject(response);
 					}
 				}
+				else if (message.getMessage().equals("PUBKEY"))//Client wants a token
+				{
+					response = new Envelope("OK");
+					response.addObject(my_gs.publicKey);
+					output.writeObject(response);
+				}
 				else if(message.getMessage().equals("CUSER")) //Client wants to create a user
 				{
 					if(message.getObjContents().size() < 2)

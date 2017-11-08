@@ -24,6 +24,8 @@ public class GroupServer extends Server {
 	public static final int SERVER_PORT = 8765;
 	public UserList userList;
 	public GroupList groupList;
+	protected PrivateKey privateKey;
+	protected  PublicKey publicKey;
     
 	public GroupServer() {
 		super(SERVER_PORT, "ALPHA");
@@ -39,6 +41,7 @@ public class GroupServer extends Server {
 
 		String userFile = "UserList.bin";
 		String groupFile = "GroupList.bin";
+		String keyFile = "rsa.bin";
 		Scanner console = new Scanner(System.in);
 		ObjectInputStream userStream;
 		ObjectInputStream groupStream;
@@ -59,10 +62,20 @@ public class GroupServer extends Server {
 			FileInputStream gfis = new FileInputStream(groupFile);
 			groupStream = new ObjectInputStream(gfis);
 			groupList = (GroupList)groupStream.readObject();
+			groupStream.close();
+
+			FileInputStream kfis = new FileInputStream(keyFile);
+			ObjectInputStream keyStream = new ObjectInputStream(kfis);
+			KeyPair keyPair = (KeyPair)keyStream.readObject();
+			publicKey = keyPair.getPublic();
+			privateKey = keyPair.getPrivate();
+			keyStream.close();
+
 		}
 		catch(FileNotFoundException e)
 		{
 			//Assume that if one file doesn't exist the other doesn't either.
+			//Must also generate rsa keypair
 			System.out.println("UserList File Does Not Exist. Creating UserList...");
 			System.out.println("No users currently exist. Your account will be the administrator.");
 			System.out.print("Enter your username: ");
@@ -103,11 +116,31 @@ public class GroupServer extends Server {
 
 				outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
 				outStream.writeObject(groupList);
+				outStream.close();
 
 				System.out.println("Created lists.");
 			}
 			catch(Exception ex)
 			{
+				System.err.println("Error: " + e.getMessage());
+				e.printStackTrace(System.err);
+			}
+
+			//Generate server keypair
+			try {
+				KeyPairGenerator rsaGenerator = KeyPairGenerator.getInstance("RSA", "BC");
+				rsaGenerator.initialize(2048);
+				KeyPair rsaKeys = rsaGenerator.generateKeyPair();
+				privateKey = rsaKeys.getPrivate();
+				publicKey = rsaKeys.getPublic();
+
+				outStream = new ObjectOutputStream(new FileOutputStream("rsa.bin"));
+				outStream.writeObject(rsaKeys);
+				outStream.close();
+
+				System.out.println("Keys generated");
+
+			} catch(Exception ex) {
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace(System.err);
 			}
