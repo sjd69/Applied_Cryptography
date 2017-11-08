@@ -16,6 +16,13 @@ To start the File Server:
 
 The file server will create a shared_files inside the working directory if one does not exist. The file server is now online.
 
+## Generating RSA key pair
+To run KeyGen:
+ - Enter the src directory containing `KeyGen.class`
+ - Type `java KeyGen`
+ 
+The application will output a public and private key pair
+
 ## Running MyClient
 First, run both the GroupServer and the FileServer in seperate terminals as stated above.
  - Enter the src directory containing `MyClient.class`
