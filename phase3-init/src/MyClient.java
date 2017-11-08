@@ -323,13 +323,15 @@ public class MyClient {
         try {
             SecretKey sessionKey = generate_AES();
 
-            byte[] encryptedKey = encrypt(serverPublicKey, sessionKey.getEncoded(), "RSA", "BC");
             Signature rsaSignature = Signature.getInstance("RSA", "BC");
             rsaSignature.initSign(privateKey);
-            assert encryptedKey != null;
-            rsaSignature.update(encryptedKey);
-
+            assert sessionKey != null;
+            rsaSignature.update(sessionKey.getEncoded());
             byte[] signedKey = rsaSignature.sign();
+            byte[] encryptedKey = encrypt(serverPublicKey, signedKey, "RSA", "BC");
+
+
+
 
             BigInteger nonce1 = new BigInteger(256, new Random());
             byte[] encryptedNonce1 = encrypt(serverPublicKey, nonce1.toByteArray(), "RSA", "BC");
@@ -353,6 +355,7 @@ public class MyClient {
 
             return null;
         } catch (Exception ex) {
+            ex.printStackTrace();
             System.out.println("Authentication error.");
             return null;
         }
