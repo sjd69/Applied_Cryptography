@@ -110,7 +110,7 @@ public class MyClient {
                         if (validated) {
 
 
-                            SecretKey sessionKey = handshake(gs_ip, serverPublicKey, privateKey);
+                            SecretKey sessionKey = handshake(username, serverPublicKey, privateKey);
 
                             if (sessionKey != null) {
                                 userToken = groupClient.getToken(username);

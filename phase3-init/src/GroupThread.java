@@ -47,7 +47,7 @@ public class GroupThread extends Thread
 					if (message.getObjContents().size() == 3){	//First part of handshake
 						String username = (String)message.getObjContents().get(0); //Get the username
 						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
-						byte[] signedKey = (byte[])message.getObjContents().get(2); //Get the signed key
+						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
 						BigInteger decryptedNonce;
 
 						if(username == null)
@@ -60,10 +60,11 @@ public class GroupThread extends Thread
 							decryptedNonce = new BigInteger(decrypt(my_gs.privateKey,
 									nonce, "RSA", "BC"));
 
-							byte[] encryptedKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
-							byte[] byteKey = decrypt(my_gs.privateKey, encryptedKey, "RSA", "BC");
+							byte[] signedKey = decrypt(my_gs.privateKey, encryptedKey, "RSA", "BC");
+							byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
+
 							assert byteKey != null;
-							sessionKey = new SecretKeySpec(byteKey, 0, byteKey.length, "AES");
+							sessionKey = new SecretKeySpec(byteKey, 0, 16, "AES");
 							secondNonce = new BigInteger(256, new Random());
 							response.addObject(decryptedNonce);
 							response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
