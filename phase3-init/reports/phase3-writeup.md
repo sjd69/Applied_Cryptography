@@ -29,7 +29,7 @@ NOTE: Our system depends on the assumption that a second simple KeyGeneration ap
 Using RSA to authenticate provides us better, more robust security compared to the alternative standard password-based system. In addition, this protocol was already being utilized in T4 to establish and securely exchange a session key. Since this protocol provides mutual authentication, it makes sense to simplify user interaction and not require a redundant password login.
 
 ## T2: Token Modification/Forgery
-Assumption: **T4** is correctly implemented, this message will be encrypted.
+Assumption: Assume that **T4** is correctly implemented, and that this message will be encrypted.
 
 
 If users can increase their own access rights at will, they can tamper with any file they wish. They could delete all the files on the server, or download files that aren't meant for them. Additionally, users who can counterfeit tokens could distribute them to whomever they wish, which takes away rights from the administrator. 
@@ -39,7 +39,7 @@ Once forged tokens come into existence, stopping distribution and use becomes mo
 ### Mechanism
 We will utilize RSA to both authenticate and exchange keys. The group server will generate a key pair, consisting of a public key and a private key, for the itself. Key generation for user accounts will occur at the time of account creation by use of a seperate KeyGeneration application. This key pair generation occurs prior to the creation an account by an Admin. The user "hands" the Admin their public key for account creation, again outside the system.
 
-When the server creates a token, it will first stream the (comma-delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server using its private key. The server will then send the signed hash of token information to the user, along with the token itself. The user may verify the signature and the hash of the token data to validate the user's token.   
+When the server creates a token, it will first stream the (comma-delimited) issuer, subject, and group information into a byte array. The standard order is illustrated in the diagram below. We will then utilize SHA256 to make a hash of the byte array. The result of that hash will be signed by the server using its private key. The server will then send the  hash of token information signed with the server's private key to the user, along with the token itself. The user may verify the signature and the hash of the token data to validate the user's token. Again, this message will be encrypted with the session key under the assumption that **T4** is correctly implemented.  
 
 ### Justification
 With public-key authentication, signatures created by the user's private key cannot be forged by anybody who does not have the key. However, a third party who has the public key would be able to verify that a signature is valid. This ensures that forged tokens will not be accepted, as a third party would be able to verify if the signature is valid or not. RSA in particular was chosen because it can be also be utilized for multiple other mechanisms, providing coverage and economy of mechanism. Signing the hash value ensures that the hash value of the token has not been modified since it was sent directly from the server. 
