@@ -29,7 +29,13 @@
 ### Justification
 
 ### Diagram(s)
-
+## Ideas
+* When a user requests a token from the group server, they also tell the group server which file server they will use that token on
+* The name of the file server will be signed along with the token itself by the group server 
+* Every time a user wishes to connect to a new server they will need to request a new token
+* When a file server recieves a token, it checks for its name. This is signed by the group server so we know it hasn't been tampered with
+* If it sees a different name, terminate connection because we know this token was not intended to be used on this server by the user 
+* This way, stolen tokens may only be used on the server where the theft took place
 
 # T7: Token Theft
 In T2 we dealt with the possible counterfeit of tokens. However, there is still an issue of tokens being stolen and subsequently used in other servers. A single token should *only* belong to a single user. However, since we must accept that stolen tokens may be a possibility, these tokens should *only* be operable within the server it was created inside. If this is not the case, a single token can be passed from hand to hand across servers to bypass other security mechanisms and allow users permissions that they are not supposed to have. 
