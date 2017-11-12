@@ -17,7 +17,13 @@
 
 
 # T6: File Leakage
-
+## Ideas
+* Threshold crypto: files on the server are encrypted with a unique threshold key for the group that it belongs to
+* Make the threshold just 1.
+* This way, everytime someone leaves a group, we can make their key become invalid, providing security as group memberships change
+* Key can be managed by the group server and generated at the time someone is added to a group or removed from a group
+* Can request key from group server when they want to decrypt a file and decryption of files on the client side can take place in a seperate applciation?
+* even though individual keys change, the secret remains the same so new keys will be able to decrypt the old files?
 ### Mechanism
 
 ### Justification
