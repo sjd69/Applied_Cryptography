@@ -28,6 +28,9 @@ We utilize CBC as the mode of operation as CBC provides message dependence for g
 * Key can be managed by the group server and generated at the time someone is added to a group or removed from a group
 * Can request key from group server when they want to decrypt a file and decryption of files on the client side can take place in a seperate applciation?
 * even though individual keys change, the secret remains the same so new keys will be able to decrypt the old files?
+
+Since we assume file servers to be untrusted, they may leak files to unauthorized individuals. This disrupts data confidentiality of gorup files since users are under the assumption that only valid group members may have access to those files. 
+
 ### Mechanism
 
 ### Justification
