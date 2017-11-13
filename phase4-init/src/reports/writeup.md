@@ -2,16 +2,20 @@
 
 
 # T5: Message Reorder, Replay or Modification
+After connecting to and properly authenticating a group or file server, the messages passed between the client and server are subject to being reordered, saved for a replay attack or modified by an active adversary. Modifying messages can affect the integrity and avaliability of data stored on the server or recieved by the user. An adversary that may insert communications, for example delete a file from a server, can disrupt data avaliablility. Inserting fake communications can also copromise data integrity as malicious files may be placed onto the server or sent to the user. Reordering communications can also compromise data avaliablility and integrity. For example, a user wishes to download a file and then delete the file from a server. Reordering these messages deletes the file before the user can access it. 
 
-## Ideas
-* Using AES with CBC mode: this prevents an adversary from generating a code book. This with the addtion of timestamps will protect from replay and reordering attacks.
-* We can add on a timestamp to messages before encryption with symmetric key and not accept messages later than some certain threshold. This will prevent replay and reorder. If the timestamps of messages are not in chronological order, the connection will be terminated. If the timestamp of a message is not within the threshold, the connection will be terminated.
-* Session keys make replay attacks beyond one session invalid.
-* Modification of an encrypted message will render the decrypted message useless. When a message is unable to be decrypted/not decrypted to a valid command, the connection will be terminated. 
+To protect against **T4** in the previous phase of this project, our file sharing system uses a unique secret session key to encrypt communications between a server and a client. This mechanism offers protection against passive adversary, and protection from replay attacks between sessions. Our current implementation does not protect against an active attacker that can insert, reorder, replay or modify messages within a session. To offer protection against this stronger attack, we utilize timestamping in addition to the previously implemented session key.
+
 
 ### Mechanism
+Our file sharing system utilizes a 128 bit AES (CBC mode) session key from the previous phase. The use of a session key makes replay attacks outside of that session useless, as a key is only valid for a single session between one user and one server for one connection. The use of CBC mode, as opposed to ECB mode, prevents an adversary from generating a code book to use for a replay attack within a session as CBC mode creates message dependence of cipher text.
+
+The addition of timestamps to messages will further protect against replay and reordering attacks. Each communication will be timestamped with the time that the message is sent before encryption with the session key. When a party recieves a communication, the message will be decrypted and the timestamp will be validataed against some reasonable threshold of three minutes. If the timestamp does not fall within this threshold, we consider the message a replay attack and will terminate the connection. Time stamps also protect against reordering. If the timestamp of messages is recieved out of chronological order, we assume a reordering attack and terminate the connection. 
+
+Encryption with our session key alerts of message modification. Since all messages are encrypted with a session key, a modification of this message will render the decrypted message useless. When a message is unable to be decrypted (or fully decrypted), or is not decrypted to a valid command, message modification is assumed and the connection will be terminated. 
 
 ### Justification
+We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal useage of the file sharing system.
 
 ### Diagram(s)
 
