@@ -37,14 +37,15 @@ In T2 we dealt with the possible counterfeit of tokens. However, there is still 
 * When a user requests a token from the group server, they also tell the group server which file server they will use that token on
 * The name of the file server will be signed along with the token itself by the group server 
 * Every time a user wishes to connect to a new server they will need to request a new token
-* When a file server recieves a token, it checks for its name. This is signed by the group server so we know it hasn't been tampered with
+* When a file server receives a token, it checks for its name. This is signed by the group server so we know it hasn't been tampered with
 * If it sees a different name, terminate connection because we know this token was not intended to be used on this server by the user 
 * This way, stolen tokens may only be used on the server where the theft took place
 
 ### Mechanism
-Individual Server authentication? 
+We will include an extra field in the token object for the file server's name. When a token's data is hashed and signed by the group server (as in the mechanisms for T2), that will include the file server's name. When the user communicates with the file server, the server will verify both the correctness of the file server name and the signature from the appropriate group server before accepting the token as valid. 
 
 ### Justification
+Requiring the file server to validate the origin of tokens prevents inter-server use of a single token, as each token will be generated for one and only one specific file server. This file server name information can be easily added to the token data that is to be streamed into a byte array and hashed as part of our T2 mechanism, requiring a minimum of additions to the codebase. 
 
 ### Diagram(s)
 
