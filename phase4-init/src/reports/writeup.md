@@ -45,7 +45,7 @@ In T2 we dealt with the possible counterfeit of tokens. However, there is still 
 We will include an extra field in the token object for the file server's name. When a token's data is hashed and signed by the group server (as in the mechanisms for T2), that will include the file server's name. When the user communicates with the file server, the server will verify both the correctness of the file server name and the signature from the appropriate group server before accepting the token as valid. 
 
 ### Justification
-Requiring the file server to validate the origin of tokens prevents inter-server use of a single token, as each token will be generated for one and only one specific file server. This file server name information can be easily added to the token data that is to be streamed into a byte array and hashed as part of our T2 mechanism, requiring a minimum of additions to the codebase. 
+Requiring the file server to validate token origin information prevents inter-server use of a single token, as each token will be generated for one and only one specific file server. This file server name information can be easily added to the token data that is to be streamed into a byte array and hashed as part of our T2 mechanism, requiring a minimum of additions to the codebase. 
 
 ### Diagram(s)
 
