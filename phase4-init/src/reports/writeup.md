@@ -29,7 +29,7 @@ We utilize CBC as the mode of operation as CBC provides message dependence for g
 * Can request key from group server when they want to decrypt a file and decryption of files on the client side can take place in a seperate applciation?
 * even though individual keys change, the secret remains the same so new keys will be able to decrypt the old files?
 
-Since we assume file servers to be untrusted, they may leak files to unauthorized individuals. This disrupts data confidentiality of gorup files since users are under the assumption that only valid group members may have access to those files. 
+Although we authenticate file servers in the previous phase of the project, we still assume that these servers may be malicious. Since we assume file servers to be untrusted, we assume that they may leak files stored on the server to unauthorized individuals at will. This disrupts data confidentiality of group files since users are under the assumption that only valid group members may have access to those files. 
 
 ### Mechanism
 
@@ -38,21 +38,13 @@ Since we assume file servers to be untrusted, they may leak files to unauthorize
 ### Diagram(s)
 
 # T7: Token Theft
-In T2 we dealt with the possible counterfeit of tokens. However, there is still an issue of tokens being stolen and subsequently used in other servers. A single token should *only* belong to a single user. However, since we must accept that stolen tokens may be a possibility, these tokens should *only* be operable within the server it was created inside. If this is not the case, a single token can be passed from hand to hand across servers to bypass other security mechanisms and allow users permissions that they are not supposed to have. 
-
-## Ideas
-* When a user requests a token from the group server, they also tell the group server which file server they will use that token on
-* The name of the file server will be signed along with the token itself by the group server 
-* Every time a user wishes to connect to a new server they will need to request a new token
-* When a file server receives a token, it checks for its name. This is signed by the group server so we know it hasn't been tampered with
-* If it sees a different name, terminate connection because we know this token was not intended to be used on this server by the user 
-* This way, stolen tokens may only be used on the server where the theft took place
+In T2 we dealt with the possible counterfeit of tokens. However, there is still an issue of tokens being stolen by the assumed untrusted file server and subsequently passed to other invalid users to be used in other servers. A single token should *only* belong to a single user. However, since we must accept that stolen tokens may be a possibility, these stolen tokens should *only* be operable within the server it was stolen by. If this is not the case, a single token can be stolen and subsequently used across servers to bypass other security mechanisms and allow users permissions that they are not supposed to have by posing as the owner of that token. 
 
 ### Mechanism
-We will include an extra field in the token object for the file server's name. When a token's data is hashed and signed by the group server (as in the mechanisms for T2), that will include the file server's name. When the user communicates with the file server, the server will verify both the correctness of the file server name and the signature from the appropriate group server before accepting the token as valid. 
+When a user requests a token from the group server, they will also be prompted to tell the group server which file server they intend to use that token on. We will include an extra String field in the token object for the file server's name. When a token's data is hashed and signed by the group server (as in the mechanisms for T2), that will include the file server's name. Note that the consequence of this security mechanism necessitates a user connect to the group server and requent a new token each time that he or she wishes to connect to a different file server. When the user communicates with the file server, the server will verify both the correctness of the file server name and the signature from the appropriate group server before accepting the token as valid. If the file server sees a different server name, we will terminate the connection because we know this token was not intended to be used on this server by the user and we can assume that the token has been stolen. This way, stolen tokens may only be used on the server where the theft took place.
 
 ### Justification
-Requiring the file server to validate token origin information prevents inter-server use of a single token, as each token will be generated for one and only one specific file server. This file server name information can be easily added to the token data that is to be streamed into a byte array and hashed as part of our T2 mechanism, requiring a minimum of additions to the codebase. 
+Requiring the file server to validate token usage intention information prevents inter-server use of a single token, as each token will be generated for one and only one specific file server. This file server name information can be easily added to the token data that is to be streamed into a byte array and hashed as part of our T2 mechanism, requiring a minimum of additions to the codebase. The process of T2 ensures that the token has not been tampered with since it was issued originally by the group server. 
 
 ### Diagram(s)
 
