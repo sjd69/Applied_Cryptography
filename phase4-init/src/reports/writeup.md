@@ -58,7 +58,7 @@ When a user requests a token from the group server, they will also be prompted t
 ### Justification
 Requiring the file server to validate token usage intention information prevents inter-server use of a single token, as each token will be generated for one and only one specific file server. This file server name information can be easily added to the token data that is to be streamed into a byte array and hashed as part of our **T2** mechanism, requiring minimal additions to the codebase. The process of **T2** ensures that the token has not been tampered with since it was issued originally by the group server. 
 
-### Diagram(s)
-
+### Diagrams
+![alt text](T7diagram.png)
 
 # Final Thoughts
