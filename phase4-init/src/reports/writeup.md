@@ -35,19 +35,20 @@ We utilize CBC as the mode of operation as CBC provides message dependence for g
 ![alt text](T5diagram.png)
 
 # T6: File Leakage
-## Ideas
-* Threshold crypto: files on the server are encrypted with a unique threshold key for the group that it belongs to
-* Make the threshold just 1.
-* This way, every time someone leaves a group, we can make their key become invalid, providing security as group memberships change
-* Key can be managed by the group server and generated at the time someone is added to a group or removed from a group
-* Can request key from group server when they want to decrypt a file and decryption of files on the client side can take place in a seperate application?
-* even though individual keys change, the secret remains the same so new keys will be able to decrypt the old files?
-
 Although we authenticate file servers in the previous phase of the project, we still assume that these servers may be malicious. Since we assume file servers to be untrusted, we assume that they may leak files stored on the server to unauthorized individuals at will. This disrupts data confidentiality of group files since users are under the assumption that only valid group members may have access to those files. We also need a way to adapt the secure storage of files with dynamic group membership. When a user is removed from a group, he or she should not have a mechanism to uncover leaked files. When a new user is added to a group, he or she should be able to uncover all files within that group.
 
 ### Mechanism
+Assumption 1: A user who is deleted from a group is not able to directly access a file through our system. But at the time a user was a member of a group, he or she had full access to these files. We assume that a removed group member keeps old group keys so that he or she will be able to decrypt a leaked file from that group if it was avaliable. An old group member will not be able to decrypt any leaked file created or modified since that user was removed from the group.
+
+Assumption 2: There exists a seperate client side application that encrypts and decrypts files using the group keys. 
+
+Upon group creation, a group key will be generated. As with the session key already utilized within our file system, the group key will be a 128-bit AES key using CBC mode. For each group, the Group Server will store this key. When a member is deleted from a group, an new key version will be generated and stored along with a version number.
+
+When a user logs in to the system, the current keys (and version numbers) for each group that user is a member of will be avaliable along with the lists of past keys. Before uploading a file to a file server, the user must encrypt the file using the current group key and send the encrypted file along with the version number of that key to the file server. When a user downloads a file from a file server, the client will decrypt the file using a version of the group keys that was provided by the group server at login.
 
 ### Justification
+Files store on file servers will now be encrypted with unique group keys. This way, if a file server leaks a file only members of the group will be able to decrypt it. Unauthorized parties will not be able to glean any information from the file without the key. Assuming that they save keys, previous members of the group will be able to decrypt leaked files that were created at the time that user was a member, but will not be able to decrypt any files created or modified after that user was removed.
+The Group Server will manage the group keys, but encryption and decryption will take place on the client side to keep the seperation of the group and file servers.
 
 ### Diagram(s)
 
