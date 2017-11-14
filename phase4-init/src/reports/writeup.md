@@ -65,3 +65,4 @@ Requiring the file server to validate token usage intention information prevents
 ![alt text](TokenDiagP4.png)
 
 # Final Thoughts
+We were able to make use of our previous protocols and extend then by adding extra information like timestamps and intended server to protect against the new threats mentioned above. Timestamping messages provides protection against replay attacks and reordering attacks, on top of the protection of a session key for each connection between a server a client. Specifying a file name where the token will be used prevents stolen tokens from being used at any server other than where the threat occured.
