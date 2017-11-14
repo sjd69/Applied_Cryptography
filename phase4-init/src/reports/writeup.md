@@ -60,5 +60,6 @@ Requiring the file server to validate token usage intention information prevents
 
 ### Diagrams
 ![alt text](T7diagram.png)
+![alt text](TokenDiagP4.png)
 
 # Final Thoughts
