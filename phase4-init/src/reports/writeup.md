@@ -43,7 +43,7 @@ We utilize CBC as the mode of operation as CBC provides message dependence for g
 * Can request key from group server when they want to decrypt a file and decryption of files on the client side can take place in a seperate application?
 * even though individual keys change, the secret remains the same so new keys will be able to decrypt the old files?
 
-Although we authenticate file servers in the previous phase of the project, we still assume that these servers may be malicious. Since we assume file servers to be untrusted, we assume that they may leak files stored on the server to unauthorized individuals at will. This disrupts data confidentiality of group files since users are under the assumption that only valid group members may have access to those files. 
+Although we authenticate file servers in the previous phase of the project, we still assume that these servers may be malicious. Since we assume file servers to be untrusted, we assume that they may leak files stored on the server to unauthorized individuals at will. This disrupts data confidentiality of group files since users are under the assumption that only valid group members may have access to those files. We also need a way to adapt the secure storage of files with dynamic group membership. When a user is removed from a group, he or she should not have a mechanism to uncover leaked files. When a new user is added to a group, he or she should be able to uncover all files within that group.
 
 ### Mechanism
 
