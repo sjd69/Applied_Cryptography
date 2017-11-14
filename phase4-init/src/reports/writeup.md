@@ -29,8 +29,8 @@ Encryption with our session key alerts to message modification. Since all messag
 ### Justification
 We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal usage of the file sharing system.
 
-### Diagram(s)
-
+### Diagram
+![alt text](T5diagram.png)
 
 # T6: File Leakage
 ## Ideas
