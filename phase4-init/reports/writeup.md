@@ -70,8 +70,8 @@ When a user requests a token from the group server, they will also be prompted t
 Requiring the file server to validate token usage intention information prevents inter-server use of a single token, as each token will be generated for one and only one specific file server. This file server IP address information can be easily added to the token data that is to be streamed into a byte array and hashed as part of our **T2** mechanism, requiring minimal additions to the codebase. The process of **T2** ensures that the token has not been tampered with since it was issued originally by the group server. 
 
 ### Diagrams
-![alt text](T7diagram.png)
-![alt text](TokenDiagP4.png)
+![alt text](T7.png)
+![alt text](T7Token.png)
 
 # Final Thoughts
 We were able to make use of our previous protocols and extend then by adding extra information like timestamps and intended server to protect against the new threats mentioned above. Timestamping messages provides protection against replay attacks and reordering attacks, on top of the protection of a session key for each connection between a server a client. Specifying a file name where the token will be used prevents stolen tokens from being used at any server other than where the threat occured.
