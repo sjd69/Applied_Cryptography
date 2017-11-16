@@ -22,10 +22,15 @@ To protect against **T4** in the previous phase of this project, our file sharin
 
 
 ### Mechanism
-Our file sharing system utilizes a 128 bit AES (CBC mode) session key from the previous phase. The use of a session key makes replay attacks outside of that session useless, as a key is only valid for a single session between one user and one server for one connection. The use of CBC mode, as opposed to ECB mode, prevents an adversary from generating a code book to use for a replay attack within a session, as CBC mode creates message dependence of cipher text.
+Our file sharing system utilizes a 128 bit AES (CBC mode) session key from the previous phase. The use of CBC mode, as opposed to ECB mode, prevents an adversary from generating a code book to use for a replay attack within a session, as CBC mode creates message dependence of cipher text.
 
-The addition of timestamps to messages will further protect against replay and reordering attacks. Each communication will be timestamped with the time that the message is sent before encryption with the session key. When a party receives a communication, the message will be decrypted and the timestamp will be validataed against some reasonable threshold of three minutes. If the timestamp does not fall within this threshold, we consider the message a replay attack and will terminate the connection. Time stamps also protect against reordering. If the timestamp of messages is received out of chronological order, we assume a reordering attack and terminate the connection. 
+##### Replay
+The addition of timestamps to messages will protect against replay attacks. Each communication will be timestamped with the time that the message is sent before encryption with the session key. When a party receives a communication, the message will be decrypted and the timestamp will be validataed against a threshold of three minutes. If the timestamp does not fall within this threshold, we consider the message a replay attack and will terminate the connection. 
 
+##### Reordering
+The addition of a message counter will protect against reordering attacks. Each communication will include a message number before encryption with the session key. At the time of connection, both the server and client will begin keeping track of the count of messages recieved from the other party. Each message will be sent with the count number of the message. The party recieving the message will verify that the message number recieved is the next message expected based on the count. If the message number is not as expexted, we assume a reordering attack and terminate the connection. 
+
+##### Modification -- NEEDS FIXED
 Encryption with our session key alerts to message modification. Since all messages are encrypted with a session key, a modification of this message will render the decrypted message useless. When a message is unable to be decrypted (or fully decrypted), or is not decrypted to a valid command, message modification is assumed and the connection will be terminated. 
 
 ### Justification
