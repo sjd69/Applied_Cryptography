@@ -55,6 +55,9 @@ When a user logs in to the system, the current and past keys for each group that
 ### Justification
 Files stored on file servers will now be encrypted with unique group keys. This way, if a file server leaks a file only members of the group will be able to decrypt it. Unauthorized parties will not be able to glean any information from the file without the key. Assuming that they save keys, previous members of the group will be able to decrypt leaked files that were created at the time that user was a member, but will not be able to decrypt any files created or modified after that user was removed. This security will not prevent new users joining the group from accessing old files as they have access to all versions of keys in their keychain. The Group Server will manage the group keys, but encryption and decryption will take place on the client side to keep the seperation of the group and file servers.
 
+### Diagram
+![alt text](T6.png)
+
 # T7: Token Theft
 In **T2** we dealt with the possible counterfeit of tokens. However, there is still an issue of tokens being stolen by the assumed untrusted file server and subsequently passed to other invalid users to be used in other servers. A single token should *only* belong to a single user. However, since we must accept that stolen tokens may be a possibility, these stolen tokens should *only* be operable within the server it was stolen by. If this is not the case, a single token can be stolen and subsequently used across servers to bypass other security mechanisms and allow users permissions that they are not supposed to have by posing as the owner of that token. 
 
