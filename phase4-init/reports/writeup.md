@@ -14,7 +14,8 @@ Mechanisms T1-T4 can be found here: https://github.com/NohrianScum/cs1635-2017fa
 
 
 # T5: Message Reorder, Replay or Modification
-Assumption: Clients and Servers have synchronized clocks.
+**Assumption 1:** The initial handshake and authentification between either the group or file server and the client is as specified in the digrams below.
+**Assumption 2:** Clients and Servers have synchronized clocks.
 
 After connecting to and properly authenticating a group or file server, the messages passed between the client and server are subject to being reordered, saved for a replay attack, or modified by an active adversary. Modifying messages can affect the integrity and avaliability of data stored on the server or recieved by the user. An adversary that may insert communications, for example delete a file from a server, can disrupt data avaliablility. Inserting fake communications can also compromise data integrity as malicious files may be placed onto the server or sent to the user. Reordering communications can also compromise data avaliablility and integrity. For example, a user wishes to download a file and then delete the file from a server. Reordering these messages deletes the file before the user can access it. 
 
@@ -38,6 +39,7 @@ We utilize CBC as the mode of operation as CBC provides message dependence for g
 
 ### Diagram
 ![alt text](T5.png)
+![alt text](T5Handshake.png)
 
 # T6: File Leakage
 Although we authenticate file servers in the previous phase of the project, we still assume that these servers may be malicious. Since we assume file servers to be untrusted, we assume that they may leak files stored on the server to unauthorized individuals at will. This disrupts data confidentiality of group files since users are under the assumption that only valid group members may have access to those files. We also need a way to adapt the secure storage of files with dynamic group membership. When a user is removed from a group, he or she should not have a mechanism to uncover leaked files. When a new user is added to a group, he or she should be able to uncover all files within that group.
