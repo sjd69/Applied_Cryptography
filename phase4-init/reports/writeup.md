@@ -48,7 +48,16 @@ The addition of timestamps to messages will protect against replay attacks. Each
 The addition of a message counter will protect against reordering attacks. Each communication will include a message number before encryption with the session key. At the time of connection, both the server and client will begin keeping track of the count of messages recieved from the other party. Each message will be sent with the count number of the message. The party receiving the message will verify that the message number received is the next message expected based on the count. If the message number is not as expexted, we assume a reordering attack and terminate the connection. 
 
 ##### Modification -- NEEDS FIXED
-Encryption with our session key alerts to message modification. Since all messages are encrypted with a session key, a modification of this message will render the decrypted message useless. When a message is unable to be decrypted (or fully decrypted), or is not decrypted to a valid command, message modification is assumed and the connection will be terminated. 
+Notes:
+* Main Idea: Integrity Protection:
+* Option 1 - CBC Residue MAC
+  * Pros:
+    * Easily usable with AES in CBC mode, which we are already using.
+  * Cons:
+    * Need for two keys to maintain integrity and confidentiality.
+    * This is expensive, but the cost might not be too bad.
+* Option 2 - Hash-based MAC
+  * Possibly too complicated? Requires a shared key, so might not be feasible with AES. But might be less costly.
 
 ### Justification
 We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal usage of the file sharing system. Keeping a message count and numbering messages ensures that messages are being received in the correct order. 
