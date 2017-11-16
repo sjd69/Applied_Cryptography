@@ -49,7 +49,7 @@ The addition of a message counter will protect against reordering attacks. Each 
 
 ##### Modification -- NEEDS FIXED
 Notes:
-* Main Idea: Integrity Protection:
+* Main Idea: Integrity Protection. Ideally, this will be a lightweight message authentication protocol, likely using symmetric crypto (such as the AES we're already using).
 * Option 1 - CBC Residue MAC
   * Pros:
     * Easily usable with AES in CBC mode, which we are already using.
