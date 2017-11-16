@@ -3,15 +3,29 @@ We have added new mechanisms in order to deal with three additional threat model
 
 Our implementation utilizes the following mechanisms:
 
-* **SHA256:** We utilize SHA256 for hashing within our system. We chose to use SHA256 instead of SHA1 due to SHA1 being considered broken. Since this is just a file sharing service, SHA256 seems more than adequate rather than going with a more heavy-handed SHA512.
-* **RSA:** Our implementation uses 2048 bit RSA keys for public key encryption. 1024 RSA keys are considered dead. 2048 bit keys are still considered secure and provide us with performance and storage benefits over 4096 bit keys, while still supplying us with sufficient security. In addition, 4096 bit RSA keys have potential compatibility concerns with older hardware, we would like to reach the widest audience possible while still providing adequate security.
+* **SHA256:** We utilize SHA256 for hashing within our system. We chose to use SHA256 instead of SHA1 due to SHA1 being considered broken. Since this is just a file sharing service, SHA256 seems more than adequate rather than going with the more heavy-handed SHA512.
+* **RSA:** Our implementation uses 2048 bit RSA keys for public key encryption. 1024 RSA keys are considered dead. 2048 bit keys are still considered secure and provide us with performance and storage benefits over 4096 bit keys, while still supplying us with sufficient security. In addition, 4096 bit RSA keys have potential compatibility concerns with older hardware and we would like to reach the widest audience possible while still providing adequate security.
 * **Random Number Challenge (Nonce):** The size of all random challenges utilized are 256 bits. This size is sufficently large to protect against brute force random guessing of the challenge by an adversary. Random challenges will not be reused.
-* **AES:** For symmetric key encryption within our system (for session keys), we will utilize AES with a 128 bit key size. We chose 128 bit keys over 256 keys as 128 bit keys are significantly faster but still sufficent security-wise and 128-bit is the largest allowed by JavaCrypto. We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. This is particularly relevant to **T5** below.
+* **AES:** For symmetric key encryption within our system (for session keys), we will utilize AES with a 128 bit key size. We chose 128 bit keys over 256 bit keys as 128 bit keys are significantly faster but still sufficent security-wise and 128-bit is the largest allowed by JavaCrypto. We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. This is particularly relevant to **T5** below.
 * **MD5:** We utilize MD5 within our system for generating public key fingerprints. MD5 produces human readible fingerprints, which is necessary for our purposes. MD5 is also used for SSH host verification, which is why we chose it compared to SHA1.
 * **Timestamp:** Timestamps will be unique to each message and will be verifiable by both the client and the server. We consider a threshold of three minutes be sufficient to prevent replay attacks without accidentally disrupting normal usage of the file sharing system. See **T5** below for more details.
 * **Counter:** Counters will be an integer count of the next expected message number. This number will be incremented each time a message is recieved.
 
 Mechanisms T1-T4 can be found here: https://github.com/NohrianScum/cs1635-2017fa-kdc42-ruz24-sjd69/blob/master/phase3-init/reports/phase3-writeup.md
+Diagrams of previous mechanisms: 
+* **T1** 
+
+![alt text](T4diagram2.png)
+* **T2**
+
+![alt text](TokenDiag.png)
+![alt text](T2diagram2.png)
+* **T3**
+
+![alt text](T3diagramNew.png)
+* **T4**
+
+![alt text](T4diagram.png)
 
 
 # T5: Message Reorder, Replay or Modification
@@ -19,7 +33,7 @@ Mechanisms T1-T4 can be found here: https://github.com/NohrianScum/cs1635-2017fa
 
 **Assumption 2:** Clients and Servers have synchronized clocks.
 
-After connecting to and properly authenticating a group or file server, the messages passed between the client and server are subject to being reordered, saved for a replay attack, or modified by an active adversary. Modifying messages can affect the integrity and avaliability of data stored on the server or recieved by the user. An adversary that may insert communications, for example delete a file from a server, can disrupt data avaliablility. Inserting fake communications can also compromise data integrity as malicious files may be placed onto the server or sent to the user. Reordering communications can also compromise data avaliablility and integrity. For example, a user wishes to download a file and then delete the file from a server. Reordering these messages deletes the file before the user can access it. 
+After connecting to and properly authenticating a group or file server, the messages passed between the client and server are subject to being reordered, saved for a replay attack, or modified by an active adversary. Modifying messages can affect the integrity and avaliability of data stored on the server or received by the user. An adversary that may insert communications, such as deleting a file from a server, can disrupt data avaliablility. Inserting fake communications can also compromise data integrity as malicious files may be placed onto the server or sent to the user. Reordering communications can also compromise data avaliablility and integrity. For example, a user wishes to download a file and then delete the file from a server. Reordering these messages deletes the file before the user can access it. 
 
 To protect against **T4** in the previous phase of this project, our file sharing system uses a unique secret session key to encrypt communications between a server and a client. This mechanism offers protection against passive adversaries, and protection from replay attacks between sessions. Our current implementation does not protect against an active attacker that can insert, reorder, replay or modify messages within a session. To offer protection against this stronger attack, we utilize timestamping in addition to the previously implemented session key.
 
@@ -31,13 +45,13 @@ Our file sharing system utilizes a 128 bit AES (CBC mode) session key from the p
 The addition of timestamps to messages will protect against replay attacks. Each communication will be timestamped with the time that the message is sent before encryption with the session key. When a party receives a communication, the message will be decrypted and the timestamp will be validataed against a threshold of three minutes. If the timestamp does not fall within this threshold, we consider the message a replay attack and will terminate the connection. 
 
 ##### Reordering
-The addition of a message counter will protect against reordering attacks. Each communication will include a message number before encryption with the session key. At the time of connection, both the server and client will begin keeping track of the count of messages recieved from the other party. Each message will be sent with the count number of the message. The party recieving the message will verify that the message number recieved is the next message expected based on the count. If the message number is not as expexted, we assume a reordering attack and terminate the connection. 
+The addition of a message counter will protect against reordering attacks. Each communication will include a message number before encryption with the session key. At the time of connection, both the server and client will begin keeping track of the count of messages recieved from the other party. Each message will be sent with the count number of the message. The party receiving the message will verify that the message number received is the next message expected based on the count. If the message number is not as expexted, we assume a reordering attack and terminate the connection. 
 
 ##### Modification -- NEEDS FIXED
 Encryption with our session key alerts to message modification. Since all messages are encrypted with a session key, a modification of this message will render the decrypted message useless. When a message is unable to be decrypted (or fully decrypted), or is not decrypted to a valid command, message modification is assumed and the connection will be terminated. 
 
 ### Justification
-We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal usage of the file sharing system. Keeping a message count and numbering messages ensures that messages are being recieved in the correct order. 
+We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal usage of the file sharing system. Keeping a message count and numbering messages ensures that messages are being received in the correct order. 
 
 ### Diagram
 ![alt text](T5.png)
