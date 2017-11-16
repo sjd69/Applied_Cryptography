@@ -37,7 +37,7 @@ Encryption with our session key alerts to message modification. Since all messag
 We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal usage of the file sharing system. Keeping a message count and numbering messages ensures that messages are being recieved in the correct order. 
 
 ### Diagram
-![alt text](T5diagram.png)
+![alt text](T5.png)
 
 # T6: File Leakage
 Although we authenticate file servers in the previous phase of the project, we still assume that these servers may be malicious. Since we assume file servers to be untrusted, we assume that they may leak files stored on the server to unauthorized individuals at will. This disrupts data confidentiality of group files since users are under the assumption that only valid group members may have access to those files. We also need a way to adapt the secure storage of files with dynamic group membership. When a user is removed from a group, he or she should not have a mechanism to uncover leaked files. When a new user is added to a group, he or she should be able to uncover all files within that group.
