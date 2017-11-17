@@ -47,17 +47,8 @@ The addition of timestamps to messages will protect against replay attacks. Each
 ##### Reordering
 The addition of a message counter will protect against reordering attacks. Each communication will include a message number before encryption with the session key. At the time of connection, both the server and client will begin keeping track of the count of messages recieved from the other party. Each message will be sent with the count number of the message. The party receiving the message will verify that the message number received is the next message expected based on the count. If the message number is not as expexted, we assume a reordering attack and terminate the connection. 
 
-##### Modification -- NEEDS FIXED
-Notes:
-* Main Idea: Integrity Protection. Ideally, this will be a lightweight message authentication protocol, likely using symmetric crypto (such as the AES we're already using).
-* Option 1 - CBC Residue MAC
-  * Pros:
-    * Easily usable with AES in CBC mode, which we are already using.
-  * Cons:
-    * Need for two keys to maintain integrity and confidentiality.
-    * This is expensive, but the cost might not be too bad.
-* Option 2 - Hash-based MAC
-  * Possibly too complicated? Requires a shared key, so might not be feasible with AES. But might be less costly.
+##### Modification
+The addition of CBC residue from our AES encryption scheme will serve as a MAC to protect against message modification. During communication, the CBC residue will be saved and transmitted to the recipient. The receiving party can then recompute and verify the CBC residue of the message. However, any attacker who would attempt to intercept and modify the message would be unable to recompute the CBC residue.
 
 ### Justification
 We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal usage of the file sharing system. Keeping a message count and numbering messages ensures that messages are being received in the correct order. 
