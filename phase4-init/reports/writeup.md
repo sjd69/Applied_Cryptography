@@ -54,7 +54,7 @@ The addition of CBC residue from our AES encryption scheme will serve as a MAC t
 We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. Timestamps will be unique to each message and will be easily verifiable by both the client and the server. We consider the threshold of three minutes to be sufficient to prevent replay attacks without accidentally dirsupting normal usage of the file sharing system. Keeping a message count and numbering messages ensures that messages are being received in the correct order. 
 
 ### Diagram
-![alt text](T5 .png)
+![alt text](T5.png)
 ![alt text](T5Handshake.png)
 ![alt text](T5HandshakeF.png)
 
