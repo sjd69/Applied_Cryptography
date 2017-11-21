@@ -306,20 +306,6 @@ public class MyClient {
         return false;
     }
 
-    private static SecretKey generate_AES() {
-        // generate session key for file server
-        System.out.println("AES session key generation");
-        try {
-            KeyGenerator keyGenAES = KeyGenerator.getInstance("AES");
-            keyGenAES.init(128);
-            //System.out.println(sessionKey);
-            return keyGenAES.generateKey();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     private static SecretKey handshake(String username, PublicKey serverPublicKey, PrivateKey privateKey) {
         try {
             SecretKey sessionKey = generate_AES();
