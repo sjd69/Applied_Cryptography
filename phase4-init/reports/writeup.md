@@ -12,20 +12,6 @@ Our implementation utilizes the following mechanisms:
 * **Counter:** Counters will be an integer count of the next expected message number. This number will be incremented each time a message is recieved. Initial number count for each party is elaborated upon in T5
 
 Mechanisms T1-T4 can be found here: https://github.com/NohrianScum/cs1635-2017fa-kdc42-ruz24-sjd69/blob/master/phase3-init/reports/phase3-writeup.md
-Diagrams of previous mechanisms: 
-* **T1** 
-
-![alt text](T4diagram2.png)
-* **T2**
-
-![alt text](TokenDiag.png)
-![alt text](T2diagram2.png)
-* **T3**
-
-![alt text](T3diagramNew.png)
-* **T4**
-
-![alt text](T4diagram.png)
 
 
 # T5: Message Reorder, Replay or Modification
