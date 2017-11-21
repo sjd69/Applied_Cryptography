@@ -33,11 +33,7 @@ Diagrams of previous mechanisms:
 
 **Assumption 2:** Clients and Servers have synchronized clocks.
 
-After connecting to and properly authenticating a group or file server, the messages passed between the client and server are subject to being reordered, saved for a replay attack, or modified by an active adversary. Modifying messages can affect the integrity and a
-
-
-
-iability of data stored on the server or received by the user. An adversary that may insert communications, such as deleting a file from a server, can disrupt data avaliablility. Inserting fake communications can also compromise data integrity as malicious files may be placed onto the server or sent to the user. Reordering communications can also compromise data avaliablility and integrity. For example, a user wishes to download a file and then delete the file from a server. Reordering these messages deletes the file before the user can access it. 
+After connecting to and properly authenticating a group or file server, the messages passed between the client and server are subject to being reordered, saved for a replay attack, or modified by an active adversary. Modifying messages can affect the integrity and avaliability of data stored on the server or received by the user. An adversary that may insert communications, such as deleting a file from a server, can disrupt data avaliablility. Inserting fake communications can also compromise data integrity as malicious files may be placed onto the server or sent to the user. Reordering communications can also compromise data avaliablility and integrity. For example, a user wishes to download a file and then delete the file from a server. Reordering these messages deletes the file before the user can access it. 
 
 To protect against **T4** in the previous phase of this project, our file sharing system uses a unique secret session key to encrypt communications between a server and a client. This mechanism offers protection against passive adversaries, and protection from replay attacks between sessions. Our current implementation does not protect against an active attacker that can insert, reorder, replay or modify messages within a session. To offer protection against this stronger attack, we utilize timestamping, message counters and CBC residue in addition to the previously implemented session key.
 
@@ -97,4 +93,4 @@ Requiring the file server to validate token usage intention information prevents
 ![alt text](T7Token.png)
 
 # Final Thoughts
-We were able to make use of our previous protocols and extend then by adding extra information like timestamps, counters and intended server to protect against the new threats mentioned above. Timestamping messages provides protection against replay attacks and reordering attacks, on top of the protection of a session key for each connection between a server a client. Specifying a file name where the token will be used prevents stolen tokens from being used at any server other than where the threat occured.
+We were able to make use of our previous protocols and extend then by adding extra information like timestamps, counters, CBC residue, and intended server to protect against the new threats mentioned above. The combination of timestamping, counters, and residue provides protection against replay attacks, reordering attacks, and modification attacks furthering the protection of a session key for each connection between a server a client. Specifying a file name where the token will be used prevents stolen tokens from being used at any server other than where the threat occured. Finally, files stored on file servers will now be encrypted with unique group keys to prevent unauthorized file leakage.
