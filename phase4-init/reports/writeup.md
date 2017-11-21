@@ -9,7 +9,7 @@ Our implementation utilizes the following mechanisms:
 * **AES:** For symmetric key encryption within our system (for session keys), we will utilize AES with a 128 bit key size. We chose 128 bit keys over 256 bit keys as 128 bit keys are significantly faster but still sufficent security-wise and 128-bit is the largest allowed by JavaCrypto. We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks. This is particularly relevant to **T5** below.
 * **MD5:** We utilize MD5 within our system for generating public key fingerprints. MD5 produces human readible fingerprints, which is necessary for our purposes. MD5 is also used for SSH host verification, which is why we chose it compared to SHA1.
 * **Timestamp:** Timestamps will be unique to each message and will be verifiable by both the client and the server. We consider a threshold of three minutes be sufficient to prevent replay attacks without accidentally disrupting normal usage of the file sharing system. See **T5** below for more details.
-* **Counter:** Counters will be an integer count of the next expected message number. This number will be incremented each time a message is recieved.
+* **Counter:** Counters will be an integer count of the next expected message number. This number will be incremented each time a message is recieved. Initial number count for each party is elaborated upon in T5
 
 Mechanisms T1-T4 can be found here: https://github.com/NohrianScum/cs1635-2017fa-kdc42-ruz24-sjd69/blob/master/phase3-init/reports/phase3-writeup.md
 Diagrams of previous mechanisms: 
