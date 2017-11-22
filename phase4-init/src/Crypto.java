@@ -85,6 +85,22 @@ public class Crypto {
             e.printStackTrace();
         }
     }
+    
+    // return HMAC of a byte array message using a SHA256 key
+    public byte[] get_HMAC(Key key, byte[] m){
+    	byte[] hash = null;
+    	try {
+    		Mac mac = Mac.getInstance("HmacSHA256", new BouncyCastleProvider());
+    		System.out.println(mac.getProvider().getInfo());
+    		mac.init(key);
+    		mac.update(m);
+    		mac.doFinal();
+    	}
+    	catch (InvalidKeyException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+		return hash;
+	}
 }
 
 
