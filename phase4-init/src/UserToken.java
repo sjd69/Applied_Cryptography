@@ -48,6 +48,14 @@ public interface UserToken
      */
     public List<String> getGroups();
     
+    
+    /**
+     * This method extracts the bytes from a given token
+     * to facilitate hashing.
+     *
+     * @return a byte array representation of the token's data.
+     *
+     */
     public byte[] getBytes();
     
     
