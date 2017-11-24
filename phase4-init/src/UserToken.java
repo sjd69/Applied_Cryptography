@@ -50,19 +50,9 @@ public interface UserToken
     
     
     /**
-     * This method extracts the bytes from a given token
-     * to facilitate hashing.
-     *
-     * @return a byte array representation of the token's data.
-     *
-     */
-    public byte[] getBytes();
-    
-    
-    /**
      * This method extracts the intended IP address of the server
      * where this token is intended to be used. 
-     * For example, if "Alice" requests a token to be used for
+     * For example, if user "Alice" requests a token to be used for
      * file server "fs" at IP Address "11037", this method will
      * return the String "11037".
      *
@@ -70,5 +60,15 @@ public interface UserToken
      *
      */
     public String getServerId();
+    
+    
+    /**
+     * This method extracts the bytes from a given token
+     * to facilitate hashing.
+     *
+     * @return a byte array representation of the token's data.
+     *
+     */
+    public byte[] getBytes();
 
 } //-- end interface UserToken
