@@ -1,8 +1,9 @@
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
 
-public class KeyChain {
-    private ArrayList<SecretKey> keychain;
+public class KeyChain implements java.io.Serializable {
+	private static final long serialVersionUID = 4L;
+	private ArrayList<SecretKey> keychain;
 	private String groupName;
     
     public KeyChain(String groupName) {
