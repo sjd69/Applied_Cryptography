@@ -6,12 +6,14 @@ public class Token implements UserToken, Serializable
 {
 	private String issuer;
 	private String subject;
+	private String serverId;
 	private List<String> groups;
 	
-	public Token(String i, String s, List<String> g)
+	public Token(String i, String s, String sid, List<String> g)
 	{
 		issuer = i;
 		subject = s;
+		serverId = sid;
 		groups = g;
 	}
 	
@@ -60,11 +62,28 @@ public class Token implements UserToken, Serializable
     	return groups;
     }
     
+    
+    /**
+     * This method extracts the intended IP address of the server
+     * where the token is intended to be used.
+     * For example, if user "Alice" requests a token to be used for
+     * file server "fs" at IP Address "11037", this method will 
+     * return the String "11037".
+     * 
+     * @return the String representation of the intended server's IP address.
+     *
+     */
+     public String getServerID() 
+     {
+     	return serverId;
+     }
+    
     public byte[] getBytes()
     {
-    	String[] tokenInfo = new String[3];
+    	String[] tokenInfo = new String[4];
 		tokenInfo[0] = issuer + ",";
 		tokenInfo[1] = subject + ",";
+		tokenInfo[2] = serverId + ",";
 		String groupStr = "";
 		for (String x:groups){
 			groupStr = groupStr + "," + x;
