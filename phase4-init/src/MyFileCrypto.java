@@ -1,12 +1,17 @@
 import java.util.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class MyFileCrypto
 {
 	UserToken utoken;
+	Crypto crypto = new Crypto();
 	
 	// TODO take in keychain as argument
-	public void startMyFileCrypto(Token token)
+	public void startMyFileCrypto(Token token, KeyChain keychain)
 	{
 		boolean connected = true;
 		System.out.println("Using File Encryption/Decryption System");
@@ -32,8 +37,37 @@ public class MyFileCrypto
 					System.out.println("Enter destination file: ");
 					String destfile = sc.nextLine();
 				
-					// TODO add encryption here
-				
+					KeySet dkey = keychain.getEncryptionKey();			
+					int ind = keychain.getEncryptionKeyInd();
+					
+					Path file_path = Paths.get(".", sourcefile);
+					byte[] encryptedFile = null;
+					try 
+					{
+						encryptedFile = Files.readAllBytes(file_path);
+					} catch (IOException e) 
+					{
+						System.out.println(e);
+					}
+					
+					// Add encryption key ind to beginning of encrypted file
+					String f = new String(encryptedFile);
+					f = ind + "~" + f;
+					
+					// back to bytes
+					encryptedFile = f.getBytes();
+					
+					// encryption
+					byte[] decryptBytes = crypto.aesEncrypt(dkey, encryptedFile);
+					
+					// write encrypted file
+					Path path = Paths.get(".", destfile);
+					try {
+						Files.write(path, decryptBytes);
+					} catch (IOException e) 
+					{
+						System.out.println(e);
+					}
 					break;
 			
 				// decrypt a file
@@ -45,7 +79,37 @@ public class MyFileCrypto
 					System.out.println("Enter destination file: ");
 					String dFile = sc.nextLine();
 
-					// TODO add decryption here
+					// get file contents
+					Path f_path = Paths.get(".", sFile);
+					encryptedFile = null;
+					try 
+					{
+						encryptedFile = Files.readAllBytes(f_path);
+					} catch (IOException e) 
+					{
+						System.out.println(e);
+					}
+					
+					// Get decrypt key index 
+					f = new String(encryptedFile);
+					String index = f.split("\\~")[0];
+					int i = Integer.parseInt(index);
+					
+					// Get correct key
+					KeySet ekey = keychain.getDecryptionKey(i);
+					
+					// Decryption
+					decryptBytes = crypto.aesDecrypt(ekey, encryptedFile);
+					
+					// write decrypted file
+					Path p = Paths.get(".", dFile);
+					try {
+						Files.write(p, decryptBytes);
+					} catch (IOException e) 
+					{
+						System.out.println(e);
+					}
+					
 					break;
 				
 			// disconnect from server
@@ -59,4 +123,9 @@ public class MyFileCrypto
 			System.out.println();
 		}
 	}
+	
+	public static void main (String args[]){
+		
+	}
+
 }
