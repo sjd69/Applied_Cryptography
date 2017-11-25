@@ -84,6 +84,7 @@ public class Crypto {
         } catch (NoSuchPaddingException | BadPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
             e.printStackTrace();
         }
+	return null;
     }
     
     // return HMAC of a byte array message using a SHA256 key
