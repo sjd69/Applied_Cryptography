@@ -29,6 +29,7 @@ public class KeyChainList implements java.io.Serializable {
         return (this.list.containsKey(groupName));
     }
     
+    // return a keychain for a group
     public synchronized KeyChain getKeyChain(String groupName) {
     	return (this.list.get(groupName));
     }
