@@ -71,7 +71,7 @@ public class MyFileCrypto
 					break;
 			
 				// decrypt a file
-				case 3:
+				case 2:
 					System.out.println("-- Decrypt File --");
 					System.out.println("Enter source file: ");
 					String sFile = sc.nextLine();
@@ -113,7 +113,7 @@ public class MyFileCrypto
 					break;
 				
 			// disconnect from server
-			case 5:
+			case 3:
 				connected = false;
 				break;
 			
