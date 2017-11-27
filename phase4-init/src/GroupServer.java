@@ -184,7 +184,7 @@ public class GroupServer extends Server {
 			{
 				sock = serverSock.accept();
 				thread = new GroupThread(sock, this);
-				thread.start();
+				thread.run();
 			}
 		}
 		catch(Exception e)
