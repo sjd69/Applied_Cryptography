@@ -9,11 +9,11 @@ public class Token implements UserToken, Serializable
 	private String serverId;
 	private List<String> groups;
 	
-	public Token(String i, String s, String sid, List<String> g)
+	public Token(String i, String s, List<String> g)
 	{
 		issuer = i;
 		subject = s;
-		serverId = sid;
+		serverId = null;
 		groups = g;
 	}
 	
@@ -77,6 +77,11 @@ public class Token implements UserToken, Serializable
      {
      	return serverId;
      }
+    
+    public void setServerID(String s)
+    {
+    	serverId = s;
+    }
     
     public byte[] getBytes()
     {

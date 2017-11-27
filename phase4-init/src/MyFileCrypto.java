@@ -11,7 +11,7 @@ public class MyFileCrypto
 	Crypto crypto = new Crypto();
 	
 	// TODO take in keychain as argument
-	public void startMyFileCrypto(Token token, KeyChain keychain)
+	public void startMyFileCrypto(UserToken token, KeyChain keychain)
 	{
 		boolean connected = true;
 		System.out.println("Using File Encryption/Decryption System");

@@ -43,7 +43,7 @@ public class GroupServer extends Server {
 		String userFile = "UserList.bin";
 		String groupFile = "GroupList.bin";
 		String keyFile = "rsa.bin";
-		String keychainList = "KeyChainList.bin";
+		String keychainFile = "KeyChainList.bin";
 		Scanner console = new Scanner(System.in);
 		ObjectInputStream userStream;
 		ObjectInputStream groupStream;

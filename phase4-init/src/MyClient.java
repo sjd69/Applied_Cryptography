@@ -27,16 +27,17 @@ public class MyClient {
         //FileClient fileClient = new FileClient();
 
         GroupServer groupServer = new GroupServer();
+        String fs_ip = null;
         UserToken userToken = null;
         String username;
         PrivateKey privateKey = null;
         PublicKey serverPublicKey = null;
         SecretKey sessionKey;
-	KeyChain keychain = null;
+		KeyChain keychain = null;
 
         MyFileClient myFileClient = new MyFileClient();
         MyGroupClient myGroupClient = new MyGroupClient();
-	MyFileCrypto myFileCrypto = new MyFileCrypto();
+		MyFileCrypto myFileCrypto = new MyFileCrypto();
 
 
 
@@ -178,7 +179,7 @@ public class MyClient {
 
                         System.out.println("Enter IP Address of File Server.");
                         scanIn.nextLine();
-                        String fs_ip = scanIn.nextLine();
+                        fs_ip = scanIn.nextLine();
 
                         System.out.println("Enter the port number for the File Server");
                         int fs_port = scanIn.nextInt();
@@ -260,25 +261,27 @@ public class MyClient {
                         break;
                     
 			
-		     // *** Connecting to MyFileCrypto ***
+		     		// *** Connecting to MyFileCrypto ***
                     case 3:
                     	// If the client has requested a keychain 
                     	if (keychain != null)
                     	{
                     		System.out.println("KeyChain for " + keychain.getGroup());
-                    		myFileCrypto.startMyFileCrypto(Token token, KeyChain keychain);
+                    		myFileCrypto.startMyFileCrypto(userToken, keychain);
                     	}
-			// If not, first request a keychain from the group server
+						// If not, first request a keychain from the group server
                     	else
                     	{
                     		System.out.print("Please request a keychain from the Group Server");
                     	}
                     	break; 
-		    case 4:
+		    
+		    		// *** Logging Out ***
+		    		case 4:
                         System.out.println("Logging out");
                         auth = false;
                         break;
-
+					// *** Exit ***
                     case 5:
                         System.out.println("Exiting");
                         auth = false;
@@ -324,7 +327,7 @@ public class MyClient {
 
     private static SecretKey handshake(String username, PublicKey serverPublicKey, PrivateKey privateKey) {
         try {
-            SecretKey sessionKey = generate_AES();
+            SecretKey sessionKey =  null; //generate_AES();
 
             Signature rsaSignature = Signature.getInstance("RSA", "BC");
             rsaSignature.initSign(privateKey);

@@ -59,7 +59,8 @@ public interface UserToken
      * @return the String representation of the intended server's IP address.
      *
      */
-    public String getServerId();
+    //public String getServerId();
+    
     
     
     /**
