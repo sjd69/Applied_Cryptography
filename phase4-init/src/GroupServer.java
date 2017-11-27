@@ -24,6 +24,7 @@ public class GroupServer extends Server {
 	public static final int SERVER_PORT = 8765;
 	public UserList userList;
 	public GroupList groupList;
+	public KeyChainList keychainList;
 	protected PrivateKey privateKey;
 	protected  PublicKey publicKey;
     
@@ -42,6 +43,7 @@ public class GroupServer extends Server {
 		String userFile = "UserList.bin";
 		String groupFile = "GroupList.bin";
 		String keyFile = "rsa.bin";
+		String keychainList = "KeyChainList.bin";
 		Scanner console = new Scanner(System.in);
 		ObjectInputStream userStream;
 		ObjectInputStream groupStream;
@@ -106,6 +108,9 @@ public class GroupServer extends Server {
 			groupList.addGroup("ADMIN");
 			groupList.addOwnership(username, "ADMIN");
 			groupList.addUser(username, "ADMIN");
+			
+			// Create new KeyChainList
+			keychainList = new KeyChainList();
 
 			ObjectOutputStream outStream;
 			try
@@ -116,6 +121,10 @@ public class GroupServer extends Server {
 
 				outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
 				outStream.writeObject(groupList);
+				outStream.close();
+				
+				outStream = new ObjectOutputStream(new FileOutputStream("KeyChainList.bin"));
+				outStream.writeObject(keychainList);
 				outStream.close();
 
 				System.out.println("Created lists.");
@@ -209,6 +218,9 @@ class ShutDownListener extends Thread
 
 			outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
 			outStream.writeObject(my_gs.groupList);
+			
+			outStream = new ObjectOutputStream(new FileOutputStream("KeyChainList.bin"));
+			outStream.writeObject(my_gs.keychainList);
 		}
 		catch(Exception e)
 		{
@@ -243,6 +255,9 @@ class AutoSave extends Thread
 
 					outStream = new ObjectOutputStream(new FileOutputStream("GroupList.bin"));
 					outStream.writeObject(my_gs.groupList);
+					
+					outStream = new ObjectOutputStream(new FileOutputStream("KeyChainList.bin"));
+					outStream.writeObject(my_gs.keychainList);
 				}
 				catch(Exception e)
 				{
