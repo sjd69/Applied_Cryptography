@@ -32,9 +32,11 @@ public class MyClient {
         PrivateKey privateKey = null;
         PublicKey serverPublicKey = null;
         SecretKey sessionKey;
+	KeyChain keychain = null;
 
         MyFileClient myFileClient = new MyFileClient();
         MyGroupClient myGroupClient = new MyGroupClient();
+	MyFileCrypto myFileCrypto = new MyFileCrypto();
 
 
 
@@ -144,15 +146,17 @@ public class MyClient {
                     System.out.println("MENU:\n" +
                             "1: Connect to File Server\n" +
                             "2: Connect to Group Server\n" +
-                            "3: Logout\n" +
-                            "4: Exit\n");
+                            "3: Encrypt/Decrypt File" +
+                            "4: Logout\n" +
+                            "5: Exit\n");
 
                     while (!scanIn.hasNextInt()) {
                         System.out.println("MENU:\n" +
                                 "1: Connect to File Server\n" +
                                 "2: Connect to Group Server\n" +
-                                "3: Logout\n" +
-                                "4: Exit\n");
+                                "3: Encrypt/Decrypt File" +
+                            	"4: Logout\n" +
+                            	"5: Exit\n");
                         scanIn.next();
                     }
                     nav = scanIn.nextInt();
@@ -254,12 +258,28 @@ public class MyClient {
 						
                         myGroupClient.startMyGroupClient(gc_ip, gc_port, userToken); 
                         break;
+                    
+			
+		     // *** Connecting to MyFileCrypto ***
                     case 3:
+                    	// If the client has requested a keychain 
+                    	if (keychain != null)
+                    	{
+                    		System.out.println("KeyChain for " + keychain.getGroup());
+                    		myFileCrypto.startMyFileCrypto(Token token, KeyChain keychain);
+                    	}
+			// If not, first request a keychain from the group server
+                    	else
+                    	{
+                    		System.out.print("Please request a keychain from the Group Server");
+                    	}
+                    	break; 
+		    case 4:
                         System.out.println("Logging out");
                         auth = false;
                         break;
 
-                    case 4:
+                    case 5:
                         System.out.println("Exiting");
                         auth = false;
                         exit = true;
