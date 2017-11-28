@@ -1,7 +1,8 @@
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-public class KeySet {
+public class KeySet implements java.io.Serializable {
+	private static final long serialVersionUID = 4L;
     private SecretKey key;
     private IvParameterSpec iv;
 
