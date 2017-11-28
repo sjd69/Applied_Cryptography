@@ -11,7 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class FileServer extends Server {
-	private final Socket socket;
+	
 	public static final int SERVER_PORT = 4321;
 	public static FileList fileList;
 
@@ -25,97 +25,80 @@ public class FileServer extends Server {
 	}
 	
 	public void start() {
-		// Start server ID verification
-		final ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-		final ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-		Envelope e = (Envelope)input.readObject();
-		Envelope response;
 		
-		String username = (String)e.getObjContents().get(0);
-		UserToken utoken = getToken(username);
-		if (!utoken.serverId.equals(Integer.toString(SERVER_PORT))) { // server ID not verified
-			response = new Envelope("FAIL");
-			response.addObject(null);
-			output.writeObject(response);
+		String fileFile = "FileList.bin";
+		ObjectInputStream fileStream;
+		
+		//This runs a thread that saves the lists on program exit
+		Runtime runtime = Runtime.getRuntime();
+		Thread catchExit = new Thread(new ShutDownListenerFS());
+		runtime.addShutdownHook(catchExit);
+		
+		//Open user file to get user list
+		try
+		{
+			FileInputStream fis = new FileInputStream(fileFile);
+			fileStream = new ObjectInputStream(fis);
+			fileList = (FileList)fileStream.readObject();
+		}
+		catch(FileNotFoundException ex)
+		{
+			System.out.println("FileList Does Not Exist. Creating FileList...");
+			
+			fileList = new FileList();
+			
+		}
+		catch(IOException e)
+		{
+			System.out.println("Error reading from FileList file");
+			System.exit(-1);
+		}
+		catch(ClassNotFoundException e)
+		{
+			System.out.println("Error reading from FileList file");
+			System.exit(-1);
 		}
 		
-		// Server ID verified. File access continues
+		File file = new File("shared_files");
+		if (file.mkdir()) {
+			System.out.println("Created new shared_files directory");
+		}
+		else if (file.exists()){
+			System.out.println("Found shared_files directory");
+		}
 		else {
+			System.out.println("Error creating shared_files directory");				 
+		 }
 		
-			String fileFile = "FileList.bin";
-			ObjectInputStream fileStream;
+		//Autosave Daemon. Saves lists every 5 minutes
+		AutoSaveFS aSave = new AutoSaveFS();
+		aSave.setDaemon(true);
+		aSave.start();
 		
-			//This runs a thread that saves the lists on program exit
-			Runtime runtime = Runtime.getRuntime();
-			Thread catchExit = new Thread(new ShutDownListenerFS());
-			runtime.addShutdownHook(catchExit);
 		
-			//Open user file to get user list
-			try
-			{
-				FileInputStream fis = new FileInputStream(fileFile);
-				fileStream = new ObjectInputStream(fis);
-				fileList = (FileList)fileStream.readObject();
-			}
-			catch(FileNotFoundException ex)
-			{
-				System.out.println("FileList Does Not Exist. Creating FileList...");
+		boolean running = true;
+		
+		try
+		{			
+			final ServerSocket serverSock = new ServerSocket(port);
+			System.out.printf("%s up and running\n", this.getClass().getName());
 			
-				fileList = new FileList();
+			Socket sock = null;
+			Thread thread = null;
 			
-			}
-			catch(IOException e)
+			while(running)
 			{
-				System.out.println("Error reading from FileList file");
-				System.exit(-1);
+				sock = serverSock.accept();
+				thread = new FileThread(sock);
+				thread.start();
 			}
-			catch(ClassNotFoundException e)
-			{
-				System.out.println("Error reading from FileList file");
-				System.exit(-1);
-			}
-		
-			File file = new File("shared_files");
-			 if (file.mkdir()) {
-				 System.out.println("Created new shared_files directory");
-			 }
-		 	else if (file.exists()){
-				 System.out.println("Found shared_files directory");
-			 }
-			 else {
-				 System.out.println("Error creating shared_files directory");				 
-		 	}
-		
-			//Autosave Daemon. Saves lists every 5 minutes
-			AutoSaveFS aSave = new AutoSaveFS();
-			aSave.setDaemon(true);
-			aSave.start();
-		
-		
-			boolean running = true;
-		
-			try
-			{			
-				final ServerSocket serverSock = new ServerSocket(port);
-				System.out.printf("%s up and running\n", this.getClass().getName());
 			
-				Socket sock = null;
-				Thread thread = null;
-			
-				while(running)
-				{
-					sock = serverSock.accept();
-					thread = new FileThread(sock);
-					thread.start();
-				}
-			
-				System.out.printf("%s shut down\n", this.getClass().getName());
-			}
-			catch(Exception e)
-			{
-				System.err.println("Error: " + e.getMessage());
-				e.printStackTrace(System.err);
-			}
+			System.out.printf("%s shut down\n", this.getClass().getName());
+		}
+		catch(Exception e)
+		{
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace(System.err);
 		}
 	}
 }
