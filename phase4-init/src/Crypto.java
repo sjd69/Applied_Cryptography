@@ -108,6 +108,19 @@ public class Crypto {
         }
 		return hash;
 	}
+	
+	// Return MD5 of a public key.
+	public byte[] get_MD5(byte[] m) {
+		byte[] hash = null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5", new BouncyCastleProvider());
+			md.update(m);
+			hash = md.digest();
+		}
+		catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return hash;
+	}
+	
 }
-
-
