@@ -11,9 +11,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class FileServer extends Server {
-	
+	private final Socket socket;
 	public static final int SERVER_PORT = 4321;
 	public static FileList fileList;
+
 	
 	public FileServer() {
 		super(SERVER_PORT, "FilePile");
@@ -24,79 +25,97 @@ public class FileServer extends Server {
 	}
 	
 	public void start() {
-		String fileFile = "FileList.bin";
-		ObjectInputStream fileStream;
+		// Start server ID verification
+		final ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+		final ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+		Envelope e = (Envelope)input.readObject();
+		Envelope response;
 		
-		//This runs a thread that saves the lists on program exit
-		Runtime runtime = Runtime.getRuntime();
-		Thread catchExit = new Thread(new ShutDownListenerFS());
-		runtime.addShutdownHook(catchExit);
-		
-		//Open user file to get user list
-		try
-		{
-			FileInputStream fis = new FileInputStream(fileFile);
-			fileStream = new ObjectInputStream(fis);
-			fileList = (FileList)fileStream.readObject();
-		}
-		catch(FileNotFoundException e)
-		{
-			System.out.println("FileList Does Not Exist. Creating FileList...");
-			
-			fileList = new FileList();
-			
-		}
-		catch(IOException e)
-		{
-			System.out.println("Error reading from FileList file");
-			System.exit(-1);
-		}
-		catch(ClassNotFoundException e)
-		{
-			System.out.println("Error reading from FileList file");
-			System.exit(-1);
+		String username = (String)e.getObjContents().get(0);
+		UserToken utoken = getToken(username);
+		if (!utoken.serverId.equals(Integer.toString(SERVER_PORT))) { // server ID not verified
+			response = new Envelope("FAIL");
+			response.addObject(null);
+			output.writeObject(response);
 		}
 		
-		File file = new File("shared_files");
-		 if (file.mkdir()) {
-			 System.out.println("Created new shared_files directory");
-		 }
-		 else if (file.exists()){
-			 System.out.println("Found shared_files directory");
-		 }
-		 else {
-			 System.out.println("Error creating shared_files directory");				 
-		 }
+		// Server ID verified. File access continues
+		else {
 		
-		//Autosave Daemon. Saves lists every 5 minutes
-		AutoSaveFS aSave = new AutoSaveFS();
-		aSave.setDaemon(true);
-		aSave.start();
+			String fileFile = "FileList.bin";
+			ObjectInputStream fileStream;
 		
+			//This runs a thread that saves the lists on program exit
+			Runtime runtime = Runtime.getRuntime();
+			Thread catchExit = new Thread(new ShutDownListenerFS());
+			runtime.addShutdownHook(catchExit);
 		
-		boolean running = true;
-		
-		try
-		{			
-			final ServerSocket serverSock = new ServerSocket(port);
-			System.out.printf("%s up and running\n", this.getClass().getName());
-			
-			Socket sock = null;
-			Thread thread = null;
-			
-			while(running)
+			//Open user file to get user list
+			try
 			{
-				sock = serverSock.accept();
-				thread = new FileThread(sock);
-				thread.start();
+				FileInputStream fis = new FileInputStream(fileFile);
+				fileStream = new ObjectInputStream(fis);
+				fileList = (FileList)fileStream.readObject();
 			}
+			catch(FileNotFoundException e)
+			{
+				System.out.println("FileList Does Not Exist. Creating FileList...");
 			
-			System.out.printf("%s shut down\n", this.getClass().getName());
-		}
-		catch(Exception e)
-		{
-			System.err.println("Error: " + e.getMessage());
-			e.printStackTrace(System.err);
+				fileList = new FileList();
+			
+			}
+			catch(IOException e)
+			{
+				System.out.println("Error reading from FileList file");
+				System.exit(-1);
+			}
+			catch(ClassNotFoundException e)
+			{
+				System.out.println("Error reading from FileList file");
+				System.exit(-1);
+			}
+		
+			File file = new File("shared_files");
+			 if (file.mkdir()) {
+				 System.out.println("Created new shared_files directory");
+			 }
+		 	else if (file.exists()){
+				 System.out.println("Found shared_files directory");
+			 }
+			 else {
+				 System.out.println("Error creating shared_files directory");				 
+		 	}
+		
+			//Autosave Daemon. Saves lists every 5 minutes
+			AutoSaveFS aSave = new AutoSaveFS();
+			aSave.setDaemon(true);
+			aSave.start();
+		
+		
+			boolean running = true;
+		
+			try
+			{			
+				final ServerSocket serverSock = new ServerSocket(port);
+				System.out.printf("%s up and running\n", this.getClass().getName());
+			
+				Socket sock = null;
+				Thread thread = null;
+			
+				while(running)
+				{
+					sock = serverSock.accept();
+					thread = new FileThread(sock);
+					thread.start();
+				}
+			
+				System.out.printf("%s shut down\n", this.getClass().getName());
+			}
+			catch(Exception e)
+			{
+				System.err.println("Error: " + e.getMessage());
+				e.printStackTrace(System.err);
+			}
 		}
 	}
 }
