@@ -13,6 +13,9 @@ import java.util.*;
 public class FileThread extends Thread
 {
 	private final Socket socket;
+	private FileServer my_fs;
+	private SecretKey sessionKey;
+	private BigInteger secondNonce;
 
 	public FileThread(Socket _socket)
 	{
@@ -34,9 +37,74 @@ public class FileThread extends Thread
 			{
 				Envelope e = (Envelope)input.readObject();
 				System.out.println("Request received: " + e.getMessage());
+				Envelope response;
+				
+				if (e.getMessage().equals("HANDSHAKE")) // Client wants a token
+				{
+					if (e.getObjContents().size() == 4) { // First part of handshake
+						Crypto crypto = new Crypto();
+						String username = (String)message.getObjContents().get(0); //Get the username
+						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
+						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
+						byte[] iv = (byte[])message.getObjContents().get(3); //Get the iv
+						BigInteger decryptedNonce;
+						
+						if (username == null)
+						{
+							response = new Envelope("FAIL");
+							response.addObject(null);
+							output.writeObject(response);
+						} else {
+							response = new Evelope("OK");
+							decryptedNonce = new BigInteger(crypto.rsaDecrypt(my_gs.privateKey, nonce));
+							
+							byte[] signedKey = byte[] signedKey = crypto.rsaDecrypt(my_gs.privateKey, encryptedKey);
+							// byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
+							
+							// assert byteKey != null
+							sessionKey = new SecretKeySpec(signedKey, 0, 16, "AES");
+							Keyset sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
+							secondNonce = new BigInteger(256, new Random());
+							response.addObject(decryptedNonce);
+							//response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
+							response.addObject(crypto.aesEncrypt(sessionKeySet, secondNonce.toByteArray()));
+							output.writeObject(response);
+						}
+					} else { // Second part of handshake
+						BigInteger nonce = (BigInteger)message.getObjContents().get(0);
+						
+						if (nonce.equals(secondNonce)) {
+							response = new Envelope("OK");
+							output.writeObject(response);
+						} else {
+							response = new Envelope("FAIL");
+							output.writeObject(response);
+						}
+					}
+				} else if (e.getMessage().equals("GET")) { // Client wants a token
+					String username = (String)message.getObjContents().get(0); // Get the username
+					if (username == null) 
+					{
+						response = new Envelope("FAIL");
+						response.addObject(null);
+						output.writeObject(response);
+					}
+					else {
+						UserToken yourToken = createToken(username); // Create a token
+						
+						// Respond to the Client. On error, the client will receive a null token
+						response = new Envelope("OK");
+						response.addObject(yourToken);
+						output.writeObject(reponse);
+					}
+				} else if (e.getMessage().equals("PUBKEY")) { // Client wants a token
+					response = new Envelope("OK");
+					response.addObject(my_fs.publicKey);
+					output.writeObject(response);
+				}
 
 				// Handler to list files that this user is allowed to see
-				if(e.getMessage().equals("LFILES"))
+				else if(e.getMessage().equals("LFILES"))
 				{
 				    /* First shot at trying to implement this 
 				    */
