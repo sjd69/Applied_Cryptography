@@ -32,14 +32,16 @@ public class MyFileCrypto
 				case 1:
 					System.out.println("-- Encrypt File --");
 					System.out.println("Enter source file: ");
+					sc.nextLine();
 					String sourcefile = sc.nextLine();
 		
-					System.out.println("Enter destination file: ");
-					String destfile = sc.nextLine();
-				
+					// Get the encryption key from the keychain
 					KeySet dkey = keychain.getEncryptionKey();			
 					int ind = keychain.getEncryptionKeyInd();
-					System.out.println(ind);
+					
+					System.out.println("Enter encrypted file name: ");
+					String destfile = ind + "_" + sourcefile;
+					System.out.println(destfile);
 					
 					Path file_path = Paths.get(".", sourcefile);
 					byte[] decFile = null;
@@ -52,20 +54,14 @@ public class MyFileCrypto
 						System.out.println(e);
 					}
 					
-					// encryption
+					// encryption of file
 					byte[] encryptedBytes = crypto.aesEncrypt(dkey, decFile);
-					
-					// Add encryption key ind to beginning of encrypted file
-					String f = new String(encryptedBytes);
-					f = ind + "~" + f;
-					
-					// back to bytes
-					byte[] encryptedFile = f.getBytes();
 					
 					// write encrypted file
 					Path path = Paths.get(".", destfile);
 					try {
-						Files.write(path, encryptedFile);
+						//Files.write(path, indBytes);
+						Files.write(path, encryptedBytes);
 					} catch (IOException e) 
 					{
 						System.out.println(e);
@@ -83,7 +79,7 @@ public class MyFileCrypto
 
 					// get file contents
 					Path f_path = Paths.get(".", sFile);
-					encryptedFile = null;
+					byte[] encryptedFile = null;
 					try 
 					{
 						encryptedFile = Files.readAllBytes(f_path);
@@ -93,22 +89,13 @@ public class MyFileCrypto
 					}
 					
 					// Get decrypt key index 
-					f = new String(encryptedFile);
-					String index = f.split("\\~")[0];
-					
+					String index = sFile.split("_")[0];
+					System.out.println(index);
 					int i = Integer.parseInt(index);
-					System.out.println(i);
-					
-					System.out.println(f.split("\\~").length);
-					String encString = f.split("\\~")[1];
-					System.out.println(encString);
-					byte[] encBytes = encString.getBytes();
-					
-					// Get correct key
 					KeySet ekey = keychain.getDecryptionKey(i);
 					
 					// Decryption
-					byte[] decryptBytes = crypto.aesDecrypt(ekey, encBytes);
+					byte[] decryptBytes = crypto.aesDecrypt(ekey, encryptedFile);
 					
 					// write decrypted file
 					Path p = Paths.get(".", dFile);
@@ -121,20 +108,16 @@ public class MyFileCrypto
 					
 					break;
 				
-			// disconnect from server
-			case 3:
-				connected = false;
-				break;
-			
-			default: System.out.println("Invalid Command Number");
+				// disconnect from server
+				case 3:
+					connected = false;
 					break;
+				
+				// default
+				default: System.out.println("Invalid Command Number");
+						break;
 			}
 			System.out.println();
 		}
 	}
-	
-	public static void main (String args[]){
-		
-	}
-
 }
