@@ -39,31 +39,33 @@ public class MyFileCrypto
 				
 					KeySet dkey = keychain.getEncryptionKey();			
 					int ind = keychain.getEncryptionKeyInd();
+					System.out.println(ind);
 					
 					Path file_path = Paths.get(".", sourcefile);
-					byte[] encryptedFile = null;
+					byte[] decFile = null;
 					try 
 					{
-						encryptedFile = Files.readAllBytes(file_path);
+						decFile = Files.readAllBytes(file_path);
 					} catch (IOException e) 
 					{
+						System.out.println("Error Finding File");
 						System.out.println(e);
 					}
 					
+					// encryption
+					byte[] encryptedBytes = crypto.aesEncrypt(dkey, decFile);
+					
 					// Add encryption key ind to beginning of encrypted file
-					String f = new String(encryptedFile);
+					String f = new String(encryptedBytes);
 					f = ind + "~" + f;
 					
 					// back to bytes
-					encryptedFile = f.getBytes();
-					
-					// encryption
-					byte[] decryptBytes = crypto.aesEncrypt(dkey, encryptedFile);
+					byte[] encryptedFile = f.getBytes();
 					
 					// write encrypted file
 					Path path = Paths.get(".", destfile);
 					try {
-						Files.write(path, decryptBytes);
+						Files.write(path, encryptedFile);
 					} catch (IOException e) 
 					{
 						System.out.println(e);
@@ -73,7 +75,7 @@ public class MyFileCrypto
 				// decrypt a file
 				case 2:
 					System.out.println("-- Decrypt File --");
-					System.out.println("Enter source file: ");
+					System.out.println("Enter encrypted file: ");
 					String sFile = sc.nextLine();
 		
 					System.out.println("Enter destination file: ");
@@ -93,13 +95,20 @@ public class MyFileCrypto
 					// Get decrypt key index 
 					f = new String(encryptedFile);
 					String index = f.split("\\~")[0];
+					
 					int i = Integer.parseInt(index);
+					System.out.println(i);
+					
+					System.out.println(f.split("\\~").length);
+					String encString = f.split("\\~")[1];
+					System.out.println(encString);
+					byte[] encBytes = encString.getBytes();
 					
 					// Get correct key
 					KeySet ekey = keychain.getDecryptionKey(i);
 					
 					// Decryption
-					decryptBytes = crypto.aesDecrypt(ekey, encryptedFile);
+					byte[] decryptBytes = crypto.aesDecrypt(ekey, encBytes);
 					
 					// write decrypted file
 					Path p = Paths.get(".", dFile);
