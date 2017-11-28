@@ -11,6 +11,7 @@ import java.io.*;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.*;
+import javax.crypto.spec.IvParameterSpec;
 
 public class GroupThread extends Thread
 {
@@ -66,6 +67,7 @@ public class GroupThread extends Thread
 
 							assert byteKey != null;
 							sessionKey = new SecretKeySpec(byteKey, 0, 16, "AES");
+							KeySet sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
 							secondNonce = new BigInteger(256, new Random());
 							response.addObject(decryptedNonce);
 							response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
