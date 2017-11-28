@@ -44,10 +44,11 @@ public class GroupThread extends Thread
 
 				if (message.getMessage().equals("HANDSHAKE"))//Client wants a token
 				{
-					if (message.getObjContents().size() == 3){	//First part of handshake
+					if (message.getObjContents().size() == 4){	//First part of handshake
 						String username = (String)message.getObjContents().get(0); //Get the username
 						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
 						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
+						byte[] iv = (byte[])message.getObjContents().get(3); //Get the iv
 						BigInteger decryptedNonce;
 
 						if(username == null)
