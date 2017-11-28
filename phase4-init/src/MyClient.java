@@ -19,7 +19,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class MyClient {
     private static String serverFile = "ServerList.bin";
     private static ServerList serverList = null;
-    private static Crypto crypto;
+    private static Crypto crypto = new Crypto();
     private static GroupClient groupClient = new GroupClient();
 
     public static void main(String[] args) {
@@ -29,6 +29,7 @@ public class MyClient {
         GroupServer groupServer = new GroupServer();
         String fs_ip = null;
         String gs_ip = null;
+        int gs_port = 8765;
         UserToken userToken = null;
         String username;
         PrivateKey privateKey = null;
@@ -71,7 +72,7 @@ public class MyClient {
                     gs_ip = scanIn.nextLine();
 
                     System.out.println("Enter the port number for the Group Server");
-                    int gs_port = scanIn.nextInt();
+                    gs_port = scanIn.nextInt();
                     scanIn.nextLine();
 
                     System.out.println("Enter username");
@@ -100,7 +101,7 @@ public class MyClient {
                             System.out.println("\n\n********WARNING********");
                             System.out.println("Server " + gs_ip + " could not be validated");
                             System.out.println("\n\nThe server's fingerprint is "
-                                    + crypto.get_MD5(serverPublicKey.getEncoded()));
+                                    + serverPublicKey);
                             System.out.println("Would you like to connect and store this server's information?");
                             System.out.print("(Yes/No): ");
                             userResp = scanIn.nextLine();
@@ -176,63 +177,7 @@ public class MyClient {
                         break;
 
                     case 2:
-						System.out.println("Enter IP Address of Group Server.");
-                        scanIn.nextLine();
-                        String gc_ip = scanIn.nextLine();
-
-                        System.out.println("Enter the port number for the Group Server");
-                        int gc_port = scanIn.nextInt();
-                        
-                        System.out.println("Enter the Group Server's public key:");
-                        String stringKey = scanIn.nextLine();
-						byte[] byteKey = Base64.getDecoder().decode(stringKey);
-						PublicKey gspublicKey = null;
-						try {
-							gspublicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(byteKey));
-						} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-							e.printStackTrace();
-						}
-						
-						System.out.println("Enter your private key:");
-						String stringPKey = scanIn.nextLine();
-						byte[] bytePKey = Base64.getDecoder().decode(stringPKey);
-						privateKey = null;
-						try {
-							privateKey = KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(byteKey));
-						} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-							e.printStackTrace();
-						}
-						
-						/*// Random Challenge
-						SecureRandom sr = new SecureRandom();
-						byte[] randbytes = new byte[20];
-						sr.nextBytes(randbytes);
-						
-						byte[] byteEncSK = null;
-						try {
-							// Random Challenge Encrypted with Server's Public Key
-							Cipher rsaCipherSig = Cipher.getInstance("RSA", "BC");
-							rsaCipherSig.init(Cipher.ENCRYPT_MODE, gspublicKey);
-							byte[] byteSignedRC = rsaCipherSig.doFinal(randbytes);
-							
-							// Session Key Encrypted with Server's Public Key 
-							byte[] bsessionKey = sessionKey.getEncoded();
-							byteEncSK = rsaCipherSig.doFinal(bsessionKey);
-						} catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException | NoSuchPaddingException | NoSuchProviderException| NoSuchAlgorithmException e) {
-							e.printStackTrace();
-						}
-						
-						try {
-							// Encrypted Session Key Signed with User Private Key
-							Cipher Signature = Cipher.getInstance("RSA", "BC");
-							Signature.init(Cipher.ENCRYPT_MODE, privateKey);
-							byte[] byteSignedSK = Signature.doFinal(byteEncSK);
-						} catch (BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchProviderException | InvalidKeyException | NoSuchAlgorithmException e) {
-							e.printStackTrace();
-						}*/
-						
-                        myGroupClient.startMyGroupClient(gc_ip, gc_port, userToken); 
-                        scanIn.nextLine();
+                        myGroupClient.startMyGroupClient(gs_ip, gs_port, userToken, groupClient);
                         break;
                     
 			

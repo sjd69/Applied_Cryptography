@@ -17,6 +17,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 		try
 		{
 			this.serverList = serverList;
+			this.ip = ip;
 			this.messageNumber = serverList.getServer(ip).getMessageNumber();
 			Envelope message = null, response = null;
 			message = new Envelope("HANDSHAKE");
@@ -149,18 +150,18 @@ public class GroupClient extends Client implements GroupClientInterface {
 			 Envelope message = null, response = null;
 			 //Tell the server to create a user
 			 message = new Envelope("PUBKEY");
-			 finalizeMessage(message);
+			 output.writeObject(message);
 
 			 response = (Envelope)input.readObject();
 
 			 //Successful response
-			 if(validateMessageNumber(response) && response.getMessage().equals("OK"))
+			 if(response.getMessage().equals("OK"))
 			 {
 				 //If there is a token in the Envelope, return it
 				 ArrayList<Object> temp = null;
 				 temp = response.getObjContents();
 
-				 if(temp.size() == 2)
+				 if(temp.size() == 1)
 				 {
 				 	return (PublicKey)temp.get(0);
 				 }

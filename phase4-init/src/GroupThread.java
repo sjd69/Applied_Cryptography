@@ -116,7 +116,7 @@ public class GroupThread extends Thread
 				{
 					response = new Envelope("OK");
 					response.addObject(my_gs.publicKey);
-					finalizeMessage(response, output);
+					output.writeObject(response);
 				}
 				else if (message.getMessage().equals("KCHAIN"))
 				{
