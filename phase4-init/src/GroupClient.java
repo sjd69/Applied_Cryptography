@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupClient extends Client implements GroupClientInterface {
-
+	
 	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv) {
 		try
 		{
@@ -57,6 +57,47 @@ public class GroupClient extends Client implements GroupClientInterface {
 			return false;
 		}
 	}
+	
+	
+	public KeyChain getKeyChain(String gname)
+	{
+		try
+		{
+			KeyChain kc = null;
+			Envelope message = null, response = null;
+		 		 	
+			//Tell the server to return a token.
+			message = new Envelope("KCHAIN");
+			message.addObject(gname); //Add g name string
+			output.writeObject(message);
+		
+			//Get the response from the server
+			response = (Envelope)input.readObject();
+			
+			//Successful response
+			if(response.getMessage().equals("OK"))
+			{
+				System.out.println("Message is OK");
+				//If there is a token in the Envelope, return it 
+				ArrayList<Object> temp = null;
+				temp = response.getObjContents();
+				
+				if(temp.size() == 1)
+				{
+					kc = (KeyChain)temp.get(0);
+					return kc;
+				}
+			}
+			return null;
+		}
+		catch(Exception e)
+		{
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace(System.err);
+			return null;
+		}
+	}
+	
 	public UserToken getToken(String username)
 	 {
 		try
