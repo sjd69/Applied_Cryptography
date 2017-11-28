@@ -43,10 +43,10 @@ public class FileThread extends Thread
 				{
 					if (e.getObjContents().size() == 4) { // First part of handshake
 						Crypto crypto = new Crypto();
-						String username = (String)message.getObjContents().get(0); //Get the username
-						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
-						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
-						byte[] iv = (byte[])message.getObjContents().get(3); //Get the iv
+						String username = (String)e.getObjContents().get(0); //Get the username
+						byte[] nonce = (byte[])e.getObjContents().get(1); //Get the nonce
+						byte[] encryptedKey = (byte[])e.getObjContents().get(2); //Get the signed key
+						byte[] iv = (byte[])e.getObjContents().get(3); //Get the iv
 						BigInteger decryptedNonce;
 						
 						if (username == null)
@@ -71,7 +71,7 @@ public class FileThread extends Thread
 							output.writeObject(response);
 						}
 					} else { // Second part of handshake
-						BigInteger nonce = (BigInteger)message.getObjContents().get(0);
+						BigInteger nonce = (BigInteger)e.getObjContents().get(0);
 						
 						if (nonce.equals(secondNonce)) {
 							response = new Envelope("OK");
@@ -82,7 +82,7 @@ public class FileThread extends Thread
 						}
 					}
 				} else if (e.getMessage().equals("GET")) { // Client wants a token
-					String username = (String)message.getObjContents().get(0); // Get the username
+					String username = (String)e.getObjContents().get(0); // Get the username
 					if (username == null) 
 					{
 						response = new Envelope("FAIL");
