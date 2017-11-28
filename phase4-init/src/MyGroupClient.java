@@ -53,7 +53,8 @@ public class MyGroupClient
 				System.out.println("(6) - Add user to group");
 				System.out.println("(7) - Delete user from group");
 				System.out.println("(8) - List members of group");
-				System.out.println("(9) - Disconnect from Group Server");
+				System.out.println("(9) - Get Keychain");
+				System.out.println("(10) - Disconnect from Group Server");
 		
 				int commandNum = sc.nextInt();
 				sc.nextLine();
@@ -215,6 +216,12 @@ public class MyGroupClient
 						
 					// disconnect from server 
 					case 9:
+						System.out.println("--  Get group keychain --");
+						System.out.println("Enter group:");
+						String group_name = sc.nextLine();
+                        groupclient.getKeyChain(group_name);
+						break;
+					case 10:
 						System.out.println("--  Disconnect from Group Server --");
 						groupclient.disconnect();
 						flag = false;
