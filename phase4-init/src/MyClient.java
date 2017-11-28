@@ -330,6 +330,7 @@ public class MyClient {
             byte[] secondNonce = (byte[])serverResponse.getObjContents().get(1);
 
             if (respNonce.equals(nonce1)) {
+            	System.out.println("Random Number Correct -  Group Server Authenticated");
                 //byte[] decrypted = decrypt(sessionKey, secondNonce, "AES", "BC");
                 byte[] decrypted = crypto.aesDecrypt(sessionKeySet, secondNonce);
                 BigInteger decryptedNonce = new BigInteger(decrypted);

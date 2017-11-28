@@ -46,6 +46,7 @@ public class GroupThread extends Thread
 				if (message.getMessage().equals("HANDSHAKE"))//Client wants a token
 				{
 					if (message.getObjContents().size() == 4){	//First part of handshake
+						Crypto crypto = new Crypto();
 						String username = (String)message.getObjContents().get(0); //Get the username
 						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
 						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
@@ -59,18 +60,18 @@ public class GroupThread extends Thread
 							output.writeObject(response);
 						} else {
 							response = new Envelope("OK");
-							decryptedNonce = new BigInteger(decrypt(my_gs.privateKey,
-									nonce, "RSA", "BC"));
+							decryptedNonce = new BigInteger(crypto.rsaDecrypt(my_gs.privateKey, nonce));
 
-							byte[] signedKey = decrypt(my_gs.privateKey, encryptedKey, "RSA", "BC");
-							byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
+							byte[] signedKey = crypto.rsaDecrypt(my_gs.privateKey, encryptedKey);
+							//byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
 
-							assert byteKey != null;
-							sessionKey = new SecretKeySpec(byteKey, 0, 16, "AES");
+							//assert byteKey != null;
+							sessionKey = new SecretKeySpec(signedKey, 0, 16, "AES");
 							KeySet sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
 							secondNonce = new BigInteger(256, new Random());
 							response.addObject(decryptedNonce);
-							response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
+							//response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
+							response.addObject(crypto.aesEncrypt(sessionKeySet, secondNonce.toByteArray()));
 							output.writeObject(response);
 						}
 					} else {	//Second part of handshake
