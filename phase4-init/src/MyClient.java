@@ -305,7 +305,7 @@ public class MyClient {
             // generate session keys for encryption and hashing
             KeySet sessionKeySet = crypto.getKeySet();
             SecretKey sessionKey = sessionKeySet.getKey();
-            byte[] iv = sessionKeySet.getIv();
+           	IvParameterSpec iv = sessionKeySet.getIv();
 			SecretKey hmackey = crypto.getHMACKey();
 			
             //Signature rsaSignature = Signature.getInstance("RSA", "BC");

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class GroupClient extends Client implements GroupClientInterface {
 
-	public Envelope firstHandshake(String username, byte[] nonce, byte[] key) {
+	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv) {
 		try
 		{
 			Envelope message = null, response = null;
@@ -15,6 +15,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 			message.addObject(username);
 			message.addObject(nonce);
 			message.addObject(key);
+			message.addObject(iv);
 
 
 			output.writeObject(message);

@@ -68,7 +68,7 @@ public class MyGroupClient
 						{
 							System.out.println("Token - " + utoken.getSubject());
 							System.out.println("Issued by - " + utoken.getIssuer());
-							System.out.println("For server - " + utoken.getServerId());
+							//System.out.println("For server - " + utoken.getServerId());
 							System.out.println("Groups: ");
 							List<String> groups = utoken.getGroups();
 							for (String f:groups){
