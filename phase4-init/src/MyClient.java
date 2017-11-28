@@ -28,6 +28,7 @@ public class MyClient {
 
         GroupServer groupServer = new GroupServer();
         String fs_ip = null;
+        String gs_ip = null;
         UserToken userToken = null;
         String username;
         PrivateKey privateKey = null;
@@ -67,7 +68,7 @@ public class MyClient {
 
                     System.out.println("Enter IP Address of Group Server.");
                     scanIn.nextLine();
-                    String gs_ip = scanIn.nextLine();
+                    gs_ip = scanIn.nextLine();
 
                     System.out.println("Enter the port number for the Group Server");
                     int gs_port = scanIn.nextInt();
@@ -111,7 +112,7 @@ public class MyClient {
                         }
                         if (validated) {
                         	// - - - - Handshake with group server - - - -
-                            sessionKey = handshake(username, serverPublicKey, privateKey);
+                            sessionKey = handshake(username, serverPublicKey, privateKey, gs_ip);
 
                             if (sessionKey != null) {
                                 userToken = groupClient.getToken(username);
@@ -316,7 +317,7 @@ public class MyClient {
 
     }
 
-    private static KeySet handshake(String username, PublicKey serverPublicKey, PrivateKey privateKey) {
+    private static KeySet handshake(String username, PublicKey serverPublicKey, PrivateKey privateKey, String ip) {
         try {
 
             // generate session keys for encryption and hashing
@@ -335,7 +336,8 @@ public class MyClient {
 			byte[] encryptedNonce1 = crypto.rsaEncrypt(serverPublicKey, nonce1.toByteArray());
 			
 			// Server Handshake Response
-            Envelope serverResponse = groupClient.firstHandshake(username, encryptedNonce1, encryptedKey, iv.getIV());
+            Envelope serverResponse = groupClient.firstHandshake(username, encryptedNonce1, encryptedKey,
+                    iv.getIV(), serverList, ip);
 
             BigInteger respNonce = (BigInteger)serverResponse.getObjContents().get(0);
             byte[] secondNonce = (byte[])serverResponse.getObjContents().get(1);

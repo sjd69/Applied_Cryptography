@@ -20,6 +20,8 @@ public class GroupThread extends Thread
 	private SecretKey sessionKey;
 	private BigInteger secondNonce;
 	private KeySet sessionKeySet;
+	private int messageNumber = -1;
+	private String username;
 
 	public GroupThread(Socket _socket, GroupServer _gs)
 	{
@@ -46,19 +48,23 @@ public class GroupThread extends Thread
 
 				if (message.getMessage().equals("HANDSHAKE"))//Client wants a token
 				{
-					if (message.getObjContents().size() == 4){	//First part of handshake
+					if (message.getObjContents().size() == 5){	//First part of handshake
 						Crypto crypto = new Crypto();
-						String username = (String)message.getObjContents().get(0); //Get the username
+						username = (String)message.getObjContents().get(0); //Get the username
 						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
 						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
 						byte[] iv = (byte[])message.getObjContents().get(3); //Get the iv
 						BigInteger decryptedNonce;
 
-						if(username == null)
+						if (messageNumber == -1) {
+							setMessageNumber(message);
+						}
+
+						if(username == null || !validateMessageNumber(message))
 						{
 							response = new Envelope("FAIL");
 							response.addObject(null);
-							output.writeObject(response);
+							finalizeMessage(response, output);
 						} else {
 							response = new Envelope("OK");
 							decryptedNonce = new BigInteger(crypto.rsaDecrypt(my_gs.privateKey, nonce));
@@ -73,17 +79,17 @@ public class GroupThread extends Thread
 							response.addObject(decryptedNonce);
 							//response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
 							response.addObject(crypto.aesEncrypt(sessionKeySet, secondNonce.toByteArray()));
-							output.writeObject(response);
+							finalizeMessage(response, output);
 						}
 					} else {	//Second part of handshake
 						BigInteger nonce = (BigInteger)message.getObjContents().get(0);
 
-						if (nonce.equals(secondNonce)) {
+						if (nonce.equals(secondNonce) && validateMessageNumber(message)) {
 							response = new Envelope("OK");
-							output.writeObject(response);
+							finalizeMessage(response, output);
 						} else {
 							response = new Envelope("FAIL");
-							output.writeObject(response);
+							finalizeMessage(response, output);
 						}
 					}
 
@@ -94,7 +100,7 @@ public class GroupThread extends Thread
 					{
 						response = new Envelope("FAIL");
 						response.addObject(null);
-						output.writeObject(response);
+						finalizeMessage(response, output);
 					}
 					else
 					{
@@ -103,14 +109,14 @@ public class GroupThread extends Thread
 						//Respond to the client. On error, the client will receive a null token
 						response = new Envelope("OK");
 						response.addObject(yourToken);
-						output.writeObject(response);
+						finalizeMessage(response, output);
 					}
 				}
 				else if (message.getMessage().equals("PUBKEY"))//Client wants a token
 				{
 					response = new Envelope("OK");
 					response.addObject(my_gs.publicKey);
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if (message.getMessage().equals("KCHAIN"))
 				{
@@ -119,7 +125,7 @@ public class GroupThread extends Thread
 					{
 						String g_name = (String)message.getObjContents().get(0);
 						response.addObject(getGroupKeyChain(g_name));
-						output.writeObject(response);
+						finalizeMessage(response, output);
 					}
 				}
 				else if(message.getMessage().equals("CUSER")) //Client wants to create a user
@@ -147,7 +153,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if(message.getMessage().equals("DUSER")) //Client wants to delete a user
 				{
@@ -175,7 +181,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if(message.getMessage().equals("CGROUP")) //Client wants to create a group
 				{
@@ -197,7 +203,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if(message.getMessage().equals("DGROUP")) //Client wants to delete a group
 				{
@@ -219,7 +225,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if(message.getMessage().equals("LMEMBERS")) //Client wants a list of members in a group
 				{
@@ -244,7 +250,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if(message.getMessage().equals("AUSERTOGROUP")) //Client wants to add user to a group
 				{
@@ -269,7 +275,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if(message.getMessage().equals("RUSERFROMGROUP")) //Client wants to remove user from a group
 				{
@@ -294,7 +300,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 				else if(message.getMessage().equals("DISCONNECT")) //Client wants to disconnect
 				{
@@ -304,7 +310,7 @@ public class GroupThread extends Thread
 				else
 				{
 					response = new Envelope("FAIL"); //Server does not understand client request
-					output.writeObject(response);
+					finalizeMessage(response, output);
 				}
 			}while(proceed);
 		}
@@ -593,35 +599,28 @@ public class GroupThread extends Thread
 		}
 	}
 
-	private static byte[] encrypt(Key key, byte[] bytes, String type, String provider) {
+	private void finalizeMessage(Envelope message, ObjectOutputStream output) {
+		updateMessageNumber(this.username);
+		message.addObject(messageNumber);
 		try {
-
-			//Create an cipher using bouncycastle. Set to encrypt using key
-			Cipher cipher = Cipher.getInstance(type, provider);
-			cipher.init(Cipher.ENCRYPT_MODE, key);
-
-			return cipher.doFinal(bytes);
-
-		} catch (Exception e) {
+			output.writeObject(message);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return null;
 	}
 
-	private static byte[] decrypt(Key key, byte[] encryptedText, String type, String provider) {
-		try {
-			//Create an cipher using bouncycastle. Set to decrypt using key
-			Cipher cipher = Cipher.getInstance(type, provider);
-			cipher.init(Cipher.DECRYPT_MODE, key);
-
-			//Return string representation of the decrypted byte array.
-			return cipher.doFinal(encryptedText);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	private void setMessageNumber(Envelope message) {
+		this.messageNumber = (int) message.getObjContents().get(message.getObjContents().size() - 1);
 	}
 
+	private boolean validateMessageNumber(Envelope response) {
+		int respMsgNumber = (int) response.getObjContents().get(response.getObjContents().size() - 1);
+		return messageNumber == respMsgNumber;
+	}
+
+	private void updateMessageNumber(String username) {
+		messageNumber++;
+		my_gs.userList.updateMessageNumber(username, messageNumber);
+
+	}
 }
