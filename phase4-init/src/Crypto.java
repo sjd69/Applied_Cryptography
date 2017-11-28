@@ -92,6 +92,34 @@ public class Crypto {
         }
 	return null;
     }
+
+    public byte[] rsaSign(byte[] text, PrivateKey privateKey) {
+        Signature signature;
+        byte[] signedBytes = new byte[0];
+        try {
+            signature = Signature.getInstance("SHA256withRSA", "BC");
+            signature.initSign(privateKey);
+            signature.update(text);
+            signedBytes = signature.sign();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | SignatureException e) {
+            e.printStackTrace();
+        }
+        return signedBytes;
+    }
+
+    public boolean rsaVerify(byte[] text, byte[] signedBytes, PublicKey publicKey) {
+        Signature signature;
+        boolean verified = false;
+        try {
+            signature = Signature.getInstance("SHA256withRSA", "BC");
+            signature.initVerify(publicKey);
+            signature.update(text);
+            verified = signature.verify(signedBytes);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | SignatureException e) {
+            e.printStackTrace();
+        }
+        return verified;
+    }
     
     // return HMAC of a byte array message using a SHA256 key
     public byte[] get_HMAC(Key key, byte[] m){
@@ -101,7 +129,7 @@ public class Crypto {
     		System.out.println(mac.getProvider().getInfo());
     		mac.init(key);
     		mac.update(m);
-    		mac.doFinal();
+    		hash = mac.doFinal();
     	}
     	catch (InvalidKeyException | NoSuchAlgorithmException e) {
             e.printStackTrace();
