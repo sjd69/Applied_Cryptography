@@ -9,7 +9,7 @@ public class Crypto {
     private final int aesSize = 128;
     private final int rsaSize = 2048;
     private SecureRandom rand;
-    private KeyGenerator aesKeyGen;
+    private KeyGenerator aesKeyGen, md5KeyGen;
 
     public Crypto() {
         Security.addProvider(new BouncyCastleProvider());
@@ -17,6 +17,7 @@ public class Crypto {
 
         try {
             aesKeyGen = KeyGenerator.getInstance("AES", "BC");
+            md5KeyGen = KeyGenerator.getInstance("HmacMD5","BC");
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
         }
@@ -31,6 +32,11 @@ public class Crypto {
         aesKeyGen.init(aesSize);
 
         return new KeySet(aesKeyGen.generateKey(), new IvParameterSpec(ivBytes));
+    }
+    
+    public SecretKey getHMACKey() {
+    	SecretKey hmacKey = md5KeyGen.generateKey();
+    	return hmacKey;
     }
 
     public byte[] aesEncrypt(KeySet keySet, byte[] bytes) {
@@ -91,7 +97,7 @@ public class Crypto {
     public byte[] get_HMAC(Key key, byte[] m){
     	byte[] hash = null;
     	try {
-    		Mac mac = Mac.getInstance("HmacSHA256", new BouncyCastleProvider());
+    		Mac mac = Mac.getInstance("HmacMD5", new BouncyCastleProvider());
     		System.out.println(mac.getProvider().getInfo());
     		mac.init(key);
     		mac.update(m);
