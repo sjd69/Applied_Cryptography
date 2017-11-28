@@ -68,6 +68,7 @@ public class UserList implements java.io.Serializable {
         private ArrayList<String> groups;
         private ArrayList<String> ownership;
         private PublicKey publicKey;
+        private int messageNumber;
 
         public User(PublicKey publicKey) {
             this.publicKey = publicKey;
@@ -113,6 +114,14 @@ public class UserList implements java.io.Serializable {
                     ownership.remove(ownership.indexOf(group));
                 }
             }
+        }
+
+        public int getMessageNumber() {
+            return messageNumber;
+        }
+
+        public void setMessageNumber(int messageNumber) {
+            this.messageNumber = messageNumber;
         }
 
     }

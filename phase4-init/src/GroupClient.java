@@ -6,16 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupClient extends Client implements GroupClientInterface {
-	
-	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv) {
+	int messageNumber;
+
+	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv, int messageNumber) {
 		try
 		{
+			this.messageNumber = messageNumber;
 			Envelope message = null, response = null;
 			message = new Envelope("HANDSHAKE");
 			message.addObject(username);
 			message.addObject(nonce);
 			message.addObject(key);
 			message.addObject(iv);
+			message.addObject(messageNumber);
+			updateMessageNumber();
 
 
 			output.writeObject(message);
@@ -40,7 +44,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 			Envelope message = null, response = null;
 			message = new Envelope("HANDSHAKE");
 			message.addObject(nonce);
-
+			message.addObject(messageNumber);
+			updateMessageNumber();
 
 			output.writeObject(message);
 
@@ -69,6 +74,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 			//Tell the server to return a token.
 			message = new Envelope("KCHAIN");
 			message.addObject(gname); //Add g name string
+			message.addObject(messageNumber);
+			updateMessageNumber();
 			output.writeObject(message);
 		
 			//Get the response from the server
@@ -108,6 +115,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 			//Tell the server to return a token.
 			message = new Envelope("GET");
 			message.addObject(username); //Add user name string
+			message.addObject(messageNumber);
+			updateMessageNumber();
 			output.writeObject(message);
 		
 			//Get the response from the server
@@ -144,6 +153,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 			 Envelope message = null, response = null;
 			 //Tell the server to create a user
 			 message = new Envelope("PUBKEY");
+			 message.addObject(messageNumber);
+			 updateMessageNumber();
 			 output.writeObject(message);
 
 			 response = (Envelope)input.readObject();
@@ -182,6 +193,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message.addObject(username); //Add user name string
 				message.addObject(token); //Add the requester's token
 				message.addObject(userPublicKey);
+				message.addObject(messageNumber);
+				updateMessageNumber();
 				output.writeObject(message);
 			
 				response = (Envelope)input.readObject();
@@ -208,6 +221,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message = new Envelope("DUSER");
 				message.addObject(username); //Add user name
 				message.addObject(token);  //Add requester's token
+				message.addObject(messageNumber);
+				updateMessageNumber();
 				output.writeObject(message);
 			
 				response = (Envelope)input.readObject();
@@ -237,6 +252,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message = new Envelope("CGROUP");
 				message.addObject(groupname); //Add the group name string
 				message.addObject(token); //Add the requester's token
+				message.addObject(messageNumber);
+				updateMessageNumber();
 				output.writeObject(message); 
 			
 				response = (Envelope)input.readObject();
@@ -266,6 +283,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message = new Envelope("DGROUP");
 				message.addObject(groupname); //Add group name string
 				message.addObject(token); //Add requester's token
+				message.addObject(messageNumber);
+				updateMessageNumber();
 				output.writeObject(message); 
 			
 				response = (Envelope)input.readObject();
@@ -295,6 +314,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 			 message = new Envelope("LMEMBERS");
 			 message.addObject(group); //Add group name string
 			 message.addObject(token); //Add requester's token
+			 message.addObject(messageNumber);
+			 updateMessageNumber();
 			 output.writeObject(message); 
 			 
 			 response = (Envelope)input.readObject();
@@ -326,6 +347,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message.addObject(username); //Add user name string
 				message.addObject(groupname); //Add group name string
 				message.addObject(token); //Add requester's token
+				message.addObject(messageNumber);
+				updateMessageNumber();
 				output.writeObject(message); 
 			
 				response = (Envelope)input.readObject();
@@ -355,6 +378,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message.addObject(username); //Add user name string
 				message.addObject(groupname); //Add group name string
 				message.addObject(token); //Add requester's token
+				message.addObject(messageNumber);
+				updateMessageNumber();
 				output.writeObject(message);
 			
 				response = (Envelope)input.readObject();
@@ -374,4 +399,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 			}
 	 }
 
+	 private void updateMessageNumber() {
+
+	 }
 }

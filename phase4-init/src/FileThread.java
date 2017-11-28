@@ -1,6 +1,10 @@
 /* File worker thread handles the business of uploading, downloading, and removing files for clients with valid tokens */
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.lang.Thread;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.util.List;
 import java.io.File;
@@ -37,7 +41,6 @@ public class FileThread extends Thread
 			{
 				Envelope e = (Envelope)input.readObject();
 				System.out.println("Request received: " + e.getMessage());
-				Envelope response;
 				
 				if (e.getMessage().equals("HANDSHAKE")) // Client wants a token
 				{
@@ -55,15 +58,15 @@ public class FileThread extends Thread
 							response.addObject(null);
 							output.writeObject(response);
 						} else {
-							response = new Evelope("OK");
-							decryptedNonce = new BigInteger(crypto.rsaDecrypt(my_gs.privateKey, nonce));
+							response = new Envelope("OK");
+							decryptedNonce = new BigInteger(crypto.rsaDecrypt(my_fs.privateKey, nonce));
 							
-							byte[] signedKey = byte[] signedKey = crypto.rsaDecrypt(my_gs.privateKey, encryptedKey);
+							byte[] signedKey = crypto.rsaDecrypt(my_fs.privateKey, encryptedKey);
 							// byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
 							
 							// assert byteKey != null
 							sessionKey = new SecretKeySpec(signedKey, 0, 16, "AES");
-							Keyset sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
+							KeySet sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
 							secondNonce = new BigInteger(256, new Random());
 							response.addObject(decryptedNonce);
 							//response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
@@ -95,7 +98,7 @@ public class FileThread extends Thread
 						// Respond to the Client. On error, the client will receive a null token
 						response = new Envelope("OK");
 						response.addObject(yourToken);
-						output.writeObject(reponse);
+						output.writeObject(response);
 					}
 				} else if (e.getMessage().equals("PUBKEY")) { // Client wants a token
 					response = new Envelope("OK");

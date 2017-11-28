@@ -1,5 +1,4 @@
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -20,7 +19,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class MyClient {
     private static String serverFile = "ServerList.bin";
     private static ServerList serverList = null;
-    private static MessageDigest md;
+    private static Crypto crypto;
     private static GroupClient groupClient = new GroupClient();
 
     public static void main(String[] args) {
@@ -94,13 +93,13 @@ public class MyClient {
 
                         groupClient.connect(gs_ip, gs_port);
                         serverPublicKey = groupClient.getPublicKey();
-                        validated = validate_server(gs_ip, serverPublicKey);
-                        String userResp = null;
+                        validated = validateServer(gs_ip, serverPublicKey);
+                        String userResp;
                         if (!validated) {
                             System.out.println("\n\n********WARNING********");
                             System.out.println("Server " + gs_ip + " could not be validated");
                             System.out.println("\n\nThe server's fingerprint is "
-                                    + serverPublicKey);
+                                    + crypto.get_MD5(serverPublicKey.getEncoded()));
                             System.out.println("Would you like to connect and store this server's information?");
                             System.out.print("(Yes/No): ");
                             userResp = scanIn.nextLine();
@@ -283,7 +282,7 @@ public class MyClient {
 
     }
 
-    private static boolean validate_server(String ip, PublicKey serverKey) {
+    private static boolean validateServer(String ip, PublicKey serverKey) {
         try {
             if (serverList == null) {
                 FileInputStream sfis = new FileInputStream(serverFile);
@@ -291,9 +290,8 @@ public class MyClient {
                 serverList = (ServerList)serverStream.readObject();
                 serverStream.close();
             }
-            md = MessageDigest.getInstance("MD5");
             PublicKey storedKey = serverList.getPublicKey(ip);
-            if (Arrays.equals(md.digest(serverKey.getEncoded()), md.digest(storedKey.getEncoded()))) {
+            if (Arrays.equals(crypto.get_MD5(serverKey.getEncoded()), crypto.get_MD5(storedKey.getEncoded()))) {
                 return true;
             }
         } catch(Exception ex) {
@@ -306,29 +304,34 @@ public class MyClient {
         return false;
     }
 
+    private static void updateServerList() {
+
+        try {
+            ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream("ServerList.bin"));
+            outStream.writeObject(serverList);
+            outStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private static KeySet handshake(String username, PublicKey serverPublicKey, PrivateKey privateKey) {
         try {
-            Crypto crypto = new Crypto();
-            
+
             // generate session keys for encryption and hashing
             KeySet sessionKeySet = crypto.getKeySet();
             SecretKey sessionKey = sessionKeySet.getKey();
            	IvParameterSpec iv = sessionKeySet.getIv();
 			SecretKey hmackey = crypto.getHMACKey();
-			
+
             //Signature rsaSignature = Signature.getInstance("RSA", "BC");
             byte[] signedSessionKey = crypto.rsaEncrypt(privateKey, sessionKey.getEncoded());
             System.out.println(signedSessionKey.length);
-            //rsaSignature.initSign(privateKey);
-            assert sessionKey != null;
-            //rsaSignature.update(sessionKey.getEncoded());
-            //byte[] signedKey = rsaSignature.sign();
-            //byte[] encryptedKey = encrypt(serverPublicKey, signedKey, "RSA", "BC");
             byte[] encryptedKey = crypto.rsaEncrypt(serverPublicKey, sessionKey.getEncoded());
 			
 
             BigInteger nonce1 = new BigInteger(256, new Random());
-            //byte[] encryptedNonce1 = encrypt(serverPublicKey, nonce1.toByteArray(), "RSA", "BC");
 			byte[] encryptedNonce1 = crypto.rsaEncrypt(serverPublicKey, nonce1.toByteArray());
 			
 			// Server Handshake Response
@@ -360,53 +363,5 @@ public class MyClient {
         }
 
     }
-
-    private static byte[] encrypt(Key key, String text, String type, String provider) {
-        try {
-
-            //Create a cipher using bouncycastle. Set to encrypt using key
-            Cipher cipher = Cipher.getInstance(type, provider);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-
-            return cipher.doFinal(text.getBytes());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private static byte[] encrypt(Key key, byte[] bytes, String type, String provider) {
-        try {
-
-            //Create a cipher using bouncycastle. Set to encrypt using key
-            Cipher cipher = Cipher.getInstance(type, provider);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-
-            return cipher.doFinal(bytes);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private static byte[] decrypt(Key key, byte[] encryptedText, String type, String provider) {
-        try {
-            //Create a cipher using bouncycastle. Set to decrypt using key
-            Cipher cipher = Cipher.getInstance(type, provider);
-            cipher.init(Cipher.DECRYPT_MODE, key);
-
-            //Return string representation of the decrypted byte array.
-            return cipher.doFinal(encryptedText);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
 }

@@ -57,7 +57,7 @@ public class FileServer extends Server {
 				fileStream = new ObjectInputStream(fis);
 				fileList = (FileList)fileStream.readObject();
 			}
-			catch(FileNotFoundException e)
+			catch(FileNotFoundException ex)
 			{
 				System.out.println("FileList Does Not Exist. Creating FileList...");
 			
