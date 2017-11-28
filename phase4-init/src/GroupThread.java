@@ -19,6 +19,7 @@ public class GroupThread extends Thread
 	private GroupServer my_gs;
 	private SecretKey sessionKey;
 	private BigInteger secondNonce;
+	private KeySet sessionKeySet;
 
 	public GroupThread(Socket _socket, GroupServer _gs)
 	{
@@ -67,7 +68,7 @@ public class GroupThread extends Thread
 
 							//assert byteKey != null;
 							sessionKey = new SecretKeySpec(signedKey, 0, 16, "AES");
-							KeySet sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
+							sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
 							secondNonce = new BigInteger(256, new Random());
 							response.addObject(decryptedNonce);
 							//response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
@@ -110,6 +111,16 @@ public class GroupThread extends Thread
 					response = new Envelope("OK");
 					response.addObject(my_gs.publicKey);
 					output.writeObject(response);
+				}
+				else if (message.getMessage().equals("KCHAIN"))
+				{
+					response = new Envelope("OK");
+					if(message.getObjContents().get(0) != null)
+					{
+						String g_name = (String)message.getObjContents().get(0);
+						response.addObject(getGroupKeyChain(g_name));
+						output.writeObject(response);
+					}
 				}
 				else if(message.getMessage().equals("CUSER")) //Client wants to create a user
 				{
@@ -307,6 +318,17 @@ public class GroupThread extends Thread
 	private PublicKey getUserKey(String username) {
 		return my_gs.userList.getPublicKey(username);
 	}
+	
+	private KeyChain getGroupKeyChain(String grp_name){
+		if (my_gs.keychainList != null)
+		{
+			return my_gs.keychainList.getKeyChain(grp_name);
+		}
+		else
+		{
+			return new KeyChain("TEMP");
+		}
+	}
 
 	// Returns a list containing the members of the specified group. Returns null if error.
 	// only shows list if 
@@ -340,6 +362,7 @@ public class GroupThread extends Thread
 
 		// Does requester exist?
 		if(my_gs.userList.checkUser(requester)) {
+			Crypto crypto = new Crypto();
 			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
 			// Requester needs to be an administrator of the group
 			if (owner == null) {
@@ -351,6 +374,15 @@ public class GroupThread extends Thread
 				if(groupList.contains(username)) {
 					// User is deleted from the group
 					my_gs.groupList.removeUser(username, groupName);
+					
+					// make a new group key
+					KeySet newGroupKey = crypto.getKeySet();
+					// get group new keychain
+					KeyChain kc = my_gs.keychainList.getKeyChain(groupName);
+					// add new group key to keychain
+					kc.addNewKey(newGroupKey);
+					// update keychainList
+					my_gs.keychainList.addKeyChain(groupName, kc);
 					return true;
 				}
 				else {
@@ -426,6 +458,7 @@ public class GroupThread extends Thread
 
 	// Returns true if the group was successfully created, else false.
 	private boolean createGroup(String groupName, UserToken yourToken) {
+		Crypto crypto = new Crypto();
 		String requester = yourToken.getSubject();
 		ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
 			// Group needs to not already exist
@@ -440,6 +473,15 @@ public class GroupThread extends Thread
 				// also add to user list of that group
 				my_gs.groupList.addUser(requester, groupName);
 				my_gs.userList.addGroup(requester, groupName);
+				
+				// generate a new group key for file crypto
+				KeySet groupKey = crypto.getKeySet();
+				// create a new keychain
+				KeyChain kchain = new KeyChain(groupName);
+				// add new group key to keychain
+				kchain.addNewKey(groupKey);
+				// update keychainList
+				my_gs.keychainList.addKeyChain(groupName, kchain);
 				return true;
 			}
 	}
