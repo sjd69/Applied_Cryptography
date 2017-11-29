@@ -1,23 +1,12 @@
 /* FileClient provides all the client functionality regarding the file server */
 
-import javax.crypto.SecretKey;
-import java.io.*;
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class FileClient extends Client implements FileClientInterface {
-
-	private ServerList serverList;
-	private String ip;
-	private KeySet sessionKeySet;
-	private SecretKey hmacKey;
-	private Crypto crypto = new Crypto();
-
-	public void setup(String ip, ServerList serverList) {
-		this.serverList = serverList;
-		this.ip = ip;
-		this.messageNumber = serverList.getServer(ip).getMessageNumber();
-	}
 
 	public boolean delete(String filename, UserToken token) {
 		String remotePath;
@@ -234,91 +223,6 @@ public class FileClient extends Client implements FileClientInterface {
 				return false;
 				}
 		 return true;
-	}
-
-	private void finalizeMessage(Envelope message, boolean isHandshake) {
-		message.addObject(messageNumber);
-		updateMessageNumber();
-
-		byte[] encryptedBytes = null;
-		try {
-			if (!isHandshake) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				ObjectOutputStream oos = new ObjectOutputStream(baos);
-				oos.writeObject(message);
-				byte[] bytes = baos.toByteArray();
-				encryptedBytes = crypto.aesEncrypt(sessionKeySet, bytes);
-
-				byte[] hmacBytes = crypto.get_HMAC(hmacKey, bytes);
-
-				output.writeObject(encryptedBytes);
-				output.writeObject(hmacBytes);
-			} else {
-				output.writeObject(message);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private Envelope parseMessage(byte[] response) {
-		ObjectInputStream ois;
-		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(crypto.aesDecrypt(sessionKeySet, response));
-			ois = new ObjectInputStream(bais);
-			return (Envelope) ois.readObject();
-
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private boolean validateHMAC(Envelope message, byte[] messageHMAC) {
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-			oos.writeObject(message);
-			byte[] bytes = baos.toByteArray();
-
-			byte[] bytesToVerify = crypto.get_HMAC(hmacKey, bytes);
-
-			if (Arrays.equals(bytesToVerify, messageHMAC)) {
-				return true;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return true;
-	}
-
-	private boolean validateMessageNumber(Envelope response) {
-		int respMsgNumber = (int) response.getObjContents().get(response.getObjContents().size() - 1);
-		return messageNumber == respMsgNumber;
-	}
-
-	private void updateMessageNumber() {
-		messageNumber++;
-		serverList.updateMessageNumber(ip, messageNumber);
-
-		ObjectOutputStream oos = null;
-		try {
-			oos = new ObjectOutputStream(new FileOutputStream("ServerList.bin"));
-			oos.writeObject(serverList);
-			oos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void setSessionKey(KeySet keySet) {
-		sessionKeySet = keySet;
-	}
-
-	public void setHmacKey(SecretKey hmacKey) {
-		this.hmacKey = hmacKey;
 	}
 
 }
