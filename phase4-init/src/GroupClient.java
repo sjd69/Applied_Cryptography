@@ -5,12 +5,14 @@ import java.io.*;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GroupClient extends Client implements GroupClientInterface {
 	private ServerList serverList;
 	private String ip;
 	private KeySet sessionKeySet;
+	private SecretKey hmacKey;
 	private Crypto crypto = new Crypto();
 	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv, byte[] hmacKey,
 								   ServerList serverList, String ip) {
@@ -54,6 +56,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 
 			response = (Envelope) input.readObject();
 
+
 			//If server indicates success, return true
 			return validateMessageNumber(response) && response.getMessage().equals("OK");
 
@@ -82,8 +85,10 @@ public class GroupClient extends Client implements GroupClientInterface {
 
 			//Get the response from the server
 			response = parseMessage((byte [])input.readObject());
+			byte[] hmacResponse = (byte[]) input.readObject();
 
-			if (validateMessageNumber(response) && response.getMessage().equals("OK")) {
+			if (validateMessageNumber(response) && response.getMessage().equals("OK")
+					&& validateHMAC(response, hmacResponse)) {
 				System.out.println("Message is OK");
 				//If there is a token in the Envelope, return it
 				ArrayList<Object> temp = null;
@@ -119,9 +124,12 @@ public class GroupClient extends Client implements GroupClientInterface {
 		
 			//Get the response from the server
 			response = parseMessage((byte [])input.readObject());
+			byte[] hmacResponse = (byte[]) input.readObject();
+
 			
 			//Successful response
-			if(validateMessageNumber(response) && response.getMessage().equals("OK"))
+			if(validateMessageNumber(response) && response.getMessage().equals("OK")
+					&& validateHMAC(response, hmacResponse))
 			{
 				//If there is a token in the Envelope, return it 
 				ArrayList<Object> temp = null;
@@ -192,9 +200,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 				finalizeMessage(message, false);
 
 				response = parseMessage((byte [])input.readObject());
+				byte[] hmacResponse = (byte[]) input.readObject();
 				
 				//If server indicates success, return true
-				return validateMessageNumber(response) && response.getMessage().equals("OK");
+				return validateMessageNumber(response) && response.getMessage().equals("OK")
+						&& validateHMAC(response, hmacResponse);
 
 			}
 			catch(Exception e)
@@ -218,9 +228,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 				finalizeMessage(message, false);
 
 				response = parseMessage((byte [])input.readObject());
+				byte[] hmacResponse = (byte[]) input.readObject();
 				
 				//If server indicates success, return true
-				return validateMessageNumber(response) && response.getMessage().equals("OK");
+				return validateMessageNumber(response) && response.getMessage().equals("OK")
+						&& validateHMAC(response, hmacResponse);
 			}
 			catch(Exception e)
 			{
@@ -242,9 +254,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 				finalizeMessage(message, false);
 
 				response = parseMessage((byte[]) input.readObject());
-				
+				byte[] hmacResponse = (byte[]) input.readObject();
+
 				//If server indicates success, return true
-				return validateMessageNumber(response) && response.getMessage().equals("OK");
+				return validateMessageNumber(response) && response.getMessage().equals("OK")
+						&& validateHMAC(response, hmacResponse);
 			}
 			catch(Exception e)
 			{
@@ -266,8 +280,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 				finalizeMessage(message, false);
 
 				response = parseMessage((byte[]) input.readObject());
+				byte[] hmacResponse = (byte[]) input.readObject();
+
 				//If server indicates success, return true
-				return validateMessageNumber(response) && response.getMessage().equals("OK");
+				return validateMessageNumber(response) && response.getMessage().equals("OK")
+						&& validateHMAC(response, hmacResponse);
 			}
 			catch(Exception e)
 			{
@@ -290,9 +307,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 			 finalizeMessage(message, false);
 
 			 response = parseMessage((byte[]) input.readObject());
-			 
+			 byte[] hmacResponse = (byte[]) input.readObject();
+
 			 //If server indicates success, return the member list
-			 if(validateMessageNumber(response) && response.getMessage().equals("OK"))
+			 if(validateMessageNumber(response) && response.getMessage().equals("OK")
+					 && validateHMAC(response, hmacResponse))
 			 { 
 				return (List<String>)response.getObjContents().get(0); //This cast creates compiler warnings. Sorry.
 			 }
@@ -321,8 +340,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 				finalizeMessage(message, false);
 
 				response = parseMessage((byte[]) input.readObject());
+				byte[] hmacResponse = (byte[]) input.readObject();
+
 				//If server indicates success, return true
-				return validateMessageNumber(response) && response.getMessage().equals("OK");
+				return validateMessageNumber(response) && response.getMessage().equals("OK")
+						&& validateHMAC(response, hmacResponse);
 			}
 			catch(Exception e)
 			{
@@ -345,8 +367,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 				finalizeMessage(message, false);
 			
 				response = parseMessage((byte [])input.readObject());
+				byte[] hmacResponse = (byte[]) input.readObject();
+
 				//If server indicates success, return true
-				return validateMessageNumber(response) && response.getMessage().equals("OK");
+				return validateMessageNumber(response) && response.getMessage().equals("OK")
+						&& validateHMAC(response, hmacResponse);
 			}
 			catch(Exception e)
 			{
@@ -369,7 +394,10 @@ public class GroupClient extends Client implements GroupClientInterface {
 				byte[] bytes = baos.toByteArray();
 				encryptedBytes = crypto.aesEncrypt(sessionKeySet, bytes);
 
+				byte[] hmacBytes = crypto.get_HMAC(hmacKey, bytes);
+
 				output.writeObject(encryptedBytes);
+				output.writeObject(hmacBytes);
 			} else {
 		 		output.writeObject(message);
 			}
@@ -391,6 +419,24 @@ public class GroupClient extends Client implements GroupClientInterface {
 		 }
 		 return null;
 	 }
+
+	private boolean validateHMAC(Envelope message, byte[] messageHMAC) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(message);
+			byte[] bytes = baos.toByteArray();
+
+			byte[] bytesToVerify = crypto.get_HMAC(hmacKey, bytes);
+
+			if (Arrays.equals(bytesToVerify, messageHMAC)) {
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
 
 	 private boolean validateMessageNumber(Envelope response) {
 		 int respMsgNumber = (int) response.getObjContents().get(response.getObjContents().size() - 1);
@@ -414,5 +460,9 @@ public class GroupClient extends Client implements GroupClientInterface {
 
 	 public void setSessionKey(KeySet keySet) {
 		sessionKeySet = keySet;
+	 }
+
+	 public void setHmacKey(SecretKey hmacKey) {
+		this.hmacKey = hmacKey;
 	 }
 }

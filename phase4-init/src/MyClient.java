@@ -21,6 +21,7 @@ public class MyClient {
     private static ServerList serverList = null;
     private static Crypto crypto = new Crypto();
     private static GroupClient groupClient = new GroupClient();
+    private static SecretKey hmacKey;
 
     public static void main(String[] args) {
 	 Security.addProvider(new BouncyCastleProvider());
@@ -35,6 +36,7 @@ public class MyClient {
         PrivateKey privateKey = null;
         PublicKey serverPublicKey = null;
         KeySet sessionKey;
+
 		KeyChain keychain = null;
 
         MyFileClient myFileClient = new MyFileClient();
@@ -117,6 +119,7 @@ public class MyClient {
 
                             if (sessionKey != null) {
                                 groupClient.setSessionKey(sessionKey);
+                                groupClient.setHmacKey(hmacKey);
                                 userToken = groupClient.getToken(username);
                                 if (userToken == null) {
                                     System.out.println("Authentication error.");
@@ -275,7 +278,7 @@ public class MyClient {
             KeySet sessionKeySet = crypto.getKeySet();
             SecretKey sessionKey = sessionKeySet.getKey();
            	IvParameterSpec iv = sessionKeySet.getIv();
-			SecretKey hmacKey = crypto.getHMACKey();
+			hmacKey = crypto.getHMACKey();
 
             //Signature rsaSignature = Signature.getInstance("RSA", "BC");
             byte[] signedSessionKey = crypto.rsaEncrypt(privateKey, sessionKey.getEncoded());

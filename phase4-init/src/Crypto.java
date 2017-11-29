@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.security.*;
+import java.util.Random;
 
 public class Crypto {
     private final int aesSize = 128;
@@ -37,8 +38,15 @@ public class Crypto {
     }
     
     public SecretKey getHMACKey() {
-    	SecretKey hmacKey = md5KeyGen.generateKey();
-    	return hmacKey;
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 18) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * chars.length());
+            salt.append(chars.charAt(index));
+        }
+        String str = salt.toString();
+    	return new SecretKeySpec(chars.getBytes(), "HmacMD5");
     }
 
     public byte[] aesEncrypt(KeySet keySet, byte[] bytes) {
@@ -127,16 +135,16 @@ public class Crypto {
     public byte[] get_HMAC(Key key, byte[] m){
     	byte[] hash = null;
     	try {
-    		Mac mac = Mac.getInstance("HmacMD5", new BouncyCastleProvider());
-    		System.out.println(mac.getProvider().getInfo());
+    		Mac mac = Mac.getInstance("HmacMD5", "BC");
     		mac.init(key);
-    		mac.update(m);
-    		hash = mac.doFinal();
+    		hash = mac.doFinal(m);
     	}
     	catch (InvalidKeyException | NoSuchAlgorithmException e) {
             e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
         }
-		return hash;
+        return hash;
 	}
 	
 	// Return MD5 of a public key.

@@ -45,8 +45,10 @@ public class GroupThread extends Thread
 			{
 				Envelope message;
 				Object obj = input.readObject();
+				byte[] hmacMessage = null;
 				if (obj.getClass() != Envelope.class) {
 					message = parseMessage((byte[]) obj);
+					hmacMessage = (byte[])input.readObject();
 				} else {
 					message = (Envelope) obj;
 				}
@@ -102,7 +104,8 @@ public class GroupThread extends Thread
 						}
 					}
 
-				} else if (message.getMessage().equals("GET"))//Client wants a token
+				} else if (message.getMessage().equals("GET") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage))//Client wants a token
 				{
 					String username = (String)message.getObjContents().get(0); //Get the username
 					if(username == null)
@@ -127,7 +130,8 @@ public class GroupThread extends Thread
 					response.addObject(my_gs.publicKey);
 					output.writeObject(response);
 				}
-				else if (message.getMessage().equals("KCHAIN"))
+				else if (message.getMessage().equals("KCHAIN") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage))
 				{
 					response = new Envelope("OK");
 					if(message.getObjContents().get(0) != null)
@@ -137,7 +141,8 @@ public class GroupThread extends Thread
 						finalizeMessage(response, output, false);
 					}
 				}
-				else if(message.getMessage().equals("CUSER")) //Client wants to create a user
+				else if(message.getMessage().equals("CUSER") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage)) //Client wants to create a user
 				{
 					if(message.getObjContents().size() < 2)
 					{
@@ -164,7 +169,8 @@ public class GroupThread extends Thread
 
 					finalizeMessage(response, output, false);
 				}
-				else if(message.getMessage().equals("DUSER")) //Client wants to delete a user
+				else if(message.getMessage().equals("DUSER") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage)) //Client wants to delete a user
 				{
 
 					if(message.getObjContents().size() < 2)
@@ -192,7 +198,8 @@ public class GroupThread extends Thread
 
 					finalizeMessage(response, output, false);
 				}
-				else if(message.getMessage().equals("CGROUP")) //Client wants to create a group
+				else if(message.getMessage().equals("CGROUP") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage)) //Client wants to create a group
 				{
 				    if (message.getObjContents().size()  < 2) {
 				    	response = new Envelope("FAIL");
@@ -214,7 +221,8 @@ public class GroupThread extends Thread
 
 					finalizeMessage(response, output, false);
 				}
-				else if(message.getMessage().equals("DGROUP")) //Client wants to delete a group
+				else if(message.getMessage().equals("DGROUP") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage)) //Client wants to delete a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -236,7 +244,8 @@ public class GroupThread extends Thread
 
 					finalizeMessage(response, output, false);
 				}
-				else if(message.getMessage().equals("LMEMBERS")) //Client wants a list of members in a group
+				else if(message.getMessage().equals("LMEMBERS") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage)) //Client wants a list of members in a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -261,7 +270,8 @@ public class GroupThread extends Thread
 
 					finalizeMessage(response, output, false);
 				}
-				else if(message.getMessage().equals("AUSERTOGROUP")) //Client wants to add user to a group
+				else if(message.getMessage().equals("AUSERTOGROUP") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage)) //Client wants to add user to a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -286,7 +296,8 @@ public class GroupThread extends Thread
 
 					finalizeMessage(response, output, false);
 				}
-				else if(message.getMessage().equals("RUSERFROMGROUP")) //Client wants to remove user from a group
+				else if(message.getMessage().equals("RUSERFROMGROUP") && validateMessageNumber(message)
+						&& validateHMAC(message, hmacMessage)) //Client wants to remove user from a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -627,7 +638,10 @@ public class GroupThread extends Thread
 				byte[] bytes = baos.toByteArray();
 				encryptedBytes = crypto.aesEncrypt(sessionKeySet, bytes);
 
+				byte[] hmacBytes = crypto.get_HMAC(hmacKey, bytes);
+
 				output.writeObject(encryptedBytes);
+				output.writeObject(hmacBytes);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -655,6 +669,24 @@ public class GroupThread extends Thread
 	private boolean validateMessageNumber(Envelope response) {
 		int respMsgNumber = (int) response.getObjContents().get(response.getObjContents().size() - 1);
 		return messageNumber == respMsgNumber;
+	}
+
+	private boolean validateHMAC(Envelope message, byte[] messageHMAC) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(message);
+			byte[] bytes = baos.toByteArray();
+
+			byte[] bytesToVerify = crypto.get_HMAC(hmacKey, bytes);
+
+			if (Arrays.equals(bytesToVerify, messageHMAC)) {
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 
 	private void updateMessageNumber(String username) {
