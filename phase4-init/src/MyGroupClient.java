@@ -55,7 +55,8 @@ public class MyGroupClient
 				System.out.println("(7) - Delete user from group");
 				System.out.println("(8) - List members of group");
 				System.out.println("(9) - Get Keychain");
-				System.out.println("(10) - Disconnect from Group Server");
+                System.out.println("(10) - Add File Server IP to token");
+				System.out.println("(11) - Disconnect from Group Server");
 		
 				int commandNum = sc.nextInt();
 				sc.nextLine();
@@ -222,7 +223,13 @@ public class MyGroupClient
 						String group_name = sc.nextLine();
                         groupclient.getKeyChain(group_name);
 						break;
-					case 10:
+                    case 10:
+                        System.out.println("--  Add File Server IP address to token --");
+                        System.out.println("Enter File Server IP:");
+                        String fileIP = sc.nextLine();
+                        token.setServerID(fileIP);
+
+                    case 11:
 						System.out.println("--  Disconnect from Group Server --");
 						groupclient.disconnect();
 						flag = false;
