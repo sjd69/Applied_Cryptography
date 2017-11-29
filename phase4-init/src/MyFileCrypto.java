@@ -32,7 +32,6 @@ public class MyFileCrypto
 				case 1:
 					System.out.println("-- Encrypt File --");
 					System.out.println("Enter source file: ");
-					sc.nextLine();
 					String sourcefile = sc.nextLine();
 		
 					// Get the encryption key from the keychain
