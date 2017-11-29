@@ -1,6 +1,8 @@
 /* FileClient provides all the client functionality regarding the file server */
 
+import javax.crypto.SecretKey;
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class FileClient extends Client implements FileClientInterface {
@@ -8,6 +10,7 @@ public class FileClient extends Client implements FileClientInterface {
 	private ServerList serverList;
 	private String ip;
 	private KeySet sessionKeySet;
+	private SecretKey hmacKey;
 	private Crypto crypto = new Crypto();
 
 	public void setup(String ip, ServerList serverList) {
@@ -246,7 +249,10 @@ public class FileClient extends Client implements FileClientInterface {
 				byte[] bytes = baos.toByteArray();
 				encryptedBytes = crypto.aesEncrypt(sessionKeySet, bytes);
 
+				byte[] hmacBytes = crypto.get_HMAC(hmacKey, bytes);
+
 				output.writeObject(encryptedBytes);
+				output.writeObject(hmacBytes);
 			} else {
 				output.writeObject(message);
 			}
@@ -267,6 +273,24 @@ public class FileClient extends Client implements FileClientInterface {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private boolean validateHMAC(Envelope message, byte[] messageHMAC) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(message);
+			byte[] bytes = baos.toByteArray();
+
+			byte[] bytesToVerify = crypto.get_HMAC(hmacKey, bytes);
+
+			if (Arrays.equals(bytesToVerify, messageHMAC)) {
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 
 	private boolean validateMessageNumber(Envelope response) {
@@ -291,6 +315,10 @@ public class FileClient extends Client implements FileClientInterface {
 
 	public void setSessionKey(KeySet keySet) {
 		sessionKeySet = keySet;
+	}
+
+	public void setHmacKey(SecretKey hmacKey) {
+		this.hmacKey = hmacKey;
 	}
 
 }
