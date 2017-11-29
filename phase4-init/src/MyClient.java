@@ -173,7 +173,13 @@ public class MyClient {
 
                         System.out.println("Enter the port number for the File Server");
                         int fs_port = scanIn.nextInt();
-                        myFileClient.startMyFileClient(fs_ip, fs_port, (Token)userToken);
+                        System.out.println("Verifying Token File IP");
+                        if (fs_ip.equals(userToken.getServerID())){
+                            myFileClient.startMyFileClient(fs_ip, fs_port, (Token)userToken);
+                        }
+                        else {
+                            System.out.println("Token File IP mismatch ... Assume Stolen Token");
+                        }
                         scanIn.nextLine();
                         break;
 

@@ -1,19 +1,21 @@
 /* FileServer loads files from FileList.bin.  Stores files in shared_files directory. */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.*;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class FileServer extends Server {
 	
 	public static final int SERVER_PORT = 4321;
 	public static FileList fileList;
+	public KeyChainList keychainList;
+	protected PrivateKey privateKey;
+	protected  PublicKey publicKey;
 
 	
 	public FileServer() {
