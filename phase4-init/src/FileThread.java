@@ -84,23 +84,7 @@ public class FileThread extends Thread
 							output.writeObject(response);
 						}
 					}
-				} else if (e.getMessage().equals("GET")) { // Client wants a token
-					String username = (String)e.getObjContents().get(0); // Get the username
-					if (username == null) 
-					{
-						response = new Envelope("FAIL");
-						response.addObject(null);
-						output.writeObject(response);
-					}
-					else {
-						UserToken yourToken = createToken(username); // Create a token
-						
-						// Respond to the Client. On error, the client will receive a null token
-						response = new Envelope("OK");
-						response.addObject(yourToken);
-						output.writeObject(response);
-					}
-				} else if (e.getMessage().equals("PUBKEY")) { // Client wants a token
+				} else if (e.getMessage().equals("PUBKEY")) { // Client wants a public key.
 					response = new Envelope("OK");
 					response.addObject(my_fs.publicKey);
 					output.writeObject(response);
