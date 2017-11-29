@@ -116,6 +116,7 @@ public class MyClient {
                             sessionKey = handshake(username, serverPublicKey, privateKey, gs_ip);
 
                             if (sessionKey != null) {
+                                groupClient.setSessionKey(sessionKey);
                                 userToken = groupClient.getToken(username);
                                 if (userToken == null) {
                                     System.out.println("Authentication error.");
