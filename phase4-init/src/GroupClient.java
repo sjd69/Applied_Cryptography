@@ -11,7 +11,6 @@ import java.util.List;
 public class GroupClient extends Client implements GroupClientInterface {
 	private ServerList serverList;
 	private String ip;
-
 	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv,
 								   ServerList serverList, String ip) {
 		try

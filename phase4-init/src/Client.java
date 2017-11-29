@@ -18,12 +18,11 @@ public abstract class Client {
 		try
 		{
 			// Connect to server
-			final Socket sock = new Socket(server, port);
+			sock = new Socket(server, port);
 			System.out.println("Connected to " + server + " on port " + port);
 			
 			// Set up I/O streams with the server
 			output = new ObjectOutputStream(sock.getOutputStream());
-			output.flush();
 	    	input = new ObjectInputStream(sock.getInputStream());
 	    	return true;
 		}
