@@ -15,7 +15,7 @@ public class FileServer extends Server {
 	public static FileList fileList;
 	public KeyChainList keychainList;
 	protected PrivateKey privateKey;
-	protected  PublicKey publicKey;
+	protected PublicKey publicKey;
 
 	
 	public FileServer() {
@@ -26,9 +26,12 @@ public class FileServer extends Server {
 		super(_port, "FilePile");
 	}
 	
-	public void start() {
+	public void start() throws InvalidKeyException {
+		Security.addProvider(new BouncyCastleProvider());
 		
 		String fileFile = "FileList.bin";
+		String keyFile = "rsa.bin";
+		Scanner console = new Scanner(System.in);
 		ObjectInputStream fileStream;
 		
 		//This runs a thread that saves the lists on program exit
@@ -36,12 +39,35 @@ public class FileServer extends Server {
 		Thread catchExit = new Thread(new ShutDownListenerFS());
 		runtime.addShutdownHook(catchExit);
 		
+		ObjectOutputStream outStream;
+		
 		//Open user file to get user list
 		try
 		{
 			FileInputStream fis = new FileInputStream(fileFile);
 			fileStream = new ObjectInputStream(fis);
 			fileList = (FileList)fileStream.readObject();
+			fileStream.close();
+			
+			FileInputStream kfis = new FileInputStream(keyFile);
+			ObjectInputStream keyStream = new ObjectInputStream(kfis);
+			KeyPair keyPair = (KeyPair)keyStream.readObject();
+			publicKey = keyPair.getPublic();
+			privateKey = keyPair.getPrivate();
+			keyStream.close();
+			
+			try {
+				outStream = new ObjectOutputStream(new FileOutputStream("FileList.bin"));
+				outStream.writeObject(fileList);
+				outStream.close();
+				
+				System.out.println("Created list.");
+			}
+			catch (Exception e) {
+				System.err.println("Error: " + e.getMessage());
+				e.printStackTrace(System.err);
+			}
+			
 		}
 		catch(FileNotFoundException ex)
 		{
@@ -49,6 +75,26 @@ public class FileServer extends Server {
 			
 			fileList = new FileList();
 			
+			
+			// Generate server keypair
+			try {
+				KeyPairGenerator rsaGenerator = KeyPairGenerator.getInstance("RSA", "BC");
+				rsaGenerator.initialize(2048);
+				KeyPair rsaKeys = rsaGenerator.generateKeyPair();
+				privateKey = rsaKeys.getPrivate();
+				publicKey = rsaKeys.getPublic();
+				
+				outStream = new ObjectOutputStream(new FileOutputStream("rsa.bin"));
+				outStream.writeObject(rsaKeys);
+				outStream.close();
+				
+				System.out.println("Keys generated.");
+			}
+			catch (Exception e) {
+				System.err.println("Error: " + e.getMessage());
+				e.printStackTrace(System.err);
+			}
+			System.out.println("Server running.");
 		}
 		catch(IOException e)
 		{
@@ -105,7 +151,7 @@ public class FileServer extends Server {
 	}
 }
 
-//This thread saves user and group lists
+//This thread saves file list
 class ShutDownListenerFS implements Runnable
 {
 	public void run()
@@ -117,6 +163,7 @@ class ShutDownListenerFS implements Runnable
 		{
 			outStream = new ObjectOutputStream(new FileOutputStream("FileList.bin"));
 			outStream.writeObject(FileServer.fileList);
+			outStream.close();
 		}
 		catch(Exception e)
 		{
@@ -134,13 +181,14 @@ class AutoSaveFS extends Thread
 		{
 			try
 			{
-				Thread.sleep(300000); //Save group and user lists every 5 minutes
+				Thread.sleep(300000); //Save file list every 5 minutes
 				System.out.println("Autosave file list...");
 				ObjectOutputStream outStream;
 				try
 				{
 					outStream = new ObjectOutputStream(new FileOutputStream("FileList.bin"));
 					outStream.writeObject(FileServer.fileList);
+					outStream.close();
 				}
 				catch(Exception e)
 				{
