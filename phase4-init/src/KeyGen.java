@@ -11,6 +11,7 @@ public class KeyGen {
         Security.addProvider(new BouncyCastleProvider());
         PrivateKey rsaPrivate = null;
         PublicKey rsaPublic = null;
+        System.out.println("---- RSA Key Pair Generation ----");
         try {
             KeyPairGenerator rsaGenerator = KeyPairGenerator.getInstance("RSA", "BC");
             rsaGenerator.initialize(2048);
@@ -27,8 +28,6 @@ public class KeyGen {
                 System.out.println("\nDO NOT GIVE YOUR PRIVATE KEY TO ANYONE!");
             }
 
-            Scanner scanner = new Scanner(System.in);
-            scanner.nextLine();
         } catch (Exception e) {
             e.printStackTrace();
         }
