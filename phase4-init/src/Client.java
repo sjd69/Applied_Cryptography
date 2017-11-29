@@ -10,6 +10,7 @@ public abstract class Client {
 	protected Socket sock;
 	protected ObjectOutputStream output;
 	protected ObjectInputStream input;
+	protected int messageNumber = -1;
 
 	public boolean connect(final String server, final int port) {
 		System.out.println("attempting to connect");
@@ -17,7 +18,7 @@ public abstract class Client {
 		try
 		{
 			// Connect to server
-			final Socket sock = new Socket(server, port);
+			sock = new Socket(server, port);
 			System.out.println("Connected to " + server + " on port " + port);
 			
 			// Set up I/O streams with the server
