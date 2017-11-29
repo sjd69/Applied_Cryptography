@@ -150,18 +150,18 @@ public class FileThread extends Thread
 							UserToken yourToken = (UserToken)e.getObjContents().get(2); //Extract token
 
 							if (FileServer.fileList.checkFile(remotePath)) {
-								System.out.printf("Error: file already exists at %s\n", remotePath);
+								System.out.printf("Error: file already exists at %s%n", remotePath);
 								response = new Envelope("FAIL-FILEEXISTS"); //Success
 							}
 							else if (!yourToken.getGroups().contains(group)) {
-								System.out.printf("Error: user missing valid token for group %s\n", group);
+								System.out.printf("Error: user missing valid token for group %s%n", group);
 								response = new Envelope("FAIL-UNAUTHORIZED"); //Success
 							}
 							else  {
 								File file = new File("shared_files/"+remotePath.replace('/', '_'));
 								file.createNewFile();
 								FileOutputStream fos = new FileOutputStream(file);
-								System.out.printf("Successfully created file %s\n", remotePath.replace('/', '_'));
+								System.out.printf("Successfully created file %s%n", remotePath.replace('/', '_'));
 
 								response = new Envelope("READY"); //Success
 								output.writeObject(response);
@@ -175,12 +175,12 @@ public class FileThread extends Thread
 								}
 
 								if(e.getMessage().compareTo("EOF")==0) {
-									System.out.printf("Transfer successful file %s\n", remotePath);
+									System.out.printf("Transfer successful file %s%n", remotePath);
 									FileServer.fileList.addFile(yourToken.getSubject(), group, remotePath);
 									response = new Envelope("OK"); //Success
 								}
 								else {
-									System.out.printf("Error reading file %s from client\n", remotePath);
+									System.out.printf("Error reading file %s from client%n", remotePath);
 									response = new Envelope("ERROR-TRANSFER"); //Success
 								}
 								fos.close();
@@ -196,13 +196,13 @@ public class FileThread extends Thread
 					Token t = (Token)e.getObjContents().get(1);
 					ShareFile sf = FileServer.fileList.getFile("/"+remotePath);
 					if (sf == null) {
-						System.out.printf("Error: File %s doesn't exist\n", remotePath);
+						System.out.printf("Error: File %s doesn't exist%n", remotePath);
 						e = new Envelope("ERROR_FILEMISSING");
 						output.writeObject(e);
 
 					}
 					else if (!t.getGroups().contains(sf.getGroup())){
-						System.out.printf("Error user %s doesn't have permission\n", t.getSubject());
+						System.out.printf("Error user %s doesn't have permission%n", t.getSubject());
 						e = new Envelope("ERROR_PERMISSION");
 						output.writeObject(e);
 					}
@@ -212,7 +212,7 @@ public class FileThread extends Thread
 						{
 							File f = new File("shared_files/_"+remotePath.replace('/', '_'));
 						if (!f.exists()) {
-							System.out.printf("Error file %s missing from disk\n", "_"+remotePath.replace('/', '_'));
+							System.out.printf("Error file %s missing from disk%n", "_"+remotePath.replace('/', '_'));
 							e = new Envelope("ERROR_NOTONDISK");
 							output.writeObject(e);
 
@@ -223,7 +223,7 @@ public class FileThread extends Thread
 							do {
 								byte[] buf = new byte[4096];
 								if (e.getMessage().compareTo("DOWNLOADF")!=0) {
-									System.out.printf("Server error: %s\n", e.getMessage());
+									System.out.printf("Server error: %s%n", e.getMessage());
 									break;
 								}
 								e = new Envelope("CHUNK");
@@ -256,18 +256,18 @@ public class FileThread extends Thread
 
 								e = (Envelope)input.readObject();
 								if(e.getMessage().compareTo("OK")==0) {
-									System.out.printf("File data upload successful\n");
+									System.out.printf("File data upload successful%n");
 								}
 								else {
 
-									System.out.printf("Upload failed: %s\n", e.getMessage());
+									System.out.printf("Upload failed: %s%n", e.getMessage());
 
 								}
 
 							}
 							else {
 
-								System.out.printf("Upload failed: %s\n", e.getMessage());
+								System.out.printf("Upload failed: %s%n", e.getMessage());
 
 							}
 						}
@@ -286,11 +286,11 @@ public class FileThread extends Thread
 					Token t = (Token)e.getObjContents().get(1);
 					ShareFile sf = FileServer.fileList.getFile("/"+remotePath);
 					if (sf == null) {
-						System.out.printf("Error: File %s doesn't exist\n", remotePath);
+						System.out.printf("Error: File %s doesn't exist%n", remotePath);
 						e = new Envelope("ERROR_DOESNTEXIST");
 					}
 					else if (!t.getGroups().contains(sf.getGroup())){
-						System.out.printf("Error user %s doesn't have permission\n", t.getSubject());
+						System.out.printf("Error user %s doesn't have permission%n", t.getSubject());
 						e = new Envelope("ERROR_PERMISSION");
 					}
 					else {
@@ -302,16 +302,16 @@ public class FileThread extends Thread
 							File f = new File("shared_files/"+"_"+remotePath.replace('/', '_'));
 
 							if (!f.exists()) {
-								System.out.printf("Error file %s missing from disk\n", "_"+remotePath.replace('/', '_'));
+								System.out.printf("Error file %s missing from disk%n", "_"+remotePath.replace('/', '_'));
 								e = new Envelope("ERROR_FILEMISSING");
 							}
 							else if (f.delete()) {
-								System.out.printf("File %s deleted from disk\n", "_"+remotePath.replace('/', '_'));
+								System.out.printf("File %s deleted from disk%n", "_"+remotePath.replace('/', '_'));
 								FileServer.fileList.removeFile("/"+remotePath);
 								e = new Envelope("OK");
 							}
 							else {
-								System.out.printf("Error deleting file %s from disk\n", "_"+remotePath.replace('/', '_'));
+								System.out.printf("Error deleting file %s from disk%n", "_"+remotePath.replace('/', '_'));
 								e = new Envelope("ERROR_DELETE");
 							}
 

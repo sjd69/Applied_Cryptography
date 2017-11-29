@@ -75,9 +75,13 @@ public class GroupClient extends Client implements GroupClientInterface {
 	{
 		try
 		{
-			KeyChain kc = null;
+			KeyChain kc = new KeyChain("TEMP");
+            		Crypto crypto = new Crypto();
+            		// generate a new group key for file crypto
+           		 KeySet groupKey = crypto.getKeySet();
+           		kc.addNewKey(groupKey);
 			Envelope message = null, response = null;
-		 		 	
+
 			//Tell the server to return a token.
 			message = new Envelope("KCHAIN");
 			message.addObject(gname); //Add g name string
@@ -94,13 +98,11 @@ public class GroupClient extends Client implements GroupClientInterface {
 				ArrayList<Object> temp = null;
 				temp = response.getObjContents();
 
-				if(temp.size() == 2)
-				{
-					kc = (KeyChain)temp.get(0);
-					return kc;
-				}
+                //kc = (KeyChain)temp.get(0);
+                return kc;
 			}
-			return null;
+			return kc;
+
 		}
 		catch(Exception e)
 		{
