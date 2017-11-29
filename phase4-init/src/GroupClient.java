@@ -98,8 +98,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				ArrayList<Object> temp = null;
 				temp = response.getObjContents();
 
-                //kc = (KeyChain)temp.get(0);
-                return kc;
+                		kc = (KeyChain)temp.get(0);
+               			 return kc;
 			}
 			return kc;
 
