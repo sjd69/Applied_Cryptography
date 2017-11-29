@@ -16,7 +16,7 @@ public class MyGroupClient
 	{
 		boolean flag = true;
 		groupclient = groupClient;
-		boolean connected = groupclient.connect(server, port);
+		boolean connected = groupclient.isConnected();
 		utoken = token;
 		System.out.println("Using MyGroupClient - Connected to Group Server");
 		Scanner sc = new Scanner(System.in);

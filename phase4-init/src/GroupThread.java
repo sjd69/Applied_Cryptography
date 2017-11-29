@@ -17,7 +17,7 @@ public class GroupThread extends Thread
 {
 	private final Socket socket;
 	private GroupServer my_gs;
-	private SecretKey sessionKey;
+	private SecretKey hmacKey;
 	private BigInteger secondNonce;
 	private KeySet sessionKeySet;
 	private int messageNumber = -1;
@@ -55,11 +55,12 @@ public class GroupThread extends Thread
 
 				if (message.getMessage().equals("HANDSHAKE"))//Client wants a token
 				{
-					if (message.getObjContents().size() == 5){	//First part of handshake
+					if (message.getObjContents().size() == 6){	//First part of handshake
 						username = (String)message.getObjContents().get(0); //Get the username
 						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
 						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
 						byte[] iv = (byte[])message.getObjContents().get(3); //Get the iv
+						byte[] hmac = (byte[])message.getObjContents().get(4); //Get the iv
 						BigInteger decryptedNonce;
 
 						if (messageNumber == -1) {
@@ -79,8 +80,10 @@ public class GroupThread extends Thread
 							//byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
 
 							//assert byteKey != null;
-							sessionKey = new SecretKeySpec(signedKey, 0, 16, "AES");
+							SecretKey sessionKey = new SecretKeySpec(signedKey, 0, 16, "AES");
 							sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
+
+							hmacKey = new SecretKeySpec(hmac, "HmacMD5");
 							secondNonce = new BigInteger(256, new Random());
 							response.addObject(decryptedNonce);
 							//response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));

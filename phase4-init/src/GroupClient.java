@@ -1,5 +1,6 @@
 /* Implements the GroupClient Interface */
 
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.math.BigInteger;
 import java.security.PublicKey;
@@ -11,7 +12,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 	private String ip;
 	private KeySet sessionKeySet;
 	private Crypto crypto = new Crypto();
-	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv,
+	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv, byte[] hmacKey,
 								   ServerList serverList, String ip) {
 		try
 		{
@@ -24,6 +25,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 			message.addObject(nonce);
 			message.addObject(key);
 			message.addObject(iv);
+			message.addObject(hmacKey);
 			finalizeMessage(message, true);
 
 			response = (Envelope) input.readObject();
@@ -238,8 +240,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message.addObject(groupname); //Add the group name string
 				message.addObject(token); //Add the requester's token
 				finalizeMessage(message, false);
-			
-				response = (Envelope)input.readObject();
+
+				response = parseMessage((byte[]) input.readObject());
 				
 				//If server indicates success, return true
 				return validateMessageNumber(response) && response.getMessage().equals("OK");
@@ -262,8 +264,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message.addObject(groupname); //Add group name string
 				message.addObject(token); //Add requester's token
 				finalizeMessage(message, false);
-			
-				response = (Envelope)input.readObject();
+
+				response = parseMessage((byte[]) input.readObject());
 				//If server indicates success, return true
 				return validateMessageNumber(response) && response.getMessage().equals("OK");
 			}
@@ -287,7 +289,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 			 message.addObject(token); //Add requester's token
 			 finalizeMessage(message, false);
 
-			 response = (Envelope)input.readObject();
+			 response = parseMessage((byte[]) input.readObject());
 			 
 			 //If server indicates success, return the member list
 			 if(validateMessageNumber(response) && response.getMessage().equals("OK"))
@@ -317,8 +319,8 @@ public class GroupClient extends Client implements GroupClientInterface {
 				message.addObject(groupname); //Add group name string
 				message.addObject(token); //Add requester's token
 				finalizeMessage(message, false);
-			
-				response = (Envelope)input.readObject();
+
+				response = parseMessage((byte[]) input.readObject());
 				//If server indicates success, return true
 				return validateMessageNumber(response) && response.getMessage().equals("OK");
 			}

@@ -130,7 +130,6 @@ public class MyClient {
                             System.out.println("Disconnecting...");
                         }
 
-                        groupClient.disconnect();
                     } catch (Exception e) {
                         e.printStackTrace(System.err);
                         System.out.println("Connection error.");
@@ -276,12 +275,14 @@ public class MyClient {
             KeySet sessionKeySet = crypto.getKeySet();
             SecretKey sessionKey = sessionKeySet.getKey();
            	IvParameterSpec iv = sessionKeySet.getIv();
-			SecretKey hmackey = crypto.getHMACKey();
+			SecretKey hmacKey = crypto.getHMACKey();
 
             //Signature rsaSignature = Signature.getInstance("RSA", "BC");
             byte[] signedSessionKey = crypto.rsaEncrypt(privateKey, sessionKey.getEncoded());
-            System.out.println(signedSessionKey.length);
+
             byte[] encryptedKey = crypto.rsaEncrypt(serverPublicKey, sessionKey.getEncoded());
+
+            byte[] encryptedHmacKey = crypto.rsaEncrypt(serverPublicKey, hmacKey.getEncoded());
 			
 
             BigInteger nonce1 = new BigInteger(256, new Random());
@@ -289,7 +290,7 @@ public class MyClient {
 			
 			// Server Handshake Response
             Envelope serverResponse = groupClient.firstHandshake(username, encryptedNonce1, encryptedKey,
-                    iv.getIV(), serverList, ip);
+                    iv.getIV(), encryptedHmacKey, serverList, ip);
 
             BigInteger respNonce = (BigInteger)serverResponse.getObjContents().get(0);
             byte[] secondNonce = (byte[])serverResponse.getObjContents().get(1);
