@@ -13,7 +13,9 @@ public class Token implements UserToken, Serializable
 	{
 		issuer = i;
 		subject = s;
-		serverId = sid;
+
+		serverId = null;
+
 		groups = g;
 	}
 	
@@ -77,6 +79,11 @@ public class Token implements UserToken, Serializable
      {
      	return serverId;
      }
+    
+    public void setServerID(String s)
+    {
+    	serverId = s;
+    }
     
     public byte[] getBytes()
     {

@@ -48,6 +48,11 @@ public interface UserToken
      */
     public List<String> getGroups();
     
+
+    public String getServerID();
+    
+    public void setServerID(String s);
+
     
     /**
      * This method extracts the intended IP address of the server
@@ -59,7 +64,10 @@ public interface UserToken
      * @return the String representation of the intended server's IP address.
      *
      */
-    public String getServerId();
+
+    //public String getServerId();
+    
+
     
     
     /**
