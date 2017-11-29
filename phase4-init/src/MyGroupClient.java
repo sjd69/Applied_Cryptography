@@ -10,13 +10,12 @@ import java.io.ObjectInputStream;
 
 public class MyGroupClient
 {
-	GroupClient groupclient;
+	GroupClient groupclient = new GroupClient();
 	UserToken utoken;
-	public boolean startMyGroupClient(String server, int port, UserToken token, GroupClient groupClient)
+	public boolean startMyGroupClient(String server, int port, UserToken token)
 	{
 		boolean flag = true;
-		groupclient = groupClient;
-		boolean connected = groupclient.isConnected();
+		boolean connected = groupclient.connect(server, port);
 		utoken = token;
 		System.out.println("Using MyGroupClient - Connected to Group Server");
 		Scanner sc = new Scanner(System.in);
@@ -28,8 +27,7 @@ public class MyGroupClient
 		if (utoken != null)
 		{
 			System.out.println("Token - " + utoken.getSubject());
-			System.out.println("Issued by - " + utoken.getIssuer());
-			System.out.println("For server - " + utoken.getServerId());
+			System.out.println("Issued by" + utoken.getIssuer());
 			System.out.println("Groups: ");
 			List<String> groupnames = utoken.getGroups();
 			for (String f:groupnames){
@@ -54,9 +52,7 @@ public class MyGroupClient
 				System.out.println("(6) - Add user to group");
 				System.out.println("(7) - Delete user from group");
 				System.out.println("(8) - List members of group");
-				System.out.println("(9) - Get Keychain");
-                System.out.println("(10) - Add File Server IP to token");
-				System.out.println("(11) - Disconnect from Group Server");
+				System.out.println("(9) - Disconnect from Group Server");
 		
 				int commandNum = sc.nextInt();
 				sc.nextLine();
@@ -71,7 +67,6 @@ public class MyGroupClient
 						{
 							System.out.println("Token - " + utoken.getSubject());
 							System.out.println("Issued by - " + utoken.getIssuer());
-							//System.out.println("For server - " + utoken.getServerId());
 							System.out.println("Groups: ");
 							List<String> groups = utoken.getGroups();
 							for (String f:groups){
@@ -218,18 +213,6 @@ public class MyGroupClient
 						
 					// disconnect from server 
 					case 9:
-						System.out.println("--  Get group keychain --");
-						System.out.println("Enter group:");
-						String group_name = sc.nextLine();
-                        groupclient.getKeyChain(group_name);
-						break;
-                    case 10:
-                        System.out.println("--  Add File Server IP address to token --");
-                        System.out.println("Enter File Server IP:");
-                        String fileIP = sc.nextLine();
-                        token.setServerID(fileIP);
-			break;
-                    case 11:
 						System.out.println("--  Disconnect from Group Server --");
 						groupclient.disconnect();
 						flag = false;
