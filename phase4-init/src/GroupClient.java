@@ -56,6 +56,49 @@ public class GroupClient extends Client implements GroupClientInterface {
 			return false;
 		}
 	}
+	
+	
+	public KeyChain getKeyChain(String gname)
+	{
+		try
+		{
+			KeyChain kc = new KeyChain(gname);
+            		Crypto crypto = new Crypto();
+            		// generate a new group key for file crypto
+           		 KeySet groupKey = crypto.getKeySet();
+           		kc.addNewKey(groupKey);
+			Envelope message = null, response = null;
+
+			//Tell the server to return a token.
+			message = new Envelope("KCHAIN");
+			message.addObject(gname); //Add g name string
+			finalizeMessage(message, false);
+
+			//Get the response from the server
+			response = parseMessage((byte [])input.readObject());
+			byte[] hmacResponse = (byte[]) input.readObject();
+
+			if (validateMessageNumber(response) && response.getMessage().equals("OK")
+					&& validateHMAC(response, hmacResponse)) {
+				System.out.println("Message is OK");
+				//If there is a token in the Envelope, return it
+				ArrayList<Object> temp = null;
+				temp = response.getObjContents();
+
+                		kc = (KeyChain)temp.get(0);
+               			 return kc;
+			}
+			return kc;
+
+		}
+		catch(Exception e)
+		{
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace(System.err);
+			return null;
+		}
+	}
+	
 	public UserToken getToken(String username)
 	 {
 		try
