@@ -228,7 +228,7 @@ public class MyGroupClient
                         System.out.println("Enter File Server IP:");
                         String fileIP = sc.nextLine();
                         token.setServerID(fileIP);
-
+			break;
                     case 11:
 						System.out.println("--  Disconnect from Group Server --");
 						groupclient.disconnect();
