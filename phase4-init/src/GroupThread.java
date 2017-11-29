@@ -11,18 +11,13 @@ import java.io.*;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.*;
-import javax.crypto.spec.IvParameterSpec;
 
 public class GroupThread extends Thread
 {
 	private final Socket socket;
 	private GroupServer my_gs;
-	private SecretKey hmacKey;
+	private SecretKey sessionKey;
 	private BigInteger secondNonce;
-	private KeySet sessionKeySet;
-	private int messageNumber = -1;
-	private String username;
-	private Crypto crypto = new Crypto();
 
 	public GroupThread(Socket _socket, GroupServer _gs)
 	{
@@ -43,76 +38,58 @@ public class GroupThread extends Thread
 
 			do
 			{
-				Envelope message;
-				Object obj = input.readObject();
-				byte[] hmacMessage = null;
-				if (obj.getClass() != Envelope.class) {
-					message = parseMessage((byte[]) obj);
-					hmacMessage = (byte[])input.readObject();
-				} else {
-					message = (Envelope) obj;
-				}
-				System.out.println("Request received: " + (message != null ? message.getMessage() : null));
+				Envelope message = (Envelope)input.readObject();
+				System.out.println("Request received: " + message.getMessage());
 				Envelope response;
 
 				if (message.getMessage().equals("HANDSHAKE"))//Client wants a token
 				{
-					if (message.getObjContents().size() == 6){	//First part of handshake
-						username = (String)message.getObjContents().get(0); //Get the username
+					if (message.getObjContents().size() == 3){	//First part of handshake
+						String username = (String)message.getObjContents().get(0); //Get the username
 						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
 						byte[] encryptedKey = (byte[])message.getObjContents().get(2); //Get the signed key
-						byte[] iv = (byte[])message.getObjContents().get(3); //Get the iv
-						byte[] hmac = (byte[])message.getObjContents().get(4); //Get the iv
 						BigInteger decryptedNonce;
 
-						if (messageNumber == -1) {
-							setMessageNumber(message);
-						}
-
-						if(username == null || !validateMessageNumber(message))
+						if(username == null)
 						{
 							response = new Envelope("FAIL");
 							response.addObject(null);
-							finalizeMessage(response, output, true);
+							output.writeObject(response);
 						} else {
 							response = new Envelope("OK");
-							decryptedNonce = new BigInteger(crypto.rsaDecrypt(my_gs.privateKey, nonce));
+							decryptedNonce = new BigInteger(decrypt(my_gs.privateKey,
+									nonce, "RSA", "BC"));
 
-							byte[] signedKey = crypto.rsaDecrypt(my_gs.privateKey, encryptedKey);
-							//byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
+							byte[] signedKey = decrypt(my_gs.privateKey, encryptedKey, "RSA", "BC");
+							byte[] byteKey = decrypt(getUserKey(username), signedKey, "RSA", "BC");
 
-							//assert byteKey != null;
-							SecretKey sessionKey = new SecretKeySpec(signedKey, 0, 16, "AES");
-							sessionKeySet = new KeySet(sessionKey, new IvParameterSpec(iv));
-
-							hmacKey = new SecretKeySpec(hmac, "HmacMD5");
+							assert byteKey != null;
+							sessionKey = new SecretKeySpec(byteKey, 0, 16, "AES");
 							secondNonce = new BigInteger(256, new Random());
 							response.addObject(decryptedNonce);
-							//response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
-							response.addObject(crypto.aesEncrypt(sessionKeySet, secondNonce.toByteArray()));
-							finalizeMessage(response, output, true);
+							response.addObject(encrypt(sessionKey, secondNonce.toByteArray(), "AES", "BC"));
+							output.writeObject(response);
 						}
 					} else {	//Second part of handshake
 						BigInteger nonce = (BigInteger)message.getObjContents().get(0);
 
-						if (nonce.equals(secondNonce) && validateMessageNumber(message)) {
+						if (nonce.equals(secondNonce)) {
 							response = new Envelope("OK");
-							finalizeMessage(response, output, true);
+							output.writeObject(response);
 						} else {
 							response = new Envelope("FAIL");
-							finalizeMessage(response, output, true);
+							output.writeObject(response);
 						}
 					}
 
-				} else if (message.getMessage().equals("GET") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage))//Client wants a token
+				} else if (message.getMessage().equals("GET"))//Client wants a token
 				{
 					String username = (String)message.getObjContents().get(0); //Get the username
 					if(username == null)
 					{
 						response = new Envelope("FAIL");
 						response.addObject(null);
-						finalizeMessage(response, output, false);
+						output.writeObject(response);
 					}
 					else
 					{
@@ -121,7 +98,7 @@ public class GroupThread extends Thread
 						//Respond to the client. On error, the client will receive a null token
 						response = new Envelope("OK");
 						response.addObject(yourToken);
-						finalizeMessage(response, output, false);
+						output.writeObject(response);
 					}
 				}
 				else if (message.getMessage().equals("PUBKEY"))//Client wants a token
@@ -130,19 +107,7 @@ public class GroupThread extends Thread
 					response.addObject(my_gs.publicKey);
 					output.writeObject(response);
 				}
-				else if (message.getMessage().equals("KCHAIN") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage))
-				{
-					response = new Envelope("OK");
-					if(message.getObjContents().get(0) != null)
-					{
-						String g_name = (String)message.getObjContents().get(0);
-						response.addObject(getGroupKeyChain(g_name));
-						finalizeMessage(response, output, false);
-					}
-				}
-				else if(message.getMessage().equals("CUSER") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage)) //Client wants to create a user
+				else if(message.getMessage().equals("CUSER")) //Client wants to create a user
 				{
 					if(message.getObjContents().size() < 2)
 					{
@@ -167,10 +132,9 @@ public class GroupThread extends Thread
 						}
 					}
 
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
-				else if(message.getMessage().equals("DUSER") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage)) //Client wants to delete a user
+				else if(message.getMessage().equals("DUSER")) //Client wants to delete a user
 				{
 
 					if(message.getObjContents().size() < 2)
@@ -196,10 +160,9 @@ public class GroupThread extends Thread
 						}
 					}
 
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
-				else if(message.getMessage().equals("CGROUP") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage)) //Client wants to create a group
+				else if(message.getMessage().equals("CGROUP")) //Client wants to create a group
 				{
 				    if (message.getObjContents().size()  < 2) {
 				    	response = new Envelope("FAIL");
@@ -219,10 +182,9 @@ public class GroupThread extends Thread
 						}
 					}
 
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
-				else if(message.getMessage().equals("DGROUP") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage)) //Client wants to delete a group
+				else if(message.getMessage().equals("DGROUP")) //Client wants to delete a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -242,10 +204,9 @@ public class GroupThread extends Thread
 						}
 					}
 
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
-				else if(message.getMessage().equals("LMEMBERS") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage)) //Client wants a list of members in a group
+				else if(message.getMessage().equals("LMEMBERS")) //Client wants a list of members in a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -268,10 +229,9 @@ public class GroupThread extends Thread
 						}
 					}
 
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
-				else if(message.getMessage().equals("AUSERTOGROUP") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage)) //Client wants to add user to a group
+				else if(message.getMessage().equals("AUSERTOGROUP")) //Client wants to add user to a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -294,10 +254,9 @@ public class GroupThread extends Thread
 						}
 					}
 
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
-				else if(message.getMessage().equals("RUSERFROMGROUP") && validateMessageNumber(message)
-						&& validateHMAC(message, hmacMessage)) //Client wants to remove user from a group
+				else if(message.getMessage().equals("RUSERFROMGROUP")) //Client wants to remove user from a group
 				{
 					if (message.getObjContents().size()  < 2) {
 						response = new Envelope("FAIL");
@@ -320,7 +279,7 @@ public class GroupThread extends Thread
 						}
 					}
 
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
 				else if(message.getMessage().equals("DISCONNECT")) //Client wants to disconnect
 				{
@@ -330,7 +289,7 @@ public class GroupThread extends Thread
 				else
 				{
 					response = new Envelope("FAIL"); //Server does not understand client request
-					finalizeMessage(response, output, false);
+					output.writeObject(response);
 				}
 			}while(proceed);
 		}
@@ -343,17 +302,6 @@ public class GroupThread extends Thread
 
 	private PublicKey getUserKey(String username) {
 		return my_gs.userList.getPublicKey(username);
-	}
-	
-	private KeyChain getGroupKeyChain(String grp_name){
-		if (my_gs.keychainList != null)
-		{
-			return my_gs.keychainList.getKeyChain(grp_name);
-		}
-		else
-		{
-			return new KeyChain("TEMP");
-		}
 	}
 
 	// Returns a list containing the members of the specified group. Returns null if error.
@@ -388,7 +336,6 @@ public class GroupThread extends Thread
 
 		// Does requester exist?
 		if(my_gs.userList.checkUser(requester)) {
-			Crypto crypto = new Crypto();
 			ArrayList<String> owner = my_gs.groupList.getOwnership(groupName);
 			// Requester needs to be an administrator of the group
 			if (owner == null) {
@@ -400,15 +347,6 @@ public class GroupThread extends Thread
 				if(groupList.contains(username)) {
 					// User is deleted from the group
 					my_gs.groupList.removeUser(username, groupName);
-					
-					// make a new group key
-					KeySet newGroupKey = crypto.getKeySet();
-					// get group new keychain
-					KeyChain kc = my_gs.keychainList.getKeyChain(groupName);
-					// add new group key to keychain
-					kc.addNewKey(newGroupKey);
-					// update keychainList
-					my_gs.keychainList.addKeyChain(groupName, kc);
 					return true;
 				}
 				else {
@@ -484,7 +422,6 @@ public class GroupThread extends Thread
 
 	// Returns true if the group was successfully created, else false.
 	private boolean createGroup(String groupName, UserToken yourToken) {
-		Crypto crypto = new Crypto();
 		String requester = yourToken.getSubject();
 		ArrayList<String> temp = my_gs.userList.getUserGroups(requester);
 			// Group needs to not already exist
@@ -499,15 +436,6 @@ public class GroupThread extends Thread
 				// also add to user list of that group
 				my_gs.groupList.addUser(requester, groupName);
 				my_gs.userList.addGroup(requester, groupName);
-				
-				// generate a new group key for file crypto
-				KeySet groupKey = crypto.getKeySet();
-				// create a new keychain
-				KeyChain kchain = new KeyChain(groupName);
-				// add new group key to keychain
-				kchain.addNewKey(groupKey);
-				// update keychainList
-				my_gs.keychainList.addKeyChain(groupName, kchain);
 				return true;
 			}
 	}
@@ -619,79 +547,35 @@ public class GroupThread extends Thread
 		}
 	}
 
-	private void finalizeMessage(Envelope message, ObjectOutputStream output, boolean isHandshake) {
-		updateMessageNumber(this.username);
-		message.addObject(messageNumber);
+	private static byte[] encrypt(Key key, byte[] bytes, String type, String provider) {
+		try {
 
-		if (isHandshake) {
-			try {
-				output.writeObject(message);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			byte[] encryptedBytes = null;
-			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				ObjectOutputStream oos = new ObjectOutputStream(baos);
-				oos.writeObject(message);
-				byte[] bytes = baos.toByteArray();
-				encryptedBytes = crypto.aesEncrypt(sessionKeySet, bytes);
+			//Create an cipher using bouncycastle. Set to encrypt using key
+			Cipher cipher = Cipher.getInstance(type, provider);
+			cipher.init(Cipher.ENCRYPT_MODE, key);
 
-				byte[] hmacBytes = crypto.get_HMAC(hmacKey, bytes);
+			return cipher.doFinal(bytes);
 
-				output.writeObject(encryptedBytes);
-				output.writeObject(hmacBytes);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
+		return null;
 	}
 
-	private Envelope parseMessage(byte[] response) {
-		ObjectInputStream ois;
+	private static byte[] decrypt(Key key, byte[] encryptedText, String type, String provider) {
 		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(crypto.aesDecrypt(sessionKeySet, response));
-			ois = new ObjectInputStream(bais);
-			return (Envelope) ois.readObject();
+			//Create an cipher using bouncycastle. Set to decrypt using key
+			Cipher cipher = Cipher.getInstance(type, provider);
+			cipher.init(Cipher.DECRYPT_MODE, key);
 
-		} catch (IOException | ClassNotFoundException e) {
+			//Return string representation of the decrypted byte array.
+			return cipher.doFinal(encryptedText);
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private void setMessageNumber(Envelope message) {
-		this.messageNumber = (int) message.getObjContents().get(message.getObjContents().size() - 1);
-	}
-
-	private boolean validateMessageNumber(Envelope response) {
-		int respMsgNumber = (int) response.getObjContents().get(response.getObjContents().size() - 1);
-		return messageNumber == respMsgNumber;
-	}
-
-	private boolean validateHMAC(Envelope message, byte[] messageHMAC) {
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-			oos.writeObject(message);
-			byte[] bytes = baos.toByteArray();
-
-			byte[] bytesToVerify = crypto.get_HMAC(hmacKey, bytes);
-
-			if (Arrays.equals(bytesToVerify, messageHMAC)) {
-				return true;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return true;
-	}
-
-	private void updateMessageNumber(String username) {
-		messageNumber++;
-		my_gs.userList.updateMessageNumber(username, messageNumber);
-
-	}
 }

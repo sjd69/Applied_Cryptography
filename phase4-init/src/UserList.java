@@ -58,13 +58,6 @@ public class UserList implements java.io.Serializable {
         list.get(user).removeOwnership(groupname);
     }
 
-    public synchronized void updateMessageNumber(String username, int messageNumber) {
-        list.get(username).setMessageNumber(messageNumber);
-    }
-
-    public synchronized int getMessageNumber(String username) {
-        return list.get(username).getMessageNumber();
-    }
 
     class User implements java.io.Serializable {
 
@@ -75,7 +68,6 @@ public class UserList implements java.io.Serializable {
         private ArrayList<String> groups;
         private ArrayList<String> ownership;
         private PublicKey publicKey;
-        private int messageNumber;
 
         public User(PublicKey publicKey) {
             this.publicKey = publicKey;
@@ -121,14 +113,6 @@ public class UserList implements java.io.Serializable {
                     ownership.remove(ownership.indexOf(group));
                 }
             }
-        }
-
-        public int getMessageNumber() {
-            return messageNumber;
-        }
-
-        public void setMessageNumber(int messageNumber) {
-            this.messageNumber = messageNumber;
         }
 
     }
