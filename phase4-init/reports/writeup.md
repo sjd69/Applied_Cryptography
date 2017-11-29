@@ -34,7 +34,9 @@ The addition of the HMAC-MD5 will protect against message modification. A second
 We utilize a HMAC over a public key signature to protect message integrity for speed. The HMAC will allow a receiving party to verify that the message has not been modified, since an adversary will not be able recompute the HMAC after modification since they do not have access to the session key. Keeping a message count and numbering messages ensures that messages are being received in the correct order, preventing replay of individual messages by an adversary. Receiving a message out of correct and expected order will be immediately detectable. Further, the usage and storage of unqiue initial counter numbers for each party (based on the random numbers for authentication) prevents an entire session from being replayed. Since old random numbers will not be accepted, an attempt to replay an entire connection will be detected. 
 
 ### Diagram
+
 ![alt text](T5final.png)
+
 ![alt text](T5Handshakeup.png)
 ![alt text](T5HandshakeF.png)
 
