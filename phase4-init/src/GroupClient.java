@@ -75,7 +75,7 @@ public class GroupClient extends Client implements GroupClientInterface {
 	{
 		try
 		{
-			KeyChain kc = new KeyChain("TEMP");
+			KeyChain kc = new KeyChain(gname);
             		Crypto crypto = new Crypto();
             		// generate a new group key for file crypto
            		 KeySet groupKey = crypto.getKeySet();
