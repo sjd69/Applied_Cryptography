@@ -8,7 +8,10 @@
 Without intervention, a malicious or corrupted server can wipe or modify all of its files. While users require special permissions to perform deletion or modification operations, there is no such restriction placed upon the server itself. Similarly, a group server that is compromised could delete all groups and/or users.
 
 ### Evidence
+
 ### Justification of Attack
+If an attacker cannot gain the privileges necessary to perform mass deletions and wipes of data, the next step might be to corrupt the server itself to perform these actions automatically. If this can be accomplished, then potentially massive amounts of data can be tampered with or deleted within a very short timeframe, with minimal risk to the attacker.
+
 ### Diagrams
 
 ## Counter Measure
