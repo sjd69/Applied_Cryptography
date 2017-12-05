@@ -31,3 +31,5 @@ Allowing only one client to be logged into a user account at one time places res
 
 ![alt text](T8RateLimiting.png)
 ![alt text](T8PuzzleDiagramLegit.png)
+### Previous Handshake Diagram
+![alt text](T5Handshakeup.png)
