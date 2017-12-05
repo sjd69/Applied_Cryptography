@@ -5,12 +5,12 @@
 
 ## Attacks
 ### Description
-Users of the file sharing system are considered untrustworthy. In the current implementation, there is no limit to the number of times in which a user can be logged in to the group server or request to be logged in. Without intervention, a malicious user can send an unlimited number of login requests to the group server. An adversary has the ability to continuiously send requests to the group server causing it to slow or even crash and shut down. A flood of such requests has the potential to cause distributed denial-of-service to legitimate users who wish to interact with the file system.
+Users of the file sharing system are considered untrustworthy. In the current implementation, there is no limit to the number of times in which a user can be logged in to the group server or request to be logged in. Without intervention, a malicious user can send an unlimited number of login requests to the group server. An adversary has the ability to continuously send requests to the group server causing it to slow or even crash and shut down. A flood of such requests has the potential to cause distributed denial-of-service to legitimate users who wish to interact with the file system.
 
-To carry out this attack, an adversay will send a continuious stream of login requests to the group server. With enough requests, service to legitimate users will be disrupted.
+To carry out this attack, an adversary will send a continuous stream of login requests to the group server. With enough requests, service to legitimate users will be disrupted.
 
 ### Evidence and Justification of Attack
-This attack is possible due to 1) lack of restrictions on login requests, and 2) the fact that users may be logged in to the same account on the group server via any number of different clients. This attack compromises data avalibility as authorized users trying to access group files, for example, will be unable to. If an attack of this type is successful, then the entire file sharing system is disabled, as users must retrieve their user token from the gorup server to interact with any file server.
+This attack is possible due to 1) lack of restrictions on login requests, and 2) the fact that users may be logged in to the same account on the group server via any number of different clients. This attack compromises data availability as authorized users trying to access group files, for example, will be unable to. If an attack of this type is successful, then the entire file sharing system is disabled, as users must retrieve their user token from the group server to interact with any file server.
 
 ## Counter Measure
 ### Description
