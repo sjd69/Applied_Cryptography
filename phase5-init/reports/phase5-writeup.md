@@ -1,4 +1,5 @@
 # Phase 5
+We have added new mechanisms to deal with an additional threat model while keeping our main ideas of ease of use and coverage at the forefront.
 
 ## Threat Model
 **T8 Group Server Denial of Service** Users are not limited or restricted on the number of login requests that can be sent to the group server.
