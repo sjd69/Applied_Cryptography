@@ -9,6 +9,8 @@ Users of the file sharing system are considered untrustworthy. In the current im
 
 To carry out this attack, an adversary will send a continuous stream of login requests to the group server. With enough requests, service to legitimate users will be disrupted.
 
+![alt text](T8Attack.png)
+
 ### Evidence and Justification of Attack
 This attack is possible due to 1) lack of restrictions on login requests, and 2) the fact that users may be logged in to the same account on the group server via any number of different clients. This attack compromises data availability, as authorized users trying to access group files or other grouo data will be unable to. If an attack of this type is successful, then the entire file sharing system is disabled, as users must retrieve their user token from the group server to interact with any file server.
 
@@ -27,4 +29,5 @@ When users attempt to log in, they will first be presented with a challenge-resp
 ### Justification
 Allowing only one client to be logged into a user account at one time places restrictions on using valid login user name and private keys to flood the server with requests. A challenge-response puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. 
 
-### Diagrams
+![alt text](T8RateLimiting.png)
+![alt text](T8PuzzleDiagramLegit.png)
