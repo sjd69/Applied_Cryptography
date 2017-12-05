@@ -33,3 +33,6 @@ Allowing only one client to be logged into a user account at one time places res
 ![alt text](T8PuzzleDiagramLegit.png)
 ### Previous Handshake Diagram
 ![alt text](T5Handshakeup.png)
+
+### Conclusion
+The principles of our file sharing system have been ease of use and coverage since the first phase of implementation. The countermeasures described for this threat provide coverage against data avaliability attacks. The counter measures are also minimally disruptive to legitimate users, which extends our theme of ease of use. 
