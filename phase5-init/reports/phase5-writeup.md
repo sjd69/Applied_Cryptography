@@ -1,31 +1,30 @@
 # Phase 5
 
 ## Threat Model
-**T8 File Modification and Deletion** Since file servers are untrusted, files may not only be leaked from the server, files may be modified or deleted. A file server may alter or delete any file that it stores, at will.
+**T8 DDOS of Group Server** Users are not limited or restricted on the number of login requests that can be sent to the group server.
 
 ## Attacks
 ### Description
-Without intervention, a malicious or corrupted file server can wipe or modify any and all of the files it stores. While users require special permissions to perform deletion or modification operations, there is no such restriction placed upon the file server itself. At any time, the file server can tamper with any of the data it currently has stored. More alarmingly, group members will be ignorant to these malicious changes. This threat poses risk to data integrity as users who are expecting to recieve correct group files from a file server can possibly recieve maliciously modified files unknowingly. This threat also poses a risk to data avalaiablilty. Group members trying to access a valid group file will be denied access if the file server maliciously deleted it.
+Users of the file sharing system are considered untrustworthy. In the current implementation, there is no limit to the number of times in which a user can be logged in to the group server or request to be logged in. Without intervention, a malicious user can send an unlimited number of login requests to the group server. An adversary has the ability to continuiously send requests to the group server causing it to slow or even crash and shut down. A flood of such requests has the potential to cause distributed denial-of-service to legitimate users who wish to interact with the file system.
 
-To carry out this attack, an adversay will first gain access to the file server (possibly just by being the user that started that file server), and navigate to the shared_files folder where the server files are stored. The adversary can then change or delete the files contained in this folder.
+To carry out this attack, an adversay will send a continuious stream of login requests to the group server. With enough requests, service to legitimate users will be disrupted.
 
 ### Evidence and Justification of Attack
-This attack is possible due to 1) the way in which the file server stores files, and 2) the fact that group servers and file servers are independent of one another. Since any user may start a file server, those users will in turn have access to whatever files are stored on that server. Although these files have been encrypted with a 128-bit AES key using CBC mode via the group keychain in the previous phase of the project, files may still be modified or deleted. Since group servers and file servers are independent of one another, there are no checks or restrictions placed on the actions of the file server. This allows the file server to not only have unrestricted access to whatever data is stored on it, but to also perform this malicious actions unknowingly to the user. 
-
-If an attacker cannot gain the privileges necessary to perform mass deletions and wipes of data, the next step might be to corrupt the server itself to perform these actions automatically. If this can be accomplished, then potentially massive amounts of data can be tampered with or deleted within a very short timeframe, with minimal risk to the attacker.
+This attack is possible due to 1) lack of restrictions on login requests, and 2) the fact that users may be logged in to the same account on the group server via any number of different clients. This attack compromises data avalibility as authorized users trying to access group files, for example, will be unable to. If an attack of this type is successful, then the entire file sharing system is disabled, as users must retrieve their user token from the gorup server to interact with any file server.
 
 ## Counter Measure
 ### Description
-Assumption 1: There exists a client-side file crypto application that encrypts and decrypts files using the group keys.
+There is the possibility of two types of login requests that an adversary can flood the group server with: login requests for a legitimate user with the correct private key, and garbage login requests and garbage private keys.
 
-**Modification:**
-In addition to encrypting files sent to the group server, users will also compute and send the HMAC-MD5 of the encrypted file to protect against file modification. When the user downloads a file from the system, the File Crypto client component will first check the hash value based on the keychain. If this value is incorrect, we assume file modification by the server and terminate the connection. If the hash value is correct, the File Crypto component with proceed with decrypting the file using the keychain.
+**Restriction on Active User Accounts:**
+A restriction on the number of different clients that may be logged in to the same user account will be restricted to one. When a user successfully logs in to the group server, no other client may also log in to that user account. Once a user is logged in, subsequent requests to login to that account will be blocked. This protects against the flood of legitimate user login requests.
 
-Upon group creation when a group key is be generated, a second 128-bit AES CBC mode hash key will also be created. For each group, the Group Server will store this key. When a member is deleted from a group, two new keys will be generated and stored (one for encyrption and one for hashing). The keys will be stored in a list that is part of a Hashtable. Specifically, a Hashtable<groupName, ArrayList keyList>. The index of the key corresponds to its freshness (i.e. it is monotonically increasing). These group keychains will be stored, accessed, and updated in the same way as the previous implementation but now with the additon of a second hashing key.
+**Computational Puzzle:**
+When users attempt to log in, they will first be presented with a computational puzzle sent from the group server. The puzzle will be easy for a user to solve quickly and since legitimate users will be logging in infrequently, this will be minimally disruptive. 
 
-**Deletion:**
+Such a puzzle will limit the rate at which automated requests can be sent.
 
 ### Justification
-Our previous security mechanisms have all dealt with the possibility of malicious users, however, this counter measure also defends against the possibility of malicious servers. With the combination of our timer and file/user/group countrs, we can determine relatively quickly if files are being tampered with and shut down the connection before long-term damage is done to the contents of the servers, providing extra Integrity protection to our servers.
+
 
 ### Diagrams
