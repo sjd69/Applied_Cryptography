@@ -26,6 +26,14 @@ A restriction on the number of different clients that may be logged in to the sa
 **Challenge-Response Puzzle:**
 When users attempt to log in, they will first be presented with a challenge-response puzzle sent from the group server. The puzzle will be easy for the group server to generate, as it will pull puzzle/answer pairs from a database of puzzles. The puzzle will be relatively easy for a human to solve quickly and since legitimate users will be logging in infrequently, this will be minimally disruptive. The puzzle will be difficult for a computer to solve. Until the puzzle is correctly solved, further requests to the group server by that IP will be disregarded.
 
+The challenge-response puzzle format will be human verifiable, but difficult for a computer to solve. For example:
+
+puzzle: "two times ten equals"; answer:"20"
+
+puzzle: "what state is pittsburgh located in"; answer: "pennsylvania"
+
+To prevent a DoS attack flood of bad responses to the puzzle, after three failed attempts the requests from that IP address will be blocked by the Group Server for 5 minutes.
+
 ### Justification
 Allowing only one client to be logged into a user account at one time places restrictions on using valid login user name and private keys to flood the server with requests. A challenge-response puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. 
 
