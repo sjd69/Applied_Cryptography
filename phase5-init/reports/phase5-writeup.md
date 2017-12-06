@@ -19,19 +19,15 @@ This attack is possible due to 1) lack of restrictions on login requests, and 2)
 We will utilize challenge-response puzzles to protect against the group server denial of service attack.
 
 ### Description
-**Challenge-Response Puzzle:**
-When users attempt to log in, they will first be presented with a challenge-response puzzle sent from the group server. The puzzle will be easy for the group server to generate, as it will pull puzzle/answer pairs from a database of puzzles. The puzzle will be relatively easy for a human to solve quickly and since legitimate users will be logging in infrequently, this will be minimally disruptive. The puzzle will be difficult for a computer to solve. Until the puzzle is correctly solved, further requests to the group server by that IP will be disregarded. Only puzzle answers will be considered valid responses.
-
-The challenge-response puzzle format will be human verifiable, but difficult for a computer to solve. For example:
-
-puzzle: "two times ten equals"; answer:"20"
-
-puzzle: "what state is pittsburgh located in"; answer: "pennsylvania"
+**Hash Inversion Puzzle:**
+When users attempt to log in, the group server will generate a cryptographic hash function for a puzzle of length 15. The server will transmit a message consisting of the puzzle state, length, and hash function to the user. The user must then invert the hash function and return a solution to the server, which will decrypt the token and verify the puzzle solution. 
 
 To prevent a DoS attack flood of bad responses to the puzzle, after three failed attempts the requests from that IP address will be blocked by the Group Server for 5 minutes.
 
 ### Justification
 A challenge-response puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. After three failed attempts we are placing a 5 minute lockout which further rate limits automated login requests.
+
+We decided to use a hash inversion puzzle in particular as it is more mathematically difficult to solve than a simple question-and-response puzzle. Puzzle state is offloaded to the user so that the server does not need to maintain vulnerable state in which it can be attacked while the user works on solving the puzzle. 
 
 ![alt text](T8RateLimiting.png)
 ![alt text](T8PuzzleDiagramLegit.png)
