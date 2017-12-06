@@ -25,7 +25,7 @@ When users attempt to log in, the group server will generate a cryptographic has
 To prevent a DoS attack flood of bad responses to the puzzle, after three failed attempts the requests from that IP address will be blocked by the Group Server for 5 minutes.
 
 ### Justification
-A challenge-response puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. After three failed attempts we are placing a 5 minute lockout which further rate limits automated login requests.
+A hash inversion puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. After three failed attempts we are placing a 5 minute lockout which further rate limits automated login requests.
 
 We decided to use a hash inversion puzzle in particular as it is more mathematically difficult to solve than a simple question-and-response puzzle. Puzzle state is offloaded to the user so that the server does not need to maintain vulnerable state in which it can be attacked while the user works on solving the puzzle. 
 
