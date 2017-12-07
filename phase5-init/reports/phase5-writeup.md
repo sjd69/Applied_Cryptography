@@ -8,6 +8,7 @@ We have added new mechanisms to deal with an additional threat model while keepi
 ### Description
 Users of the file sharing system are considered untrustworthy. In the current implementation, there is no limit to the number of times in which a user can request to log in to the group server, meaning that the initial handshake can repeated indefinitely. Without intervention, a malicious user can send an unlimited number of login requests to the group server. An malicious user who has a valid account can repeatedly send handshakes which pose a computational cost to the server. In the initial handshake the server must decrypt a nonce with the group server's private key, decrypt the set containing the encyrpted session key, the HMAC key and file server IP with the user's private key, and finally decrypt that set with the server's private key. The diagram for this handshake is included below. A flood of such requests has the potential to cause denial-of-service to legitimate users who wish to interact with the file system. As demonstrated with our attack program, a legitimate user sending an infinite stream of initial handshakes blocks other users from correctly connecting to the group server. This disrupts use of the group server from legitimate users, which denies users access to the file sharing system at large due to the fact that tokens can only be retrieved from the group server. 
 
+![alt text](T5Handshakeup.png)
 ![alt text](T8Attack.png)
 
 ### Evidence and Justification of Attack
