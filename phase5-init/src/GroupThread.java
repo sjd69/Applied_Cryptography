@@ -57,6 +57,22 @@ public class GroupThread extends Thread
 
 				if (message.getMessage().equals("HANDSHAKE"))//Client wants a token
 				{
+				
+					// Hash inversion puzzle before handshaking.
+					// Generate hash puzzle answer
+					byte[] puzzleAnswer = crypto.generatePuzzleAnswer();
+					// Generate the hash of the puzzle answer to send to the client
+					byte[] puzzle = crypto.generatePuzzle();
+					// TODO: Get client answer... not sure how to do this.
+					// byte[] clientAnswer = 
+					// Check that the answer provided by the client is correct
+					boolean isCorrectAnswer = crypto.verifyPuzzle(puzzleAnswer, clientAnswer);
+					if (!isCorrectAnswer) {
+						response = new Envelope("FAIL");
+						response.addObject(null);
+						finalizeMessage(response, output, false);
+					}
+					
 					if (message.getObjContents().size() == 6){	//First part of handshake
 						username = (String)message.getObjContents().get(0); //Get the username
 						byte[] nonce = (byte[])message.getObjContents().get(1); //Get the nonce
