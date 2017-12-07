@@ -161,4 +161,40 @@ public class Crypto {
 		return hash;
 	}
 	
+	// --------------------------------- HASH INVERSION PUZZLE -------------------------------------
+	// Generate Hash Puzzle Answer of 15 bytes -- for use by server
+    public byte[] generatePuzzleAnswer() {
+        byte[] b = new byte[2];
+        new Random().nextBytes(b);
+        return b;
+    }
+	
+    // Generate the hash of the puzzle answer to send to client -- for use by server
+    public byte[] generatePuzzle(byte[] answer) {
+        byte[] puzzle = get_MD5(answer);
+        return puzzle;
+    }
+    
+    // Check that the answer provided by the server is correct -- for use by server and client
+    public boolean verifyPuzzle(byte[] correctAns, byte[] clientAns){
+        if (Arrays.equals(correctAns, clientAns))
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    // brute force check hash values to find match -- for use by client
+    public byte[] solvePuzzle(byte[] hash) {
+        for (int i = 0; i < 32767; i++){
+            BigInteger bi = BigInteger.valueOf(i);
+            byte[] bytes = bi.toByteArray();
+            byte[] testhash = get_MD5(bytes);
+            if (verifyPuzzle(hash, testhash)){
+                return testhash;
+            }
+        }
+        return null;
+    }
+	
 }
