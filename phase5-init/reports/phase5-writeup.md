@@ -26,10 +26,8 @@ Specifically, we implemented a hash inversion puzzle. When users attempt to log 
 ### Justification
 A hash inversion puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. We decided to use a hash inversion puzzle in particular as it is more mathematically difficult to solve than a simple question-and-response puzzle. Puzzle state is offloaded to the user so that the server does not need to maintain vulnerable state in which it can be attacked while the user works on solving the puzzle. 
 
-![alt text](T8RateLimiting.png)
-![alt text](T8PuzzleDiagramLegit.png)
-### Previous Handshake Diagram
-![alt text](T5Handshakeup.png)
+![alt text](T8RateLimitingUp.png)
+![alt text](T8PuzzleDiagramLegitUp.png)
 
 ### Conclusion
 The principles of our file sharing system have been ease of use and coverage since the first phase of implementation. The countermeasures described for this threat provide coverage against data avaliability attacks. The counter measures are also minimally disruptive to legitimate users, which extends our theme of ease of use. 
