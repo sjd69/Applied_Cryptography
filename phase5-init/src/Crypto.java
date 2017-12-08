@@ -10,6 +10,8 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Arrays;
+import java.math.BigInteger;
 
 public class Crypto {
     private final int aesSize = 128;
