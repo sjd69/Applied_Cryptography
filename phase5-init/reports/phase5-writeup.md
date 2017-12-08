@@ -1,8 +1,8 @@
 # Phase 5
 We have added new mechanisms to deal with an additional threat model while keeping our main ideas of ease of use and coverage at the forefront.
 
-* **AES:** For symmetric key encryption within our system, we have utilized AES with a 128 bit key size. For a secret server keys to encrypt puzzle answers, we also chose to use AES 128 bit keys. We chose 128 bit keys over 256 bit keys as 128 bit keys are significantly faster but still sufficient security-wise, and 128-bit is the largest allowed by JavaCrypto. We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks.
-* **MD5:** We previously utilize MD5 within our system for generating public key fingerprints. We use MD5 as the method for our hash inversion puzzle because although MD5 is cryptographically broken, it will still force clients to brute force hash inversion to find a correct answer which is sufficient for these purposes.
+* **AES:** For symmetric key encryption within our system, we have utilized AES with a 128 bit key size. For a secret server key to encrypt puzzle answers, we also chose to use AES 128 bit keys. We chose 128 bit keys over 256 bit keys as 128 bit keys are significantly faster but still sufficient security-wise, and 128-bit is the largest allowed by JavaCrypto. We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks.
+* **MD5:** We previously utilize MD5 within our system for generating public key fingerprints. We use MD5 as the method for our hash inversion puzzle because it will force clients to brute force a hash inversion solution. We feel that MD5 is robust enough to provide data integrity for the work required of it, as well as provide economy of mechanism with the rest of our codebase.
 
 ## Threat Model
 **T8 Group Server Denial of Service** Clients are not limited or restricted on the number of login requests that can be sent to the group server.
