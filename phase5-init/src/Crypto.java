@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.security.*;
 import java.util.Random;
+import java.util.Arrays;
+import java.math.BigInteger;
 
 public class Crypto {
     private final int aesSize = 128;
