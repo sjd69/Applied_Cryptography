@@ -63,11 +63,21 @@ public class GroupThread extends Thread
 					byte[] puzzleAnswer = crypto.generatePuzzleAnswer();
 					// Generate the hash of the puzzle answer to send to the client
 					byte[] puzzle = crypto.generatePuzzle();
-					// TODO: Get client answer... not sure how to do this.
-					// byte[] clientAnswer = 
-					// Check that the answer provided by the client is correct
-					boolean isCorrectAnswer = crypto.verifyPuzzle(puzzleAnswer, clientAnswer);
-					if (!isCorrectAnswer) {
+					// Send the puzzle to the client
+					response = new Envelope("PUZZLE");
+					response.addObjects(puzzle);
+					finalizeMessage(response, output, true);
+					// Check to see if the client's answer is correct
+					if (message.getMessage().equals("ANSWER")) {
+						byte[] clientAnswer = (byte[])message.getObjContents().get(0);
+						boolean isCorrectAnswer = crypto.verifyPuzzle(puzzleAnswer, clientAnswer);
+						if (!isCorrectAnswer) {
+							response = new Envelope("FAIL");
+							response.addObject(null);
+							finalizeMessage(response, output, false);
+						}
+					}
+					else {
 						response = new Envelope("FAIL");
 						response.addObject(null);
 						finalizeMessage(response, output, false);
