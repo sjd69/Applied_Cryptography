@@ -1,6 +1,9 @@
 # Phase 5
 We have added new mechanisms to deal with an additional threat model while keeping our main ideas of ease of use and coverage at the forefront.
 
+* **AES:** For symmetric key encryption within our system, we have utilized AES with a 128 bit key size. For a secret server keys to encrypt puzzle answers, we also chose to use AES 128 bit keys. We chose 128 bit keys over 256 bit keys as 128 bit keys are significantly faster but still sufficient security-wise, and 128-bit is the largest allowed by JavaCrypto. We utilize CBC as the mode of operation as CBC provides message dependence for generating cipher text unlike ECB mode, which is subject to code book attacks.
+* **MD5:** We previously utilize MD5 within our system for generating public key fingerprints. We use MD5 as the method for our hash inversion puzzle because although MD5 is cryptographically broken, it will still force clients to brute force hash inversion to find a correct answer which is sufficient for these purposes.
+
 ## Threat Model
 **T8 Group Server Denial of Service** Clients are not limited or restricted on the number of login requests that can be sent to the group server.
 
@@ -21,13 +24,13 @@ We will utilize computational puzzles to protect against the group server denial
 Computational puzzles make the client pay for their request by first solving a hard puzzle. Making the client solve such a puzzle, which takes time, limits the rate at which random requests can be sent and thus reduces the use of server resources.
 
 **Hash Inversion Puzzle:**
-Specifically, we implemented a hash inversion puzzle. When users attempt to log in, the group server will first generate a cryptographic hash function for a random puzzle of length 16. The server will transmit a message consisting of the puzzle state, length, and hash function to the user. The user must then invert the hash function and return the correct solution to the server before the server will use resources to decrypt the handshake. If the client provides an incorrect answer to the hash inversion, the connection will be closed.
+Specifically, we implemented a hash inversion puzzle. When users attempt to log in (by sending a login request), the group server will reply with a hash inversion puzzle before any work by the server will be done. The group server will first generate a **secret 128-bit AES key using CBC mode**, and a **random puzzle answer of length 8 bits**. The group server will then compute the MD5 hash of the random puzzle answer to server as the puzzle. The server will encrypt the random puzzle answer with the secret key. The server will then transmit a message consisting of the puzzle, and the encrypted puzzle answer to the client. The user must then invert the hash function by brute force and return the correct solution to the server, along with the encrypted answer sent by the server. The server will decrypt the correct answer and verify the client's answer before using any resources to decrypt the handshake. If the client provides an incorrect answer to the hash inversion, the connection will be closed.
 
 ### Justification
-A hash inversion puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. We decided to use a hash inversion puzzle in particular as it is more mathematically difficult to solve than a simple question-and-response puzzle, and the server isn't required to save any state beyond the 16 bit puzzle answer. Puzzle state is offloaded to the user so that the server does not need to maintain vulnerable state in which it can be attacked while the user works on solving the puzzle. 
+A hash inversion puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. We decided to use a hash inversion puzzle in particular as it is more mathematically difficult to solve than a simple question-and-response puzzle. By sending the encypted puzzle answer that may only be decypted by the server's public key, the puzzle state is offloaded to the user. The group server does not need to maintain vulnerable state that can be attacked while the user works on solving the puzzle. 
 
 ![alt text](T8RateLimitingNew1.png)
 ![alt text](T8PuzzleDiagramLegitNew.png)
 
 ### Conclusion
-The principles of our file sharing system have been ease of use and coverage since the first phase of implementation. The countermeasures described for this threat provide coverage against data avaliability attacks. The counter measures are also minimally disruptive to legitimate users, which extends our theme of ease of use. 
+The principles of our file sharing system have been ease of use and coverage since the first phase of implementation. The countermeasures described for this threat provide coverage against denial-of-service attacks. The counter measures are also minimally disruptive to legitimate users, which extends our theme of ease of use. 
