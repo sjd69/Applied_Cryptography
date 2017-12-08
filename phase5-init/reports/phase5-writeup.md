@@ -26,7 +26,7 @@ Specifically, we implemented a hash inversion puzzle. When users attempt to log 
 ### Justification
 A hash inversion puzzle will limit the rate at which automated requests can be sent. This countermeasure can be used to mitigate this DoS attack becuase clients are assumed to have approximately similar computational ability, and the puzzles are efficiently generated on the server end. We decided to use a hash inversion puzzle in particular as it is more mathematically difficult to solve than a simple question-and-response puzzle, and the server isn't required to save any state beyond the 16 bit puzzle answer. Puzzle state is offloaded to the user so that the server does not need to maintain vulnerable state in which it can be attacked while the user works on solving the puzzle. 
 
-![alt text](T8RateLimitingNew.png)
+![alt text](T8RateLimitingNew1.png)
 ![alt text](T8PuzzleDiagramLegitNew.png)
 
 ### Conclusion
