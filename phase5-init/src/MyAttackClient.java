@@ -138,6 +138,7 @@ public class MyAttackClient {
                         } else {
                             System.out.println("Disconnecting...");
                         }
+                        groupClient.disconnect();
 
                     } catch (Exception e) {
                         e.printStackTrace(System.err);
@@ -192,7 +193,7 @@ public class MyAttackClient {
                         break;
 
                     case 2:
-                        myGroupClient.startMyGroupClient(gs_ip, gs_port, userToken, groupClient);
+                        myGroupClient.startMyGroupClient(gs_ip, gs_port, userToken, groupClient.getMessageNumber());
                         break;
                     
 			

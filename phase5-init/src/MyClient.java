@@ -113,13 +113,7 @@ public class MyClient {
                                 validated=true;
                             }
                         }
-                        if (validated) {
-				// - - - - Verify hash function before handshaking with the group server - - - -
-				// TODO: Get puzzle hash from the server. 
-				// byte[] puzzle =
-				byte[] puzzleAnswer = crypto.solvePuzzle(puzzle);
-				// TODO: Transmit puzzle to the server
-				
+                        if (validated && puzzle()) {
                         	// - - - - Handshake with group server - - - -
                             sessionKey = handshake(username, serverPublicKey, privateKey, gs_ip);
 
@@ -138,6 +132,7 @@ public class MyClient {
                         } else {
                             System.out.println("Disconnecting...");
                         }
+                        groupClient.disconnect();
 
                     } catch (Exception e) {
                         e.printStackTrace(System.err);
@@ -171,7 +166,7 @@ public class MyClient {
                         scanIn.next();
                     }
                     nav = scanIn.nextInt();
-                } while (!(nav > 0 && nav < 5));
+                } while (!(nav > 0 && nav <= 5));
 
                 switch(nav) {
                     case 1:
@@ -192,7 +187,7 @@ public class MyClient {
                         break;
 
                     case 2:
-                        myGroupClient.startMyGroupClient(gs_ip, gs_port, userToken, groupClient);
+                        myGroupClient.startMyGroupClient(gs_ip, gs_port, userToken, groupClient.getMessageNumber());
                         break;
                     
 			
@@ -275,6 +270,10 @@ public class MyClient {
             e.printStackTrace();
         }
 
+    }
+
+    private static boolean puzzle() {
+        return groupClient.solvePuzzle();
     }
 
     private static KeySet handshake(String username, PublicKey serverPublicKey, PrivateKey privateKey, String ip) {

@@ -34,6 +34,29 @@ public abstract class Client {
 		}
 	}
 
+	public boolean connect(final String server, final int port, final int messageNumber) {
+		System.out.println("attempting to connect");
+
+		try
+		{
+			// Connect to server
+			sock = new Socket(server, port);
+			System.out.println("Connected to " + server + " on port " + port);
+
+			// Set up I/O streams with the server
+			output = new ObjectOutputStream(sock.getOutputStream());
+			input = new ObjectInputStream(sock.getInputStream());
+			this.messageNumber = messageNumber;
+			return true;
+		}
+		catch(Exception e)
+		{
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace(System.err);
+			return false;
+		}
+	}
+
 	public boolean isConnected() {
 		if (sock == null || !sock.isConnected()) {
 			return false;
@@ -41,6 +64,10 @@ public abstract class Client {
 		else {
 			return true;
 		}
+	}
+
+	public int getMessageNumber() {
+		return messageNumber;
 	}
 
 	public void disconnect()	 {

@@ -14,6 +14,39 @@ public class GroupClient extends Client implements GroupClientInterface {
 	private KeySet sessionKeySet;
 	private SecretKey hmacKey;
 	private Crypto crypto = new Crypto();
+
+	public boolean solvePuzzle() {
+		Envelope message = null, response = null;
+
+		try {
+			message = new Envelope("PGET");
+			output.writeObject(message);
+			response = (Envelope) input.readObject();
+
+			byte[] puzzle = (byte[])response.getObjContents().get(0);
+			byte[] solvedPuzzle = crypto.solvePuzzle(puzzle);
+			byte[] encryptedPuzzleAnswer = (byte[])response.getObjContents().get(1);
+
+			message = new Envelope("PANSWER");
+			message.addObject(solvedPuzzle);
+			message.addObject(encryptedPuzzleAnswer);
+			output.writeObject(message);
+
+			response = (Envelope) input.readObject();
+
+			//Successful response
+			if(response.getMessage().equals("OK"))
+			{
+				return true;
+			}
+
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
 	public Envelope firstHandshake(String username, byte[] nonce, byte[] key, byte[] iv, byte[] hmacKey,
 								   ServerList serverList, String ip) {
 		try

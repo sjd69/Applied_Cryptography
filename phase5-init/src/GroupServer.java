@@ -18,6 +18,10 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
 
 public class GroupServer extends Server {
 
@@ -27,6 +31,7 @@ public class GroupServer extends Server {
 	public KeyChainList keychainList;
 	protected PrivateKey privateKey;
 	protected  PublicKey publicKey;
+	protected KeySet puzzleKeySet;
     
 	public GroupServer() {
 		super(SERVER_PORT, "ALPHA");
@@ -44,10 +49,12 @@ public class GroupServer extends Server {
 		String groupFile = "GroupList.bin";
 		String keyFile = "rsa.bin";
 		String keychainFile = "KeyChainList.bin";
+		String puzzleFile = "PuzzleKey.bin";
 		Scanner console = new Scanner(System.in);
 		ObjectInputStream userStream;
 		ObjectInputStream groupStream;
 		ObjectInputStream keyChainStream;
+		ObjectInputStream puzzleStream;
 		
 		//This runs a thread that saves the lists on program exit
 		Runtime runtime = Runtime.getRuntime();
@@ -78,6 +85,11 @@ public class GroupServer extends Server {
 			publicKey = keyPair.getPublic();
 			privateKey = keyPair.getPrivate();
 			keyStream.close();
+
+			FileInputStream pkfis = new FileInputStream(puzzleFile);
+			puzzleStream = new ObjectInputStream(pkfis);
+			puzzleKeySet = (KeySet)puzzleStream.readObject();
+			puzzleStream.close();
 
 		}
 		catch(FileNotFoundException e)
@@ -154,6 +166,12 @@ public class GroupServer extends Server {
 
 			//Generate server keypair
 			try {
+				puzzleKeySet = crypto.getKeySet();
+
+				outStream = new ObjectOutputStream(new FileOutputStream("PuzzleKey.bin"));
+				outStream.writeObject(puzzleKeySet);
+				outStream.close();
+
 				KeyPairGenerator rsaGenerator = KeyPairGenerator.getInstance("RSA", "BC");
 				rsaGenerator.initialize(2048);
 				KeyPair rsaKeys = rsaGenerator.generateKeyPair();
@@ -167,8 +185,8 @@ public class GroupServer extends Server {
 				System.out.println("Keys generated");
 
 			} catch(Exception ex) {
-				System.err.println("Error: " + e.getMessage());
-				e.printStackTrace(System.err);
+				System.err.println("Error: " + ex.getMessage());
+				ex.printStackTrace(System.err);
 			}
 			System.out.println("Server running.");
 		}
@@ -278,6 +296,10 @@ class AutoSave extends Thread
 					
 					outStream = new ObjectOutputStream(new FileOutputStream("KeyChainList.bin"));
 					outStream.writeObject(my_gs.keychainList);
+					outStream.close();
+
+					outStream = new ObjectOutputStream(new FileOutputStream("PuzzleKey.bin"));
+					outStream.writeObject(my_gs.puzzleKeySet);
 					outStream.close();
 				}
 				catch(Exception e)

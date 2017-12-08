@@ -5,7 +5,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.*;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Crypto {
@@ -164,8 +167,12 @@ public class Crypto {
 	// --------------------------------- HASH INVERSION PUZZLE -------------------------------------
 	// Generate Hash Puzzle Answer of 15 bytes -- for use by server
     public byte[] generatePuzzleAnswer() {
-        byte[] b = new byte[2];
-        new Random().nextBytes(b);
+        byte[] b = new byte[1];
+        try {
+            SecureRandom.getInstanceStrong().nextBytes(b);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         return b;
     }
 	
@@ -186,9 +193,9 @@ public class Crypto {
     
     // brute force check hash values to find match -- for use by client
     public byte[] solvePuzzle(byte[] hash) {
-        for (int i = 0; i < 32767; i++){
-            BigInteger bi = BigInteger.valueOf(i);
-            byte[] bytes = bi.toByteArray();
+        for (int i = 0; i < 256; i++){
+            byte[] bytes = new byte[1];
+            bytes[0] = (byte) i;
             byte[] testhash = get_MD5(bytes);
             if (verifyPuzzle(hash, testhash)){
                 return testhash;

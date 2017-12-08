@@ -10,13 +10,12 @@ import java.io.ObjectInputStream;
 
 public class MyGroupClient
 {
-	GroupClient groupclient;
+	GroupClient groupclient = new GroupClient();
 	UserToken utoken;
-	public boolean startMyGroupClient(String server, int port, UserToken token, GroupClient groupClient)
+	public boolean startMyGroupClient(String server, int port, UserToken token, int messageNumber)
 	{
 		boolean flag = true;
-		groupclient = groupClient;
-		boolean connected = groupclient.isConnected();
+		boolean connected = groupclient.connect(server, port);
 		utoken = token;
 		System.out.println("Using MyGroupClient - Connected to Group Server");
 		Scanner sc = new Scanner(System.in);
