@@ -114,6 +114,12 @@ public class MyClient {
                             }
                         }
                         if (validated) {
+				// - - - - Verify hash function before handshaking with the group server - - - -
+				// TODO: Get puzzle hash from the server. 
+				// byte[] puzzle =
+				byte[] puzzleAnswer = crypto.solvePuzzle(puzzle);
+				// TODO: Transmit puzzle to the server
+				
                         	// - - - - Handshake with group server - - - -
                             sessionKey = handshake(username, serverPublicKey, privateKey, gs_ip);
 
